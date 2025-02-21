@@ -31,11 +31,22 @@ const register = asyncHandler(async (req, res) => {
 
   await newUser.save();
 
+  const token = jwt.sign({ id: newUser._id }, SECRET_KEY, {
+    expiresIn: "1h",
+  });
+
   res.status(201).json({
     message: "User registered successfully!",
+    token,
+    user: {
+      id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      matricNumber: newUser.matricNumber,
+      department: newUser.department,
+      role: newUser.role,
+    },
   });
 });
-
-module.exports = { register };
 
 module.exports = { register };
