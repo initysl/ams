@@ -3,11 +3,10 @@
   "version": "1.0.0",
   "description": "AttendanceManagementSystem BackedServer",
   "main": "server.js",
- "scripts": {
-  "start": "node server",
-  "dev": "nodemon server"
-}
-,
+  "scripts": {
+    "start": "node server",
+    "dev": "nodemon server"
+  },
   "author": "Yusuf Lawal",
   "license": "ISC",
   "dependencies": {
@@ -17,6 +16,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-async-handler": "^1.2.0",
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.30.1",

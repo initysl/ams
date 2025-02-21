@@ -11,6 +11,15 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    matricNumber: {
+      type: String,
+      unique: true,
+      sparse: true, // Ensures only students have this field (lecturers can have null)
+    },
+    department: {
+      type: String,
+      required: true,
+    },
     password: {
       type: String,
       required: true,
@@ -19,15 +28,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: ["student", "lecturer"], // Roles can be expanded
-    },
-    matriculationNumber: {
-      type: String,
-      unique: true,
-      sparse: true, // Ensures only students have this field (lecturers can have null)
-    },
-    department: {
-      type: String,
-      required: true,
     },
     isVerified: {
       type: Boolean,

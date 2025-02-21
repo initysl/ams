@@ -2,20 +2,14 @@ const LectureSession = require("../models/LectureSession");
 
 exports.markAttendance = async (req, res) => {
   try {
-    const {
-      sessionId,
-      studentId,
-      name,
-      matriculationNumber,
-      courseCode,
-      level,
-    } = req.body;
+    const { sessionId, studentId, name, matricNumber, courseCode, level } =
+      req.body;
     await LectureSession.findByIdAndUpdate(sessionId, {
       $push: {
         attendanceRecords: {
           student: studentId,
           name,
-          matriculationNumber,
+          matricNumber,
           courseCode,
           level,
           status: "present",

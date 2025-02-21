@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const studentSchema = new mongoose.Schema(
   {
@@ -12,10 +12,10 @@ const studentSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    matriculationNumber: {
+    matricNumber: {
       type: String,
       required: true,
-      unique: true, 
+      unique: true,
     },
     department: {
       type: String,
@@ -27,8 +27,8 @@ const studentSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: 'student', // Default role for students
-      enum: ['student'], // Restrict the possible values for this field
+      default: "student", // Default role for students
+      enum: ["student"], // Restrict the possible values for this field
     },
     isVerified: {
       type: Boolean,
@@ -38,4 +38,4 @@ const studentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Student', studentSchema);
+module.exports = mongoose.model("Student", studentSchema);

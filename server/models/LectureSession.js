@@ -9,7 +9,7 @@ const attendanceRecordSchema = new mongoose.Schema(
       required: true,
     },
     name: { type: String, required: true },
-    matriculationNumber: { type: String, required: true },
+    matricNumber: { type: String, required: true },
     courseCode: { type: String, required: true },
     level: { type: String },
     status: {
