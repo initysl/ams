@@ -96,7 +96,8 @@ const verifyEmail = asyncHandler(async (req, res) => {
 
 // Logout
 const logout = asyncHandler(async (req, res) => {
-  // Remove or clearCookie
+  res.clearCookie("token");
+  res.status(200).json({ message: "User logged out successfully" });
 });
 
 module.exports = { register, login, verifyEmail, logout };
