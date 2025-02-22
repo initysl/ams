@@ -7,7 +7,9 @@ const {
 const router = express.Router();
 
 // Routes here
-router.put("/update-profile", updateUserProfile, authMiddleware);
-router.delete("/delete-profile", deleteUserProfile, authMiddleware);
+router
+  .route("/profile")
+  .put(authMiddleware, updateUserProfile)
+  .delete(authMiddleware, deleteUserProfile);
 
 module.exports = router;

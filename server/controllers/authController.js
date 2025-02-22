@@ -37,7 +37,7 @@ const register = asyncHandler(async (req, res) => {
   await newUser.save();
 
   const token = jwt.sign({ id: newUser._id }, SECRET_KEY, {
-    expiresIn: "1h",
+    expiresIn: "5d",
   });
 
   res.status(201).json({
