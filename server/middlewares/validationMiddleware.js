@@ -21,7 +21,7 @@ const validateRegistration = [
     .withMessage("Password must be at least 6 characters long"),
 ];
 
-// Login Validation Middleware (both student and lecturer)
+// Login Validation Middleware
 const validateLogin = [
   check("email").isEmail().withMessage("Invalid email address"),
 

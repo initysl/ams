@@ -2,9 +2,9 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const logger = require("../middlewares/log");
-const expressAsyncHandler = require("express-async-handler");
+const asyncHandler = require("express-async-handler");
 
-const updateUserProfile = expressAsyncHandler(async (req, res) => {
+const updateUserProfile = asyncHandler(async (req, res) => {
   const updates = { ...req.body };
 
   if (updates.password) {
@@ -28,25 +28,25 @@ const updateUserProfile = expressAsyncHandler(async (req, res) => {
       }),
     });
     logger.info(
-      `User updated: ${updatedUser.email}, ${updatedUser.matricNumber}`
+      `User profile updated: ${updatedUser.email}, ${updatedUser.matricNumber}`
     );
   } else {
     res.status(404);
-    throw new Error("User not found");
+    throw new Error("User profile not found");
   }
 });
 
-const deleteUserProfile = expressAsyncHandler(async (req, res) => {
+const deleteUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (!user) {
     res.status(404);
-    throw new Error("Account not found");
+    throw new Error("User profile not found");
   }
 
   await User.deleteOne({ _id: req.user._id });
-  logger.info(`User deleted: ${user.email}, ${user.matricNumber}`);
-  res.json({ message: "Account deleted successfully" });
+  logger.info(`User profile deleted: ${user.email}, ${user.matricNumber}`);
+  res.json({ message: "User profile deleted successfully" });
 });
 
 module.exports = {
