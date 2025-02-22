@@ -1,3 +1,4 @@
+require("dotenv").config();
 const nodemailer = require("nodemailer");
 
 const sendVerificationEmail = async (email, token) => {

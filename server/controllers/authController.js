@@ -6,6 +6,7 @@ const logger = require("../middlewares/log");
 const { validationResult } = require("express-validator");
 const SECRET_KEY = process.env.JWT_SECRET;
 const asyncHandler = require("express-async-handler");
+const sendVerificationEmail = require("../utils/verifyEmail");
 
 // Registration
 const register = asyncHandler(async (req, res) => {
@@ -37,12 +38,13 @@ const register = asyncHandler(async (req, res) => {
   await newUser.save();
 
   const token = jwt.sign({ id: newUser._id }, SECRET_KEY, {
-    expiresIn: "5d",
+    expiresIn: "1h",
   });
 
+  await sendVerificationEmail(newUser.email, token);
+
   res.status(201).json({
-    message: "User registered successfully!",
-    token,
+    message: "User registered successfully! Please verify your email",
   });
   logger.info(`User registered: ${newUser.email}, ${newUser.matricNumber}`);
 });
