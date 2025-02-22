@@ -94,7 +94,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
     .json({ message: "Email verfication successfully! Proceed to login" });
 });
 
-// Logout
+// Logout; Handle this in frontend using cookies
 const logout = asyncHandler(async (req, res) => {
   res.clearCookie("token");
   res.status(200).json({ message: "User logged out successfully" });
