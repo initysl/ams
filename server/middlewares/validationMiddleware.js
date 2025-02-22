@@ -1,6 +1,6 @@
 const { check } = require("express-validator");
 
-// Registration Validation Middleware
+// Registration Validation
 const validateRegistration = [
   check("name")
     .isLength({ min: 5 })
@@ -22,7 +22,7 @@ const validateRegistration = [
     .withMessage("Password must be at least 6 characters long"),
 ];
 
-// Login Validation Middleware
+// Login Validation
 const validateLogin = [
   check("email").isEmail().withMessage("Invalid email address"),
 
