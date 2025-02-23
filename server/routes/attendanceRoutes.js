@@ -1,8 +1,12 @@
 const express = require("express");
-const { markAttendance } = require("../controllers/attendanceController");
+const {
+  generateAttendanceQRCode,
+  markAttendance,
+} = require("../controllers/attendanceController");
 const router = express.Router();
 
 // Routes here
-router.post("/mark-attendance", markAttendance);
+router.post("/generate", generateAttendanceQRCode);
+router.post("/mark", markAttendance);
 
 module.exports = router;

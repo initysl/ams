@@ -15,7 +15,7 @@ connectDB();
 
 // Routes
 app.use("/api", lectureRoutes);
-app.use("/api", attendanceRoutes);
+app.use("/api/attendance", attendanceRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 // Server Start
