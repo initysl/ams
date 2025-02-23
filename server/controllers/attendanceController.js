@@ -1,8 +1,12 @@
+const mongoose = require("mongoose");
 const LectureSession = require("../models/LectureSession");
 const jwt = require("jsonwebtoken");
 const QRCode = require("qrcode");
 const moment = require("moment");
 const asyncHandler = require("express-async-handler");
+const logger = require("../middlewares/log");
+
+let qrGenerationCount = 0;
 
 // Generate Attendance QR Code
 const generateAttendanceQRCode = asyncHandler(async (req, res) => {
@@ -14,8 +18,6 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
         .status(400)
         .json({ error: "Session ID and expiry time are required" });
     }
-
-    // Set expiry time
     const expiryTime = moment().add(expiryMinutes, "minutes").toISOString();
 
     // Generate JWT token with session ID and expiry time
@@ -25,6 +27,13 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
 
     // Generate QR Code
     const qrCodeUrl = await QRCode.toDataURL(token);
+    qrGenerationCount++;
+
+    if (qrGenerationCount % 5 === 0) {
+      logger.info(
+        `QR Code generated for session: ${sessionId} expires at ${expiryTime}`
+      );
+    }
 
     res.status(200).json({ qrCodeUrl, expiryTime });
   } catch (error) {
@@ -36,23 +45,28 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
 // Mark Attendance
 const markAttendance = asyncHandler(async (req, res) => {
   try {
-    const { token } = req.body; // Student scans QR code and sends token
+    const { token } = req.body;
     if (!token) {
       return res.status(400).json({ error: "QR Code token is required" });
     }
 
     // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const { sessionId, expiryTime } = decoded;
+    let { sessionId, expiryTime } = decoded;
+
+    // Ensure sessionId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(sessionId)) {
+      return res.status(400).json({ error: "Invalid session ID format" });
+    }
+
+    sessionId = new mongoose.Types.ObjectId(sessionId); // Convert to ObjectId
 
     // Check if token is expired
     if (moment().isAfter(expiryTime)) {
-      return res.status(400).json({ error: "QR Code has expired" });
+      return res.status(400).json({ error: "Invalid QR Code " });
     }
 
     const { name, matricNumber, courseCode, level } = req.body;
-
-    // Validate required fields
     if (!name || !matricNumber || !courseCode || !level) {
       return res.status(400).json({ error: "All fields are required" });
     }
