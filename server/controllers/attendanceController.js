@@ -11,19 +11,34 @@ let qrGenerationCount = 0;
 // Generate Attendance QR Code
 const generateAttendanceQRCode = asyncHandler(async (req, res) => {
   try {
-    const { sessionId, expiryMinutes } = req.body;
+    const { courseCode, description, level, expiryMinutes } = req.body;
 
-    if (!sessionId || !expiryMinutes) {
-      return res
-        .status(400)
-        .json({ error: "Session ID and expiry time are required" });
+    if (!courseCode || !description || !expiryMinutes) {
+      return res.status(400).json({
+        error: "Course code, description, and expiry time are required",
+      });
     }
-    const expiryTime = moment().add(expiryMinutes, "minutes").toISOString();
 
-    // Generate JWT token with session ID and expiry time
-    const token = jwt.sign({ sessionId, expiryTime }, process.env.JWT_SECRET, {
-      expiresIn: expiryMinutes * 60, // Convert minutes to seconds
+    // Create a new lecture session
+    const lectureSession = new LectureSession({
+      courseCode,
+      description,
+      level,
+      sessionStart: new Date(),
+      sessionEnd: moment().add(expiryMinutes, "minutes").toDate(),
     });
+
+    await lectureSession.save();
+
+    const sessionId = lectureSession._id.toString();
+    const expiryTime = lectureSession.sessionEnd.toISOString();
+
+    // Generate JWT token with session ID
+    const token = jwt.sign(
+      { sessionId, courseCode, description, level, expiryTime },
+      process.env.JWT_SECRET,
+      { expiresIn: expiryMinutes * 60 } // Convert minutes to seconds
+    );
 
     // Generate QR Code
     const qrCodeUrl = await QRCode.toDataURL(token);
@@ -31,11 +46,11 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
 
     if (qrGenerationCount % 5 === 0) {
       logger.info(
-        `QR Code generated for session: ${sessionId} expires at ${expiryTime}`
+        `QR Code generated for session: ${sessionId}, expires at: ${expiryTime}`
       );
     }
 
-    res.status(200).json({ qrCodeUrl, expiryTime });
+    res.status(200).json({ qrCodeUrl, sessionId, expiryTime });
   } catch (error) {
     console.error("Error generating QR code:", error);
     res.status(500).json({ error: "Error generating QR code" });
@@ -46,30 +61,31 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
 const markAttendance = asyncHandler(async (req, res) => {
   try {
     const { token } = req.body;
+
     if (!token) {
       return res.status(400).json({ error: "QR Code token is required" });
     }
 
-    // Verify JWT token
+    // Verify JWT token from the QR code
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    let { sessionId, expiryTime } = decoded;
+    const { sessionId, expiryTime, courseCode, level } = decoded;
 
-    // Ensure sessionId is a valid ObjectId
+    // Validate sessionId
     if (!mongoose.Types.ObjectId.isValid(sessionId)) {
       return res.status(400).json({ error: "Invalid session ID format" });
     }
 
-    sessionId = new mongoose.Types.ObjectId(sessionId); // Convert to ObjectId
-
     // Check if token is expired
     if (moment().isAfter(expiryTime)) {
-      return res.status(400).json({ error: "Invalid QR Code " });
+      return res.status(400).json({ error: "QR Code has expired" });
     }
 
-    const { name, matricNumber, courseCode, level } = req.body;
-    if (!name || !matricNumber || !courseCode || !level) {
-      return res.status(400).json({ error: "All fields are required" });
+    const student = req.user;
+    if (!student) {
+      return res.status(401).json({ error: "Unauthorized user" });
     }
+
+    const { name, matricNumber } = student;
 
     // Find lecture session
     const lectureSession = await LectureSession.findById(sessionId);
@@ -88,6 +104,7 @@ const markAttendance = asyncHandler(async (req, res) => {
 
     // Add student to attendance list
     lectureSession.attendanceRecords.push({
+      student: student._id, // Store student ID for reference
       name,
       matricNumber,
       courseCode,
