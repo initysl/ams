@@ -4,6 +4,24 @@ const jwt = require("jsonwebtoken");
 const logger = require("../middlewares/log");
 const asyncHandler = require("express-async-handler");
 
+// Get User Profile
+const getUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (user) {
+    res.json({
+      _id: user._id,
+      name: user.name,
+      department: user.department,
+      matricNumber: user.matricNumber,
+      email: user.email,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User profile not found");
+  }
+});
+
+// Update User Profile
 const updateUserProfile = asyncHandler(async (req, res) => {
   const updates = { ...req.body };
 
@@ -36,6 +54,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
+// Delete User Profile
 const deleteUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
@@ -50,6 +69,7 @@ const deleteUserProfile = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+  getUserProfile,
   updateUserProfile,
   deleteUserProfile,
 };
