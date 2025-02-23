@@ -11,11 +11,19 @@ let qrGenerationCount = 0;
 // Generate Attendance QR Code
 const generateAttendanceQRCode = asyncHandler(async (req, res) => {
   try {
-    const { courseCode, description, level, expiryMinutes } = req.body;
+    if (!req.user) {
+      return res.status(401).json({ error: "Unauthorized. Please log in" });
+    }
+    if (req.user.role !== "lecturer") {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized. Only lecturers can generate QR codes" });
+    }
 
+    const { courseCode, description, level, expiryMinutes } = req.body;
     if (!courseCode || !description || !expiryMinutes) {
       return res.status(400).json({
-        error: "Course code, description, and expiry time are required",
+        error: "Course code, description, level, and expiry time are required",
       });
     }
 
