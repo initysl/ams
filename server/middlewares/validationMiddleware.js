@@ -11,7 +11,7 @@ const validateRegistration = [
   check("matricNumber")
     .matches(/^[A-Za-z0-9/]+$/)
     .isLength({ min: 10 })
-    .withMessage("Invalid matric number format"),
+    .optional(),
 
   check("department")
     .isLength({ min: 3 })
