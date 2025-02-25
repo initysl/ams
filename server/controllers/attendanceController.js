@@ -76,6 +76,8 @@ const markAttendance = asyncHandler(async (req, res) => {
 
     // Verify JWT token from the QR code
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded sessionId:", decoded.sessionId); // Debug purpose
+
     const { sessionId, expiryTime, courseCode, level } = decoded;
 
     // Validate sessionId
@@ -129,4 +131,44 @@ const markAttendance = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { generateAttendanceQRCode, markAttendance };
+// Generate Attedance Report
+const getAttendanceReport = asyncHandler(async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "Unauthorized. Please log in" });
+    }
+    if (req.user.role !== "lecturer") {
+      return res.status(401).json({
+        error: "Unauthorized. Only lecturers can generate attendance reports",
+      });
+    }
+    const { sessionId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(sessionId)) {
+      res.status(400).json({ error: "Invalid session ID format" });
+      console.log("Requested sessionId:", sessionId);
+    }
+    const lectureSession = await LectureSession.findById(sessionId);
+    if (!lectureSession) {
+      return res.status(404).json({ error: "Session not found" });
+    }
+    const { attendanceRecords } = lectureSession;
+    const report = attendanceRecords.map((record) => {
+      return {
+        name: record.name,
+        matricNumber: record.matricNumber,
+        courseCode: record.courseCode,
+        level: record.level,
+        status: record.status,
+      };
+    });
+    res.status(200).json({ report });
+  } catch (error) {
+    console.error("Error generating attendance report:", error);
+    res.status(500).json({ error: "Error generating attendance report" });
+  }
+});
+module.exports = {
+  generateAttendanceQRCode,
+  markAttendance,
+  getAttendanceReport,
+};
