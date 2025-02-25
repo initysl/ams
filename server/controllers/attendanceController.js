@@ -144,8 +144,8 @@ const getAttendanceReport = asyncHandler(async (req, res) => {
     }
     const { sessionId } = req.params;
     if (!mongoose.Types.ObjectId.isValid(sessionId)) {
-      res.status(400).json({ error: "Invalid session ID format" });
       console.log("Requested sessionId:", sessionId);
+      return res.status(400).json({ error: "Invalid session ID format" });
     }
     const lectureSession = await LectureSession.findById(sessionId);
     if (!lectureSession) {
@@ -161,7 +161,10 @@ const getAttendanceReport = asyncHandler(async (req, res) => {
         status: record.status,
       };
     });
-    res.status(200).json({ report });
+    logger.info(
+      `Attendance report generated for lecture session: ${sessionId}`
+    );
+    return res.status(200).json({ report });
   } catch (error) {
     console.error("Error generating attendance report:", error);
     res.status(500).json({ error: "Error generating attendance report" });
