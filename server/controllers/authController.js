@@ -8,6 +8,8 @@ const SECRET_KEY = process.env.JWT_SECRET;
 const asyncHandler = require("express-async-handler");
 const sendVerificationEmail = require("../utils/verifyEmail");
 
+// Ensure you store jwt using cookies here
+
 // Registration
 const register = asyncHandler(async (req, res) => {
   const errors = validationResult(req);

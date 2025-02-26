@@ -14,7 +14,6 @@ const {
 const router = express.Router();
 
 // Ensure to remove uneccessary authMiddleware
-
 router.post("/register", validateRegistration, register);
 router.post("/login", validateLogin, login);
 router.get("/verify-email", verifyEmail);
