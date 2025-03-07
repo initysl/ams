@@ -3,6 +3,7 @@ node_modules/
 *.log
 .env
 
+/middlewares/playground-1.mongodb.js
 
 dist/
 build/
