@@ -65,7 +65,7 @@ const login = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "User does not exist" });
   }
 
-  // Check if user is locked out
+  // Check if account is locked
   if (user.lockUntil && user.lockUntil > Date.now()) {
     return res.status(429).json({
       message: "Too many failed attempts. Please try again later.",
@@ -79,18 +79,13 @@ const login = asyncHandler(async (req, res) => {
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
-
   if (!isMatch) {
-    user.loginAttempts += 1;
+    user.loginAttempts = (user.loginAttempts || 0) + 1;
 
     // Lock account after 5 failed attempts
     if (user.loginAttempts >= 5) {
       user.lockUntil = Date.now() + 10 * 60 * 1000; // Lock for 10 minutes
-      await user.save();
       logger.warn(`User locked out: ${user.email}`);
-      return res.status(429).json({
-        message: "Too many failed attempts.Try again in ten minutes.",
-      });
     }
 
     await user.save();
@@ -98,20 +93,16 @@ const login = asyncHandler(async (req, res) => {
   }
 
   // Reset failed attempts on successful login
-  user.loginAttempts = 0;
-  user.lockUntil = undefined;
+  Object.assign(user, { loginAttempts: 0, lockUntil: undefined });
   await user.save();
 
-  const token = jwt.sign({ id: user._id }, SECRET_KEY, {
-    expiresIn: "5d",
-  });
+  const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "5d" });
 
-  // Store token in cookie
   res.cookie("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 5 * 24 * 60 * 60 * 1000, // Stay logged in for 5 days
+    maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
   });
 
   res.status(200).json({
