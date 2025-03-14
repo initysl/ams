@@ -150,7 +150,9 @@ const logout = asyncHandler(async (req, res) => {
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
   });
-  res.status(200).json({ message: "User logged out successfully" });
+  res
+    .status(200)
+    .json({ message: `User logged out successfully: ${req.user.email}` });
   logger.info(`User logged out: ${req.user.email}`);
 });
 
