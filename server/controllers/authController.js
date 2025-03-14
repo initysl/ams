@@ -57,11 +57,19 @@ const login = asyncHandler(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ message: errors.array() });
   }
-  const { email, password } = req.body;
 
+  const { email, password } = req.body;
   const user = await User.findOne({ email });
+
   if (!user) {
     return res.status(400).json({ message: "User does not exist" });
+  }
+
+  // Check if user is locked out
+  if (user.lockUntil && user.lockUntil > Date.now()) {
+    return res.status(429).json({
+      message: "Too many failed attempts. Please try again later.",
+    });
   }
 
   if (!user.isVerified) {
@@ -69,13 +77,35 @@ const login = asyncHandler(async (req, res) => {
       message: "Please verify your email before logging in.",
     });
   }
+
   const isMatch = await bcrypt.compare(password, user.password);
+
   if (!isMatch) {
+    user.loginAttempts += 1;
+
+    // Lock account after 3 failed attempts
+    if (user.loginAttempts >= 3) {
+      user.lockUntil = Date.now() + 15 * 60 * 1000; // Lock for 15 minutes
+      await user.save();
+      logger.warn(`User locked out: ${user.email}`);
+      return res.status(429).json({
+        message: "Too many failed attempts. Account locked for 15 minutes.",
+      });
+    }
+
+    await user.save();
     return res.status(400).json({ message: "Invalid credentials" });
   }
+
+  // Reset failed attempts on successful login
+  user.loginAttempts = 0;
+  user.lockUntil = undefined;
+  await user.save();
+
   const token = jwt.sign({ id: user._id }, SECRET_KEY, {
     expiresIn: "5d",
   });
+
   res.status(200).json({
     message: "User logged in successfully",
     token,
@@ -84,6 +114,7 @@ const login = asyncHandler(async (req, res) => {
       matricNumber: user.matricNumber,
     },
   });
+
   logger.info(`User logged in: ${user.email}`);
 });
 

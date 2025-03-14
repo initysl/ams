@@ -5,7 +5,10 @@ const {
   verifyEmail,
   logout,
 } = require("../controllers/authController");
-const authMiddleware = require("../middlewares/authMiddleware");
+const {
+  authMiddleware,
+  loginLimiter,
+} = require("../middlewares/authMiddleware");
 const {
   validateRegistration,
   validateLogin,
@@ -15,7 +18,7 @@ const router = express.Router();
 
 // Ensure to remove uneccessary authMiddleware
 router.post("/register", validateRegistration, register);
-router.post("/login", validateLogin, login);
+router.post("/login", validateLogin, loginLimiter, login);
 router.get("/verify-email", verifyEmail);
 router.post("/logout", authMiddleware, logout);
 

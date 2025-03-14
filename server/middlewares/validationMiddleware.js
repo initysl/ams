@@ -31,7 +31,12 @@ const validateLogin = [
     .withMessage("Password must be at least 6 characters long"),
 ];
 
+const validateSessionId = [
+  check("sessionId").isMongoId().withMessage("Invalid session id"),
+];
+
 module.exports = {
   validateRegistration,
   validateLogin,
+  validateSessionId,
 };
