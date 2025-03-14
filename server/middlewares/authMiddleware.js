@@ -27,7 +27,7 @@ const loginLimiter = rateLimit({
     return req.headers["x-forwarded-for"] || req.ip; // Works with proxies
   },
   message: {
-    message: "Too many login attempts, please try again after 15 minutes",
+    message: "Too many login attecmpts, please try again after 15 minutes",
   },
   handler: (req, res) => {
     logger.warn(`🚨 Too many login attempts from IP: ${req.ip}`);
