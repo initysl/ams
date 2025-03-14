@@ -106,9 +106,16 @@ const login = asyncHandler(async (req, res) => {
     expiresIn: "5d",
   });
 
+  // Store token in cookie
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
+  });
+
   res.status(200).json({
     message: "User logged in successfully",
-    token,
     user: {
       name: user.name,
       matricNumber: user.matricNumber,
@@ -137,8 +144,14 @@ const verifyEmail = asyncHandler(async (req, res) => {
 
 // Logout; Handle this in frontend using cookies
 const logout = asyncHandler(async (req, res) => {
-  res.clearCookie("token");
+  res.cookie("token", "", {
+    httpOnly: true,
+    expires: new Date(0),
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
   res.status(200).json({ message: "User logged out successfully" });
+  logger.info(`User logged out: ${req.user.email}`);
 });
 
 module.exports = { register, login, verifyEmail, logout };
