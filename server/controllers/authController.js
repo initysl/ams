@@ -83,13 +83,13 @@ const login = asyncHandler(async (req, res) => {
   if (!isMatch) {
     user.loginAttempts += 1;
 
-    // Lock account after 3 failed attempts
-    if (user.loginAttempts >= 3) {
-      user.lockUntil = Date.now() + 15 * 60 * 1000; // Lock for 15 minutes
+    // Lock account after 5 failed attempts
+    if (user.loginAttempts >= 5) {
+      user.lockUntil = Date.now() + 10 * 60 * 1000; // Lock for 10 minutes
       await user.save();
       logger.warn(`User locked out: ${user.email}`);
       return res.status(429).json({
-        message: "Too many failed attempts. Account locked for 15 minutes.",
+        message: "Too many failed attempts.Try again in ten minutes.",
       });
     }
 
@@ -111,7 +111,7 @@ const login = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
+    maxAge: 5 * 24 * 60 * 60 * 1000, // Stay logged in for 5 days
   });
 
   res.status(200).json({
