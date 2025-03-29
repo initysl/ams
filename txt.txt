@@ -1,2 +1,2 @@
 Ensure to remove all console.log
-After email update, verify the new email address
+After email update, verify the new email address... Working.......
