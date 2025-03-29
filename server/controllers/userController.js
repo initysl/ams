@@ -34,42 +34,51 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: errors.array() });
   }
 
-  const updates = { ...req.body };
-
-  if (updates.email) {
-    const user = await User.findById(req.user._id);
-    if (user.email !== updates.email) {
-      updates.isEmailVerified = false; // Mark email as unverified
-
-      const token = jwt.sign({ id: newUser._id }, SECRET_KEY, {
-        expiresIn: "1h",
-      });
-      await sendVerificationEmail(updates.email, token);
-      logger.info(
-        `User email updated: ${user.email} to ${updates.email}, ${user.matricNumber}`
-      );
-    }
+  const user = await User.findById(req.user._id).select("+password");
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
   }
 
-  if (updates.password) {
-    const user = await User.findById(req.user._id).select("+password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+  const updates = { ...req.body };
+
+  // Handle Email Update
+  if (updates.email && updates.email !== user.email) {
+    // Check if the new email already exists in the database
+    const emailExists = await User.findOne({ email: updates.email });
+    if (emailExists) {
+      return res.status(400).json({ message: "Email is already in use" });
     }
 
+    updates.isEmailVerified = false; // Mark email as unverified
+
+    // Generate email verification token
+    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    await sendVerificationEmail(updates.email, token);
+    logger.info(
+      `User email updated: ${user.email} to ${updates.email}, ${user.matricNumber}`
+    );
+  }
+
+  // Handle Password Update
+  if (updates.password) {
     const isSamePassword = await bcrypt.compare(
       updates.password,
       user.password
     );
     if (isSamePassword) {
-      return res.status(400).json({
-        message: "New password cannot be the same as the old password",
-      });
+      return res
+        .status(400)
+        .json({
+          message: "New password cannot be the same as the old password",
+        });
     }
-
     updates.password = await bcrypt.hash(updates.password, 10);
   }
 
+  // Update User
   const updatedUser = await User.findByIdAndUpdate(req.user._id, updates, {
     new: true,
     runValidators: true,
