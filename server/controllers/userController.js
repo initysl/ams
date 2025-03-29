@@ -2,10 +2,15 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const logger = require("../middlewares/log");
+const { validationResult } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 
 // Get User Profile
 const getUserProfile = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array() });
+  }
   const user = await User.findById(req.user._id);
   if (user) {
     res.json({
@@ -23,6 +28,10 @@ const getUserProfile = asyncHandler(async (req, res) => {
 
 // Update User Profile
 const updateUserProfile = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array() });
+  }
   const updates = { ...req.body };
 
   if (updates.password) {
@@ -56,6 +65,10 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 
 // Delete User Profile
 const deleteUserProfile = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array() });
+  }
   const user = await User.findById(req.user._id);
 
   if (!user) {

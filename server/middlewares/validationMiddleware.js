@@ -3,29 +3,25 @@ const { check } = require("express-validator");
 // Registration Validation
 const validateRegistration = [
   check("name")
-    //trim()
-    // .customSanitizer((value) => value.replace(/\s+/g, ""))
+    .customSanitizer((value) => value.trim().replace(/\s+/g, ""))
     .isLength({ min: 5 })
     .withMessage("Name must be at least 5 characters long"),
 
-  check("email").isEmail().withMessage("Invalid email address"),
+  check("email").trim().isEmail().withMessage("Invalid email address"),
 
   check("matricNumber")
-    //trim()
-    .customSanitizer((value) => value.replace(/\s+/g, ""))
+    .customSanitizer((value) => value.trim().replace(/\s+/g, ""))
     .matches(/^[A-Za-z0-9/]+$/)
     .isLength({ min: 10 })
     .optional(),
 
   check("department")
-    //trim()
-    .customSanitizer((value) => value.replace(/\s+/g, ""))
+    .customSanitizer((value) => value.trim().replace(/\s+/g, ""))
     .isLength({ min: 3 })
     .withMessage("Department must be at least 3 characters long"),
 
   check("password")
-    //trim()
-    .customSanitizer((value) => value.replace(/\s+/g, ""))
+    .customSanitizer((value) => value.trim().replace(/\s+/g, ""))
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
 ];
@@ -50,8 +46,44 @@ const validateSessionId = [
     .withMessage("Invalid session ID"),
 ];
 
+// Profile Update Validation
+const validateProfileUpdate = [
+  check("name")
+    .optional()
+    .customSanitizer((value) => value.trim().replace(/\s+/g, ""))
+    .isLength({ min: 5 })
+    .withMessage("Name must be at least 5 characters long"),
+
+  check("email")
+    .optional()
+    .trim()
+    .isEmail()
+    .withMessage("Invalid email address"),
+
+  check("matricNumber")
+    .optional()
+    .customSanitizer((value) => value.trim().replace(/\s+/g, ""))
+    .matches(/^[A-Za-z0-9/]+$/)
+    .isLength({ min: 10 })
+    .withMessage("Matric number must be at least 10 characters long"),
+
+  check("department")
+    .optional()
+    .customSanitizer((value) => value.trim().replace(/\s+/g, ""))
+    .isLength({ min: 3 })
+    .withMessage("Department must be at least 3 characters long"),
+
+  check("password")
+    .optional()
+    //trim()
+    .customSanitizer((value) => value.replace(/\s+/g, ""))
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+];
+
 module.exports = {
   validateRegistration,
   validateLogin,
   validateSessionId,
+  validateProfileUpdate,
 };

@@ -22,7 +22,7 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
 
 const loginLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 3, // Limit to 3 attempts per IP
+  max: 5, // Limit to 3 attempts per IP
   keyGenerator: (req) => {
     return req.headers["x-forwarded-for"] || req.ip; // Works with proxies
   },
