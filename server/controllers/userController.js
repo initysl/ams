@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const logger = require("../middlewares/log");
 const { validationResult } = require("express-validator");
 const asyncHandler = require("express-async-handler");
+const sendVerificationEmail = require("../utils/verifyEmail");
 
 // Get User Profile
 const getUserProfile = asyncHandler(async (req, res) => {
@@ -35,6 +36,21 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 
   const updates = { ...req.body };
 
+  if (updates.email) {
+    const user = await User.findById(req.user._id);
+    if (user.email !== updates.email) {
+      updates.isEmailVerified = false; // Mark email as unverified
+
+      const token = jwt.sign({ id: newUser._id }, SECRET_KEY, {
+        expiresIn: "1h",
+      });
+      await sendVerificationEmail(updates.email, token);
+      logger.info(
+        `User email updated: ${user.email} to ${updates.email}, ${user.matricNumber}`
+      );
+    }
+  }
+
   if (updates.password) {
     const user = await User.findById(req.user._id).select("+password");
     if (!user) {
@@ -46,11 +62,9 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       user.password
     );
     if (isSamePassword) {
-      return res
-        .status(400)
-        .json({
-          message: "New password cannot be the same as the old password",
-        });
+      return res.status(400).json({
+        message: "New password cannot be the same as the old password",
+      });
     }
 
     updates.password = await bcrypt.hash(updates.password, 10);
