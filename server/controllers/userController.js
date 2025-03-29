@@ -32,9 +32,27 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ message: errors.array() });
   }
+
   const updates = { ...req.body };
 
   if (updates.password) {
+    const user = await User.findById(req.user._id).select("+password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isSamePassword = await bcrypt.compare(
+      updates.password,
+      user.password
+    );
+    if (isSamePassword) {
+      return res
+        .status(400)
+        .json({
+          message: "New password cannot be the same as the old password",
+        });
+    }
+
     updates.password = await bcrypt.hash(updates.password, 10);
   }
 
@@ -54,12 +72,12 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         expiresIn: "5d",
       }),
     });
+
     logger.info(
       `User profile updated: ${updatedUser.email}, ${updatedUser.matricNumber}`
     );
   } else {
-    res.status(404);
-    throw new Error("User profile not found");
+    return res.status(404).json({ message: "User profile not found" });
   }
 });
 
