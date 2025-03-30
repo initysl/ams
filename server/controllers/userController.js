@@ -40,29 +40,9 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   }
 
   const updates = { ...req.body };
+  let isEmailUpdated = false;
 
-  // Handle Email Update
-  if (updates.email && updates.email !== user.email) {
-    // Check if the new email already exists in the database
-    const emailExists = await User.findOne({ email: updates.email });
-    if (emailExists) {
-      return res.status(400).json({ message: "Email is already in use" });
-    }
-
-    updates.isEmailVerified = false; // Mark email as unverified
-
-    // Generate email verification token
-    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-
-    await sendVerificationEmail(updates.email, token);
-    logger.info(
-      `User email updated: ${user.email} to ${updates.email}, ${user.matricNumber}`
-    );
-  }
-
-  // Handle Password Update
+  // Validate Password Change
   if (updates.password) {
     const isSamePassword = await bcrypt.compare(
       updates.password,
@@ -78,7 +58,42 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     updates.password = await bcrypt.hash(updates.password, 10);
   }
 
-  // Update User
+  // Validate Email Change
+  if (updates.email && updates.email !== user.email) {
+    const emailExists = await User.findOne({ email: updates.email });
+    if (emailExists) {
+      return res.status(400).json({ message: "Email is already in use" });
+    }
+
+    // Temporarily store email until verification is done
+    updates.pendingEmail = updates.email;
+    updates.isVerified = false; // Mark email as unverified
+    isEmailUpdated = true;
+
+    // Generate email verification token
+    const token = jwt.sign(
+      { id: req.user._id, newEmail: updates.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    await sendVerificationEmail(updates.email, token);
+    logger.info(
+      `Verification email sent to ${updates.email} for ${user.matricNumber}`
+    );
+
+    delete updates.email; // Prevent direct email update before verification
+  }
+
+  // If email is updated, stop further execution and request verification first
+  if (isEmailUpdated) {
+    return res.json({
+      message:
+        "Verification email sent. Please verify before changes take effect.",
+    });
+  }
+
+  // Update User Profile
   const updatedUser = await User.findByIdAndUpdate(req.user._id, updates, {
     new: true,
     runValidators: true,
@@ -91,9 +106,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       department: updatedUser.department,
       matricNumber: updatedUser.matricNumber,
       email: updatedUser.email,
-      token: jwt.sign({ id: updatedUser._id }, process.env.JWT_SECRET, {
-        expiresIn: "5d",
-      }),
+      isVerified: updatedUser.isVerified,
     });
 
     logger.info(

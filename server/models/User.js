@@ -33,6 +33,9 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    pendingEmail: {
+      type: String,
+    },
     loginAttempts: {
       type: Number,
       default: 0,
