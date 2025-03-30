@@ -126,6 +126,8 @@ const verifyEmail = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Invalid verification link." });
   }
   // Update user's verification status
+  user.email = user.pendingEmail;
+  user.pendingEmail = undefined;
   user.isVerified = true;
   await user.save();
   res
