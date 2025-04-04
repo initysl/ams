@@ -2,3 +2,4 @@ Ensure to remove all console.log
 After email update, verify the new email address... Working.......
 Add a password pattern, user can't use symbols or special characters for pass
 Add profile picture
+Add conform password 
