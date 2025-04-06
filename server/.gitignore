@@ -7,7 +7,7 @@ node_modules/
 
 dist/
 build/
-
+uploads/
 # Ignore temporary files
 *.tmp
 *.swp
