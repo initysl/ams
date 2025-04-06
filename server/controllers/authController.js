@@ -7,7 +7,7 @@ const { validationResult } = require("express-validator");
 const SECRET_KEY = process.env.JWT_SECRET;
 const asyncHandler = require("express-async-handler");
 const sendVerificationEmail = require("../utils/verifyEmail");
-
+const upload = require("../utils/multerConfig");
 // Ensure you store jwt using cookies here
 
 // Registration
@@ -16,7 +16,8 @@ const register = asyncHandler(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ message: errors.array() });
   }
-  const { name, email, matricNumber, password, department } = req.body;
+  const { name, email, matricNumber, department, profilePicture, password } =
+    req.body;
 
   const existingUser = await User.findOne({
     $or: [{ email }, { matricNumber }],
@@ -33,6 +34,7 @@ const register = asyncHandler(async (req, res) => {
     email,
     matricNumber,
     department,
+    profilePicture,
     password: hashedPassword,
     role: matricNumber ? "student" : "lecturer",
   });
@@ -110,6 +112,7 @@ const login = asyncHandler(async (req, res) => {
     user: {
       name: user.name,
       matricNumber: user.matricNumber,
+      profilePic: user.profilePicture,
     },
   });
 
