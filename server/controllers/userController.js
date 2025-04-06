@@ -17,9 +17,10 @@ const getUserProfile = asyncHandler(async (req, res) => {
     res.json({
       _id: user._id,
       name: user.name,
+      email: user.email,
       matricNumber: user.matricNumber,
       department: user.department,
-      email: user.email,
+      profilePic: user.profilePicture,
     });
   } else {
     res.status(404);
@@ -49,13 +50,17 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       user.password
     );
     if (isSamePassword) {
-      return res
-        .status(400)
-        .json({
-          message: "New password cannot be the same as the old password",
-        });
+      return res.status(400).json({
+        message: "New password cannot be the same as the old password",
+      });
     }
     updates.password = await bcrypt.hash(updates.password, 10);
+  }
+  // Handle Profile Picture Upload
+  if (req.file) {
+    updates.profilePicture = "./uploads/${req.file.filename}";
+  } else if (!user.profilePicture) {
+    updates.profilePicture = "./public/images/default.png";
   }
 
   // Validate Email Change
@@ -106,6 +111,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       department: updatedUser.department,
       matricNumber: updatedUser.matricNumber,
       email: updatedUser.email,
+      profilePicture: updatedUser.profilePicture,
       isVerified: updatedUser.isVerified,
     });
 

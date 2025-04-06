@@ -8,17 +8,23 @@ const {
 const {
   validateProfileUpdate,
 } = require("../middlewares/validationMiddleware");
-const { validate } = require("../models/User");
+const upload = require("../utils/upload");
+
 const router = express.Router();
 
-// Routes here
+// GET user profile
 router.get("/profile/me", authMiddleware, getUserProfile);
+
+// PUT update profile with upload and validation
 router.put(
   "/profile/update",
   authMiddleware,
+  upload.single("profilePicture"),
   validateProfileUpdate,
   updateUserProfile
 );
+
+// DELETE user profile
 router.delete("/profile/delete", authMiddleware, deleteUserProfile);
 
 module.exports = router;

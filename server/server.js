@@ -47,6 +47,7 @@ app.use("/api", lectureRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+// app.use("./uploads", express.static("uploads"));
 
 // Server Start
 const PORT = process.env.PORT || 5060;
