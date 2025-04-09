@@ -8,7 +8,7 @@ const {
 const {
   validateProfileUpdate,
 } = require("../middlewares/validationMiddleware");
-const upload = require("../utils/upload");
+const upload = require("../utils/multerConfig");
 
 const router = express.Router();
 
