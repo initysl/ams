@@ -1,4 +1,4 @@
-const { check } = require("express-validator");
+const { check, body } = require("express-validator");
 
 // Registration Validation
 const validateRegistration = [
@@ -26,6 +26,13 @@ const validateRegistration = [
     .withMessage("Password can only contain letters and numbers")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
+
+  check("confirmPassword").custom((value, { req }) => {
+    if (value !== req.body.password) {
+      throw new Error("Passwords do not match");
+    }
+    return true;
+  }),
 ];
 
 // Login Validation
