@@ -58,9 +58,9 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   }
   // Handle Profile Picture Upload
   if (req.file) {
-    updates.profilePicture = "./uploads/${req.file.filename}";
+    updates.profilePicture = "../uploads/${req.file.filename}";
   } else if (!user.profilePicture) {
-    updates.profilePicture = "./public/images/default.png";
+    updates.profilePicture = "../public/images/default.png";
   }
 
   // Validate Email Change

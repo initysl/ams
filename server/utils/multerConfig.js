@@ -1,9 +1,19 @@
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
+
+// Define the upload path
+const uploadPath = path.join(__dirname, "..", "uploads");
+
+// Ensure the upload directory exists
+// If the directory doesn't exist, create it
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true }); // recursive in case parent folders are missing
+}
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./uploads");
+    cb(null, uploadPath); // use the resolved path
   },
   filename: (req, file, cb) => {
     const uniqueName = `${Date.now()}-${file.originalname}`;
@@ -11,7 +21,7 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter to allow only specific file types
+// File filter to allow only specific image types
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|gif/;
   const extname = allowedTypes.test(
@@ -23,13 +33,13 @@ const fileFilter = (req, file, cb) => {
     return cb(null, true);
   }
   cb(
-    "Error: File upload only supports the following filetypes - " + allowedTypes
+    "Error: File upload only supports the following filetypes - jpeg, jpg, png, gif"
   );
 };
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 1024 * 1024 * 5 }, // Limit file size to 5MB
+  limits: { fileSize: 1024 * 1024 * 2 }, // 2MB max
   fileFilter: fileFilter,
 });
 
