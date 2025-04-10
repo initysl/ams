@@ -1,4 +1,8 @@
 Ensure to remove all console.log
+# NODE_ENV = production
+
+
+
 After email update, verify the new email address... Working....... Done
 Add a password pattern, user can't use symbols or special characters for pass ...Done
 Add profile picture... Done
