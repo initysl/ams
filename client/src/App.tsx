@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
+import SplashScreen from "./features/splash/SplashScreen";
 
 function App() {
   return (
     <div className="flex flex-col items-center justify-center min-h-svh">
-      <Button className="bg-red-500 text-white">Click me</Button>
+      <SplashScreen />
     </div>
   );
 }
