@@ -1,4 +1,4 @@
-import SplashScreen from "./features/splash/SplashScreen";
+import SplashScreen from "./pages/splash/SplashScreen";
 
 function App() {
   return (
