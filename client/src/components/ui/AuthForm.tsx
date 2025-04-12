@@ -63,21 +63,31 @@ const AuthForm: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 flex justify-center items-center">
-      <div className="bg-slate-200 p-6 rounded-lg shadow-lg max-w-3xl relative">
-        <h2 className="text-xl font-bold mb-4">
+    <div className="flex justify-center items-center w-auto m-1">
+      <div className="bg-gradient-to-bl from-green-400 to-stone-400 p-5 rounded-2xl shadow-xl ">
+        <div className="flex flex-col space-y-3 items-center justify-center mb-10 text-pretty text-center">
+          <h1 className="text-3xl font-bold text-white">
+            Welcome to AttenEase
+          </h1>
+          <p className="text-white">
+            Login or sign up below to manage your attendance activities{" "}
+          </p>
+        </div>
+        <h2 className="text-2xl font-bold mb-4 text-white">
           {isSignIn ? "Sign In" : "Register"}
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {isSignIn ? (
             <>
               <div>
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email" className="text-xl text-white">
+                  Email
+                </label>
                 <input
                   id="email"
                   autoComplete="email"
                   {...register("email")}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border-none rounded-md bg-white p-3"
                   placeholder="Enter your email address"
                 />
                 {loginErrors.email && (
@@ -85,29 +95,40 @@ const AuthForm: React.FC = () => {
                 )}
               </div>
               <div>
-                <label htmlFor="password">Password</label>
+                <label htmlFor="password" className="text-xl text-white">
+                  Password
+                </label>
                 <input
                   id="password"
                   type="password"
                   autoComplete="current-password"
                   {...register("password")}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full order-none rounded-md bg-white p-3"
                   placeholder="Password"
                 />
                 {loginErrors.password && (
                   <p className="text-red-500">{loginErrors.password.message}</p>
                 )}
               </div>
+
+              <div className="space-x-2 flex">
+                <input type="checkbox" name="remember-me" id="remember-me" />
+                <label htmlFor="remember-me" className="text-gray text-sm">
+                  Remember me
+                </label>
+              </div>
             </>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <label htmlFor="name">Name</label>
+            <div className="grid grid-cols-2 gap-5">
+              <div className="col-span-1">
+                <label htmlFor="name" className="text-xl text-white">
+                  Name
+                </label>
                 <input
                   id="name"
                   autoComplete="name"
                   {...register("name")}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border-none rounded-md bg-white p-3"
                   placeholder="Full name"
                 />
                 {registerErrors.name && (
@@ -115,12 +136,14 @@ const AuthForm: React.FC = () => {
                 )}
               </div>
               <div>
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email" className="text-xl text-white">
+                  Email
+                </label>
                 <input
                   id="email"
                   autoComplete="email"
                   {...register("email")}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border-none rounded-md bg-white p-3"
                   placeholder="Email"
                 />
                 {registerErrors.email && (
@@ -128,12 +151,14 @@ const AuthForm: React.FC = () => {
                 )}
               </div>
               <div>
-                <label htmlFor="department">Department</label>
+                <label htmlFor="department" className="text-white">
+                  Department
+                </label>
                 <input
                   id="department"
                   autoComplete="organization"
                   {...register("department")}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border-none rounded-md bg-white p-3"
                   placeholder="Department"
                 />
                 {registerErrors.department && (
@@ -143,12 +168,14 @@ const AuthForm: React.FC = () => {
                 )}
               </div>
               <div>
-                <label htmlFor="matricNo">Matric No</label>
+                <label htmlFor="matricNo" className="text-white">
+                  Matric No
+                </label>
                 <input
                   id="matricNo"
                   autoComplete="username"
                   {...register("matricNo")}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border-none rounded-md bg-white p-3"
                   placeholder="Matric No"
                 />
                 {registerErrors.matricNo && (
@@ -158,13 +185,15 @@ const AuthForm: React.FC = () => {
                 )}
               </div>
               <div>
-                <label htmlFor="password">Password</label>
+                <label htmlFor="password" className="text-white">
+                  Password
+                </label>
                 <input
                   id="password"
                   type="password"
                   autoComplete="new-password"
                   {...register("password")}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border-none rounded-md bg-white p-3"
                   placeholder="Password"
                 />
                 {registerErrors.password && (
@@ -174,13 +203,15 @@ const AuthForm: React.FC = () => {
                 )}
               </div>
               <div>
-                <label htmlFor="confirmPassword">Confirm Password</label>
+                <label htmlFor="confirmPassword" className="text-white">
+                  Confirm Password
+                </label>
                 <input
                   id="confirmPassword"
                   type="password"
                   autoComplete="off"
                   {...register("confirmPassword")}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border-none rounded-md bg-white p-3"
                   placeholder="Confirm Password"
                 />
                 {registerErrors.confirmPassword && (
@@ -192,33 +223,27 @@ const AuthForm: React.FC = () => {
             </div>
           )}
 
-          <div className="flex justify-between items-center mt-4">
-            <Button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded"
-            >
-              {isSubmitting
-                ? "Please wait..."
-                : isSignIn
-                ? "Sign In"
-                : "Register"}
-            </Button>
-
+          <div className="flex flex-col justify-between items-center space-y-5 mt-10">
+            <div>
+              <Button type="submit" className="bg-stone-600 text-white ">
+                {isSubmitting
+                  ? "Please wait..."
+                  : isSignIn
+                  ? "Sign In"
+                  : "Register"}
+              </Button>
+            </div>
             <button
               onClick={() => setIsSignIn(!isSignIn)}
               type="button"
-              className="text-sm text-blue-500 hover:underline"
+              className="text-sm text-gray hover:underline"
             >
-              {isSignIn ? "Register instead" : "Already have an account?"}
+              {isSignIn
+                ? "Don't have an account yet, Sign up"
+                : "Already have an account?"}
             </button>
           </div>
         </form>
-
-        <div className="flex justify-end mt-4">
-          <Button className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-            Close
-          </Button>
-        </div>
       </div>
     </div>
   );
