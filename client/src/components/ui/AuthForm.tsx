@@ -63,31 +63,29 @@ const AuthForm: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center w-auto m-1">
-      <div className="bg-gradient-to-bl from-green-400 to-stone-400 p-5 rounded-2xl shadow-xl ">
+    <div className="flex justify-center items-center min-h-svh ">
+      <div className="bg-white p-5 rounded-2xl shadow-2xl ">
         <div className="flex flex-col space-y-3 items-center justify-center mb-10 text-pretty text-center">
-          <h1 className="text-3xl font-bold text-white">
-            Welcome to AttenEase
+          <h1 className="text-3xl font-bold">
+            Welcome to <span className="text-green-600">AttenEase</span>
           </h1>
-          <p className="text-white">
-            Login or sign up below to manage your attendance activities{" "}
-          </p>
+          <p>Login or sign up below to manage your attendance activities </p>
         </div>
-        <h2 className="text-2xl font-bold mb-4 text-white">
+        <h2 className="text-2xl font-bold mb-4 text-green-600">
           {isSignIn ? "Sign In" : "Register"}
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {isSignIn ? (
             <>
               <div>
-                <label htmlFor="email" className="text-xl text-white">
+                <label htmlFor="email" className="text-xl">
                   Email
                 </label>
                 <input
                   id="email"
                   autoComplete="email"
                   {...register("email")}
-                  className="w-full border-none rounded-md bg-white p-3"
+                  className="w-full border-none rounded-md bg-stone-300 p-3"
                   placeholder="Enter your email address"
                 />
                 {loginErrors.email && (
@@ -95,7 +93,7 @@ const AuthForm: React.FC = () => {
                 )}
               </div>
               <div>
-                <label htmlFor="password" className="text-xl text-white">
+                <label htmlFor="password" className="text-xl">
                   Password
                 </label>
                 <input
@@ -103,7 +101,7 @@ const AuthForm: React.FC = () => {
                   type="password"
                   autoComplete="current-password"
                   {...register("password")}
-                  className="w-full order-none rounded-md bg-white p-3"
+                  className="w-full order-none rounded-md bg-stone-300 p-3"
                   placeholder="Password"
                 />
                 {loginErrors.password && (
@@ -121,14 +119,14 @@ const AuthForm: React.FC = () => {
           ) : (
             <div className="grid grid-cols-2 gap-5">
               <div className="col-span-1">
-                <label htmlFor="name" className="text-xl text-white">
+                <label htmlFor="name" className="text-xl">
                   Name
                 </label>
                 <input
                   id="name"
                   autoComplete="name"
                   {...register("name")}
-                  className="w-full border-none rounded-md bg-white p-3"
+                  className="w-full border-none rounded-md bg-stone-300 p-3"
                   placeholder="Full name"
                 />
                 {registerErrors.name && (
@@ -136,14 +134,14 @@ const AuthForm: React.FC = () => {
                 )}
               </div>
               <div>
-                <label htmlFor="email" className="text-xl text-white">
+                <label htmlFor="email" className="text-xl">
                   Email
                 </label>
                 <input
                   id="email"
                   autoComplete="email"
                   {...register("email")}
-                  className="w-full border-none rounded-md bg-white p-3"
+                  className="w-full border-none rounded-md bg-stone-300 p-3"
                   placeholder="Email"
                 />
                 {registerErrors.email && (
@@ -151,14 +149,14 @@ const AuthForm: React.FC = () => {
                 )}
               </div>
               <div>
-                <label htmlFor="department" className="text-white">
+                <label htmlFor="department" className="text-xl">
                   Department
                 </label>
                 <input
                   id="department"
                   autoComplete="organization"
                   {...register("department")}
-                  className="w-full border-none rounded-md bg-white p-3"
+                  className="w-full border-none rounded-md bg-stone-300 p-3"
                   placeholder="Department"
                 />
                 {registerErrors.department && (
@@ -168,14 +166,14 @@ const AuthForm: React.FC = () => {
                 )}
               </div>
               <div>
-                <label htmlFor="matricNo" className="text-white">
+                <label htmlFor="matricNo" className="text-xl">
                   Matric No
                 </label>
                 <input
                   id="matricNo"
                   autoComplete="username"
                   {...register("matricNo")}
-                  className="w-full border-none rounded-md bg-white p-3"
+                  className="w-full border-none rounded-md bg-stone-300 p-3"
                   placeholder="Matric No"
                 />
                 {registerErrors.matricNo && (
@@ -185,7 +183,7 @@ const AuthForm: React.FC = () => {
                 )}
               </div>
               <div>
-                <label htmlFor="password" className="text-white">
+                <label htmlFor="password" className="text-xl">
                   Password
                 </label>
                 <input
@@ -193,7 +191,7 @@ const AuthForm: React.FC = () => {
                   type="password"
                   autoComplete="new-password"
                   {...register("password")}
-                  className="w-full border-none rounded-md bg-white p-3"
+                  className="w-full border-none rounded-md bg-stone-300 p-3"
                   placeholder="Password"
                 />
                 {registerErrors.password && (
@@ -203,15 +201,18 @@ const AuthForm: React.FC = () => {
                 )}
               </div>
               <div>
-                <label htmlFor="confirmPassword" className="text-white">
-                  Confirm Password
+                <label
+                  htmlFor="confirmPassword"
+                  className="text-xl text-ellipsis"
+                >
+                  Confirm Pass
                 </label>
                 <input
                   id="confirmPassword"
                   type="password"
                   autoComplete="off"
                   {...register("confirmPassword")}
-                  className="w-full border-none rounded-md bg-white p-3"
+                  className="w-full border-none rounded-md bg-stone-300 p-3"
                   placeholder="Confirm Password"
                 />
                 {registerErrors.confirmPassword && (
@@ -225,7 +226,10 @@ const AuthForm: React.FC = () => {
 
           <div className="flex flex-col justify-between items-center space-y-5 mt-10">
             <div>
-              <Button type="submit" className="bg-stone-600 text-white ">
+              <Button
+                type="submit"
+                className="bg-green-600 text-white text-xl w-50"
+              >
                 {isSubmitting
                   ? "Please wait..."
                   : isSignIn
