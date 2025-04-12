@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import logo from "../../assets/images/at.png";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const messages: string[] = [
   "Dive into the world of automated attendance management",
@@ -20,6 +21,11 @@ const SplashScreen: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const navigate = useNavigate();
+
+  const handleGetStated = () => {
+    navigate("/auth");
+  };
   return (
     <div className="splash-screen flex flex-col items-center justify-center min-h-svh">
       <div className="space-y-10">
@@ -65,7 +71,10 @@ const SplashScreen: React.FC = () => {
         </div>
 
         <div>
-          <Button className="bg-stone-500 hover:bg-stone-700 hover:ease-in-out text-white cursor-pointer">
+          <Button
+            onClick={handleGetStated}
+            className="bg-green-600 hover:bg-green-700 hover:ease-in-out text-white cursor-pointer"
+          >
             Get Started
           </Button>
         </div>
