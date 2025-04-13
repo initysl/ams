@@ -3,7 +3,7 @@ import { useForm, SubmitHandler, FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "../ui/button";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -31,7 +31,7 @@ type RegisterFields = z.infer<typeof registerSchema>;
 
 const AuthForm: React.FC = () => {
   const [isSignIn, setIsSignIn] = useState(true);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const {
     register,
@@ -50,10 +50,10 @@ const AuthForm: React.FC = () => {
   ) => {
     try {
       if (isSignIn) {
-        alert("Signed in successfully");
+        alert(`Signed in successfully: ${JSON.stringify(data)}`);
         reset();
       } else {
-        alert("Registered successfully");
+        alert(`Registered Successfully: ${JSON.stringify(data)}`);
         reset();
       }
     } catch (err) {
@@ -62,8 +62,8 @@ const AuthForm: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-svh bg-gradient-to-br from-green-100 via-white to-green-200 p-2">
-      <div className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-2xl transition-all duration-500">
+    <div className="flex justify-center items-center min-h-svh p-2">
+      <div className="bg-white p-8 rounded-tr-xl rounded-bl-xl shadow-2xl w-full max-w-2xl transition-all duration-500">
         <div className="text-center space-y-2 mb-10">
           <h1 className="text-4xl font-extrabold text-gray-800">
             Welcome to <span className="text-green-600">AttendEase</span>
@@ -85,9 +85,10 @@ const AuthForm: React.FC = () => {
                 <input
                   id="email"
                   type="email"
+                  autoComplete="email"
                   {...register("email")}
                   placeholder="Email address"
-                  className="w-full p-4 bg-gray-100 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                  className="w-full p-2 bg-gray-100 rounded-sm focus:ring-2 focus:ring-slate-400 focus:outline-none"
                 />
                 {loginErrors.email && (
                   <p className="text-red-500 text-sm mt-1">
@@ -99,9 +100,10 @@ const AuthForm: React.FC = () => {
                 <input
                   id="password"
                   type="password"
+                  autoComplete="current-password"
                   {...register("password")}
                   placeholder="Password"
-                  className="w-full p-4 bg-gray-100 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
                 />
                 {loginErrors.password && (
                   <p className="text-red-500 text-sm mt-1">
@@ -125,9 +127,10 @@ const AuthForm: React.FC = () => {
               <div>
                 <input
                   id="name"
+                  autoComplete="name"
                   {...register("name")}
                   placeholder="Full Name"
-                  className="w-full p-4 bg-gray-100 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
                 />
                 {registerErrors.name && (
                   <p className="text-red-500 text-sm mt-1">
@@ -139,9 +142,10 @@ const AuthForm: React.FC = () => {
                 <input
                   id="email"
                   type="email"
+                  autoComplete="email"
                   {...register("email")}
                   placeholder="Email"
-                  className="w-full p-4 bg-gray-100 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
                 />
                 {registerErrors.email && (
                   <p className="text-red-500 text-sm mt-1">
@@ -152,9 +156,10 @@ const AuthForm: React.FC = () => {
               <div>
                 <input
                   id="department"
+                  autoComplete="department"
                   {...register("department")}
                   placeholder="Department"
-                  className="w-full p-4 bg-gray-100 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
                 />
                 {registerErrors.department && (
                   <p className="text-red-500 text-sm mt-1">
@@ -165,9 +170,10 @@ const AuthForm: React.FC = () => {
               <div>
                 <input
                   id="matricNo"
+                  autoComplete="matricNo"
                   {...register("matricNo")}
                   placeholder="Matric Number"
-                  className="w-full p-4 bg-gray-100 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
                 />
                 {registerErrors.matricNo && (
                   <p className="text-red-500 text-sm mt-1">
@@ -179,9 +185,10 @@ const AuthForm: React.FC = () => {
                 <input
                   id="password"
                   type="password"
+                  autoComplete="new-password"
                   {...register("password")}
                   placeholder="Password"
-                  className="w-full p-4 bg-gray-100 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
                 />
                 {registerErrors.password && (
                   <p className="text-red-500 text-sm mt-1">
@@ -193,9 +200,10 @@ const AuthForm: React.FC = () => {
                 <input
                   id="confirmPassword"
                   type="password"
+                  autoComplete="off"
                   {...register("confirmPassword")}
                   placeholder="Confirm Password"
-                  className="w-full p-4 bg-gray-100 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
                 />
                 {registerErrors.confirmPassword && (
                   <p className="text-red-500 text-sm mt-1">

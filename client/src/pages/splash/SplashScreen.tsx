@@ -73,9 +73,9 @@ const SplashScreen: React.FC = () => {
         <div>
           <Button
             onClick={handleGetStated}
-            className="bg-green-600 hover:bg-green-700 hover:ease-in-out text-white cursor-pointer"
+            className="bg-white hover:shadow-3xl hover:ease-in-out cursor-pointer "
           >
-            Get Started
+            <span className="animate-pulse">Get Started</span>
           </Button>
         </div>
       </div>

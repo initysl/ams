@@ -4,7 +4,7 @@ import Auth from "./pages/auth/Auth";
 
 function App() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-svh">
+    <div className="flex flex-col items-center justify-center min-h-svh bg-gradient-to-br from-green-200 via-slate-300 to-green-400">
       <Router>
         <Routes>
           <Route path="/" element={<SplashScreen />} />
