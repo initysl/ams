@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { useForm, SubmitHandler, FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Button } from "../ui/button";
-// import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import api from "@/lib/axios";
+import { toast } from "sonner"; // for user feedback
+import { Button } from "../../components/ui/button";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -17,7 +19,8 @@ const registerSchema = z
     department: z.string().min(3, "Department is required"),
     matricNo: z
       .string()
-      .min(10, "Matric number must be at least 10 characters"),
+      .min(10, "Matric number must be at least 10 characters")
+      .or(z.literal("").optional()),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(6, "Confirm your password"),
   })
@@ -31,7 +34,6 @@ type RegisterFields = z.infer<typeof registerSchema>;
 
 const AuthForm: React.FC = () => {
   const [isSignIn, setIsSignIn] = useState(true);
-  // const navigate = useNavigate();
 
   const {
     register,
@@ -45,19 +47,38 @@ const AuthForm: React.FC = () => {
   const loginErrors = errors as FieldErrors<LoginFields>;
   const registerErrors = errors as FieldErrors<RegisterFields>;
 
+  // === Login Mutation ===
+  const loginMutation = useMutation({
+    mutationFn: (data: LoginFields) => api.post("/auth/login", data),
+    onSuccess: (res) => {
+      toast.success("Signed in successfully");
+      reset();
+      // save token, redirect, etc.
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || "Login failed");
+    },
+  });
+
+  // === Register Mutation ===
+  const registerMutation = useMutation({
+    mutationFn: (data: RegisterFields) => api.post("/auth/register", data),
+    onSuccess: (res) => {
+      toast.success("Registered successfully");
+      reset();
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || "Registration failed");
+    },
+  });
+
   const onSubmit: SubmitHandler<LoginFields | RegisterFields> = async (
     data
   ) => {
-    try {
-      if (isSignIn) {
-        alert(`Signed in successfully: ${JSON.stringify(data)}`);
-        reset();
-      } else {
-        alert(`Registered Successfully: ${JSON.stringify(data)}`);
-        reset();
-      }
-    } catch (err) {
-      console.error("Error submitting form:", err);
+    if (isSignIn) {
+      loginMutation.mutate(data as LoginFields);
+    } else {
+      registerMutation.mutate(data as RegisterFields);
     }
   };
 
@@ -217,9 +238,9 @@ const AuthForm: React.FC = () => {
           <div className="flex flex-col items-center mt-8 space-y-4">
             <Button
               type="submit"
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg "
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg"
             >
-              {isSubmitting
+              {loginMutation.isPending || registerMutation.isPending
                 ? "Please wait..."
                 : isSignIn
                 ? "Sign In"

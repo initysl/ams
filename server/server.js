@@ -13,7 +13,7 @@ const userRoutes = require("./routes/userRoutes");
 
 // Frontend url here
 const corsOptions = {
-  // origin: "PROCESS.env.CLIENT_URL",
+  origin: "process.env.CLIENT_URL",
   credentials: true,
   methods: "GET, POST, PUT, DELETE",
   allowedHeaders: "Content-Type, Authorization",

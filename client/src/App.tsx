@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
 import SplashScreen from "./pages/splash/SplashScreen";
-import Auth from "./pages/auth/Auth";
+import AuthForm from "./pages/auth/AuthForm";
 
 function App() {
   return (
@@ -8,7 +8,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<SplashScreen />} />
-          <Route path="/auth" element={<Auth />} />
+          <Route path="/auth" element={<AuthForm />} />
           {/* <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} /> */}
           <Route path="*" element={<Navigate to="/" />} />
