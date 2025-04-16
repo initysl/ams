@@ -25,6 +25,7 @@ const Profilebox: React.FC<ProfileboxProps> = ({
             src={profilePic}
             alt="Profile"
             className="w-full h-full object-cover"
+            crossOrigin="anonymous"
           />
         ) : (
           <span className="text-gray-400 text-xs">Pic</span>
