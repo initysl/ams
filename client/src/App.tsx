@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
 import SplashScreen from "./pages/splash/SplashScreen";
 import AuthForm from "./pages/auth/AuthForm";
+import { Toaster } from "sonner";
 
 function App() {
   return (
@@ -14,6 +15,9 @@ function App() {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>
+
+      {/* Toaster for toast notifications */}
+      <Toaster richColors position="top-center" closeButton />
     </div>
   );
 }

@@ -16,8 +16,8 @@ const register = asyncHandler(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ message: errors.array() });
   }
-  const { name, email, matricNumber, department, profilePicture, password } =
-    req.body;
+
+  const { name, email, matricNumber, department, password } = req.body;
 
   const existingUser = await User.findOne({
     $or: [{ email }, { matricNumber }],
@@ -28,6 +28,11 @@ const register = asyncHandler(async (req, res) => {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
+
+  // If a profile picture was uploaded, use the filename; else fallback to default
+  const profilePicture = req.file
+    ? `/uploads/${req.file.filename}` // frontend can access via this path
+    : "/images/default.png"; // use your fallback image path
 
   const newUser = new User({
     name,
@@ -50,6 +55,7 @@ const register = asyncHandler(async (req, res) => {
   res.status(201).json({
     message: "User registered successfully! Please verify your email",
   });
+
   logger.info(`User registered: ${newUser.email}, ${newUser.matricNumber}`);
 });
 
@@ -60,7 +66,7 @@ const login = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: errors.array() });
   }
 
-  const { email, password } = req.body;
+  const { email, password, remember } = req.body;
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -104,7 +110,7 @@ const login = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
+    maxAge: remember ? 5 * 24 * 60 * 60 * 1000 : undefined, // 5 days
   });
 
   res.status(200).json({

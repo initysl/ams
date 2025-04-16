@@ -6,10 +6,12 @@ import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { toast } from "sonner"; // for user feedback
 import { Button } from "../../components/ui/button";
+import Profilebox from "@/components/ui/Profilebox";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  remember: z.boolean().optional(),
 });
 
 const registerSchema = z
@@ -17,12 +19,13 @@ const registerSchema = z
     name: z.string().min(5, "Name is required"),
     email: z.string().email("Invalid email"),
     department: z.string().min(3, "Department is required"),
-    matricNo: z
+    matricNumber: z
       .string()
       .min(10, "Matric number must be at least 10 characters")
       .or(z.literal("").optional()),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(6, "Confirm your password"),
+    profilePic: z.any().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -35,10 +38,24 @@ type RegisterFields = z.infer<typeof registerSchema>;
 const AuthForm: React.FC = () => {
   const [isSignIn, setIsSignIn] = useState(true);
 
+  const [profilePic, setProfilePic] = useState<File | null>(null);
+
+  const [previewURL, setPreviewURL] = useState<string>("");
+  // Handle image change from Profilebox
+  const handleImageChange = (file: File) => {
+    const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Only JPG, JPEG, and PNG files are allowed");
+      return;
+    }
+    setProfilePic(file);
+    setPreviewURL(URL.createObjectURL(file));
+  };
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     reset,
   } = useForm<LoginFields | RegisterFields>({
     resolver: zodResolver(isSignIn ? loginSchema : registerSchema),
@@ -48,27 +65,50 @@ const AuthForm: React.FC = () => {
   const registerErrors = errors as FieldErrors<RegisterFields>;
 
   // === Login Mutation ===
+
   const loginMutation = useMutation({
     mutationFn: (data: LoginFields) => api.post("/auth/login", data),
     onSuccess: (res) => {
-      toast.success("Signed in successfully");
+      toast.success(`Signed in successfully: ${res.data.message}`);
       reset();
-      // save token, redirect, etc.
     },
     onError: (err: any) => {
-      toast.error(err.response?.data?.message || "Login failed");
+      toast.error(
+        `Sign in failed: ${err.response?.data?.message || "Unknown error"}`
+      );
     },
   });
 
   // === Register Mutation ===
   const registerMutation = useMutation({
-    mutationFn: (data: RegisterFields) => api.post("/auth/register", data),
+    mutationFn: async (data: RegisterFields) => {
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("email", data.email);
+      formData.append("department", data.department);
+      formData.append("matricNumber", data.matricNumber ?? "");
+      formData.append("password", data.password);
+      formData.append("confirmPassword", data.confirmPassword);
+      if (profilePic) {
+        formData.append("profilePicture", profilePic);
+      }
+
+      return api.post("/auth/register", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    },
     onSuccess: (res) => {
-      toast.success("Registered successfully");
+      toast.success(`Registered successfully: ${res.data.message}`);
       reset();
+      setProfilePic(null);
+      setPreviewURL("");
     },
     onError: (err: any) => {
-      toast.error(err.response?.data?.message || "Registration failed");
+      toast.error(
+        `Registration failed: ${err.response?.data?.message || "Unknown error"}`
+      );
     },
   });
 
@@ -95,8 +135,19 @@ const AuthForm: React.FC = () => {
               : "Create an account to get started"}
           </p>
         </div>
-        <h2 className="text-2xl font-bold text-green-600 mb-6 text-left">
-          {isSignIn ? "Sign In" : "Register"}
+        <h2 className="text-2xl font-bold text-green-600 mb-6">
+          <div className="flex justify-between items-center">
+            {isSignIn ? "Sign In" : "Register"}
+            {!isSignIn && (
+              <Profilebox
+                profilePic={
+                  previewURL ||
+                  `${import.meta.env.VITE_API_URL}images/default.png`
+                }
+                onImageChange={handleImageChange}
+              />
+            )}
+          </div>
         </h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -135,102 +186,105 @@ const AuthForm: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
-                  id="remember-me"
+                  id="remember"
+                  {...register("remember")}
                   className="accent-green-600"
                 />
-                <label htmlFor="remember-me" className="text-sm text-gray-600">
+                <label htmlFor="remember" className="text-sm text-gray-600">
                   Remember me
                 </label>
               </div>
             </>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <input
-                  id="name"
-                  autoComplete="name"
-                  {...register("name")}
-                  placeholder="Full Name"
-                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-                />
-                {registerErrors.name && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {registerErrors.name.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  {...register("email")}
-                  placeholder="Email"
-                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-                />
-                {registerErrors.email && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {registerErrors.email.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <input
-                  id="department"
-                  autoComplete="department"
-                  {...register("department")}
-                  placeholder="Department"
-                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-                />
-                {registerErrors.department && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {registerErrors.department.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <input
-                  id="matricNo"
-                  autoComplete="matricNo"
-                  {...register("matricNo")}
-                  placeholder="Matric Number"
-                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-                />
-                {registerErrors.matricNo && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {registerErrors.matricNo.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <input
-                  id="password"
-                  type="password"
-                  autoComplete="new-password"
-                  {...register("password")}
-                  placeholder="Password"
-                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-                />
-                {registerErrors.password && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {registerErrors.password.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  autoComplete="off"
-                  {...register("confirmPassword")}
-                  placeholder="Confirm Password"
-                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-                />
-                {registerErrors.confirmPassword && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {registerErrors.confirmPassword.message}
-                  </p>
-                )}
+            <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <input
+                    id="name"
+                    autoComplete="name"
+                    {...register("name")}
+                    placeholder="Full Name"
+                    className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
+                  />
+                  {registerErrors.name && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {registerErrors.name.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    {...register("email")}
+                    placeholder="Email"
+                    className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
+                  />
+                  {registerErrors.email && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {registerErrors.email.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <input
+                    id="department"
+                    autoComplete="department"
+                    {...register("department")}
+                    placeholder="Department"
+                    className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
+                  />
+                  {registerErrors.department && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {registerErrors.department.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <input
+                    id="matricNumber"
+                    autoComplete="matricNumber"
+                    {...register("matricNumber")}
+                    placeholder="Matric Number"
+                    className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
+                  />
+                  {registerErrors.matricNumber && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {registerErrors.matricNumber.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <input
+                    id="password"
+                    type="password"
+                    autoComplete="new-password"
+                    {...register("password")}
+                    placeholder="Password"
+                    className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
+                  />
+                  {registerErrors.password && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {registerErrors.password.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    autoComplete="off"
+                    {...register("confirmPassword")}
+                    placeholder="Confirm Password"
+                    className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
+                  />
+                  {registerErrors.confirmPassword && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {registerErrors.confirmPassword.message}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           )}

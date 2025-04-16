@@ -1,4 +1,5 @@
 require("dotenv").config();
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -13,7 +14,7 @@ const userRoutes = require("./routes/userRoutes");
 
 // Frontend url here
 const corsOptions = {
-  origin: "process.env.CLIENT_URL",
+  origin: process.env.CLIENT_URL,
   credentials: true,
   methods: "GET, POST, PUT, DELETE",
   allowedHeaders: "Content-Type, Authorization",
@@ -28,14 +29,13 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'https://apis.google.com'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", "https://apis.google.com"],
+        styleSrc: ["'self'"],
         imgSrc: ["'self'", "https://yourcdn.com"],
-        contentSrc: ["'self'"],
+        connectSrc: ["'self'"],
         fontSrc: ["'self'"],
       },
     },
-    XssFilter: true, //Enable X-XSS Filter Protection Header
   })
 );
 
@@ -43,11 +43,13 @@ app.use(
 connectDB();
 
 // Routes
-app.use("/api", lectureRoutes);
+app.use("/api/lecture", lectureRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
-// app.use("./uploads", express.static("uploads"));
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api/images", express.static(path.join(__dirname, "public/images")));
 
 // Server Start
 const PORT = process.env.PORT || 5060;
