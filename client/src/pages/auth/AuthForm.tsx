@@ -86,7 +86,10 @@ const AuthForm: React.FC = () => {
       formData.append("name", data.name);
       formData.append("email", data.email);
       formData.append("department", data.department);
-      formData.append("matricNumber", data.matricNumber ?? "");
+      formData.append(
+        "matricNumber",
+        data.matricNumber?.match(/^\d{4}\/\d+$/) ? data.matricNumber : ""
+      );
       formData.append("password", data.password);
       formData.append("confirmPassword", data.confirmPassword);
       if (profilePic) {
@@ -246,7 +249,7 @@ const AuthForm: React.FC = () => {
                     id="matricNumber"
                     autoComplete="matricNumber"
                     {...register("matricNumber")}
-                    placeholder="Matric Number"
+                    placeholder="Matric Number (2021/36000)"
                     className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
                   />
                   {registerErrors.matricNumber && (
@@ -293,6 +296,7 @@ const AuthForm: React.FC = () => {
             <Button
               type="submit"
               className="bg-green-600 hover:bg-green-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg"
+              disabled={loginMutation.isPending || registerMutation.isPending}
             >
               {loginMutation.isPending || registerMutation.isPending
                 ? "Please wait..."

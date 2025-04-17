@@ -135,13 +135,22 @@ const verifyEmail = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Invalid verification link." });
   }
   // Update user's verification status
-  user.email = user.pendingEmail;
-  user.pendingEmail = undefined;
+  if (user.pendingEmail) {
+    user.email = user.pendingEmail;
+    user.pendingEmail = undefined;
+  }
+
   user.isVerified = true;
   await user.save();
   res
     .status(200)
     .json({ message: "Email verfication successfully! Proceed to login" });
+
+  if (!user.pendingEmail) {
+    console.warn(
+      `User ${user._id} has no pendingEmail set during verification.`
+    );
+  }
 });
 
 // Logout; Handle this in frontend using cookies
