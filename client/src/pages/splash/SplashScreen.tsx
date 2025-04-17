@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import logo from "../../assets/images/at.png";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowRightCircleIcon } from "lucide-react";
 
 const messages: string[] = [
   "Dive into the world of automated attendance management",
@@ -73,9 +74,10 @@ const SplashScreen: React.FC = () => {
         <div>
           <Button
             onClick={handleGetStated}
-            className="bg-white hover:shadow-3xl hover:ease-in-out cursor-pointer "
+            className="bg-stone-700 text-white  hover:shadow-3xl hover:ease-in-out cursor-pointer "
           >
-            <span className="animate-pulse">Get Started</span>
+            Get Started
+            <ArrowRightCircleIcon size={10} className="ml-1 animate-pulse" />
           </Button>
         </div>
       </div>

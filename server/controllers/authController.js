@@ -128,29 +128,29 @@ const login = asyncHandler(async (req, res) => {
 // Verify Email Address
 const verifyEmail = asyncHandler(async (req, res) => {
   const { token } = req.query;
-  const decoded = jwt.verify(token, SECRET_KEY);
 
-  let user = await User.findById(decoded.id);
-  if (!user) {
-    return res.status(400).json({ message: "Invalid verification link." });
+  let decoded;
+  try {
+    decoded = jwt.verify(token, SECRET_KEY);
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid or expired token." });
   }
-  // Update user's verification status
-  if (user.pendingEmail) {
-    user.email = user.pendingEmail;
-    user.pendingEmail = undefined;
+
+  const user = await User.findById(decoded.id);
+  if (!user) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid verification link." });
   }
 
   user.isVerified = true;
   await user.save();
+
   res
     .status(200)
-    .json({ message: "Email verfication successfully! Proceed to login" });
-
-  if (!user.pendingEmail) {
-    console.warn(
-      `User ${user._id} has no pendingEmail set during verification.`
-    );
-  }
+    .json({ success: true, message: "Email verified successfully!" });
 });
 
 // Logout; Handle this in frontend using cookies

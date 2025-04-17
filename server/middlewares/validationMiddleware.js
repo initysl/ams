@@ -3,7 +3,7 @@ const { check, body } = require("express-validator");
 // Registration Validation
 const validateRegistration = [
   check("name")
-    .customSanitizer((value) => value.trim().replace(/\s+/g, ""))
+    .customSanitizer((value) => value.trim())
     .isLength({ min: 5 })
     .withMessage("Name must be at least 5 characters long"),
 
