@@ -1,7 +1,8 @@
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import api from "@/lib/axios";
+import AuthForm from "../auth/AuthForm";
 
 const VerifyEmail: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -11,17 +12,19 @@ const VerifyEmail: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const verify = async () => {
       try {
         const res = await api.get(`auth/verify-email?token=${token}`);
         if (res.data.success) {
-          toast.success("Email verified successfully! You can now log in.");
+          toast.success("Email verified successfully! Redirecting to login");
           setSuccess(true);
           // Optionally open login modal after short delay
-          // setTimeout(() => {
-          //   loginModal.onOpen();
-          // }, 1500);
+          setTimeout(() => {
+            navigate("/auth");
+          }, 3000);
         } else {
           setErrorMessage("Invalid or expired verification link.");
         }
@@ -42,7 +45,7 @@ const VerifyEmail: React.FC = () => {
   }, [token]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[50vh] bg-white rounded-lg shadow-lg p-6">
+    <div className="flex flex-col items-center justify-center min-h-[50vh] ">
       {/* Spinner */}
       {isVerifying && (
         <>
