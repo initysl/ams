@@ -6,6 +6,7 @@ import {
   QrCodeIcon,
   User2,
   ChevronUp,
+  SeparatorVerticalIcon,
 } from "lucide-react";
 import {
   Sidebar,
@@ -27,6 +28,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Link, useLocation } from "react-router-dom";
+import { Separator } from "./ui/separator";
 
 // Menu items.
 const items = [
@@ -59,45 +61,47 @@ const items = [
 
 export function AppSidebar() {
   // const { isMobile } = useSidebar();
-  const location = useLocation(); // 🟢 useLocation instead of window.location
+  const location = useLocation();
   const isActive = (item: { url: string }) =>
     location.pathname.includes(`/dashboard/${item.url}`);
 
   return (
-    <Sidebar className="bg-stone-600">
+    <Sidebar className="bg-stone-400 border-none">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="bg-white text-xl font-bold p-8 mb-10">
+          <SidebarGroupLabel className="text-3xl font-bold py-8 mb-5 text-center text-white tracking-widest">
             AttendEase
           </SidebarGroupLabel>
+          <Separator className="bg-white mb-5" />
           <SidebarGroupContent>
-            <SidebarMenu className="text-white space-y-5">
+            <SidebarMenu className=" space-y-5">
               {items.map((item) => {
                 const active = isActive(item);
 
                 return (
                   <SidebarMenuItem
                     key={item.title}
-                    className={`rounded-sm transition-colors duration-200 ${
+                    className={`p-2 transition-colors duration-200 ${
                       active
-                        ? " text-white hover:bg-stone-800 bg-stone-800 hover:text-white"
-                        : "text-white  hover:text-gray-200 hover:bg-stone-800 transition-all duration-200 rounded-sm "
+                        ? "  rounded-xl shadow-2xs bg-white"
+                        : "  transition-all duration-200 rounded-xl "
                     }`}
                   >
                     <SidebarMenuButton asChild isActive={active}>
                       <Link to={`/dashboard/${item.url}`}>
-                        <item.icon />
-                        <span>{item.title}</span>
+                        <item.icon fontSize={20} />
+                        <span className="">{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
               })}
-              <SidebarFooter className="fixed bottom-0 left-0">
+              <SidebarFooter className="fixed bottom-2 left-0 bg-white rounded-xl">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <SidebarMenuButton>
-                      <User2 /> Username
+                      <User2 />
+                      lawalyusuf356@gmail.com
                       <ChevronUp className="ml-auto" />
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>

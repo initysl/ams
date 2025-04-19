@@ -17,7 +17,7 @@ import ScanQR from "./pages/dashboard/ScanQR";
 
 function App() {
   return (
-    <div className="bg-gradient-to-br from-green-200 via-slate-300 to-green-400">
+    <div className="bg-stone-300">
       <Router>
         <Routes>
           <Route path="/" element={<SplashScreen />} />
