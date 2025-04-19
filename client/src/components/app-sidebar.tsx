@@ -17,6 +17,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 import {
@@ -57,6 +58,7 @@ const items = [
 ];
 
 export function AppSidebar() {
+  // const { isMobile } = useSidebar();
   const location = useLocation(); // 🟢 useLocation instead of window.location
   const isActive = (item: { url: string }) =>
     location.pathname.includes(`/dashboard/${item.url}`);
@@ -65,7 +67,7 @@ export function AppSidebar() {
     <Sidebar className="bg-stone-600">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="bg-white text-xl font-bold mb-10">
+          <SidebarGroupLabel className="bg-white text-xl font-bold p-8 mb-10">
             AttendEase
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -91,7 +93,7 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 );
               })}
-              <SidebarFooter className="fixed bottom-0">
+              <SidebarFooter className="fixed bottom-0 left-0">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <SidebarMenuButton>
