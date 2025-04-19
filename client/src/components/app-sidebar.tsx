@@ -6,7 +6,6 @@ import {
   QrCodeIcon,
   User2,
   ChevronUp,
-  SeparatorVerticalIcon,
 } from "lucide-react";
 import {
   Sidebar,
@@ -18,7 +17,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar";
 
 import {
@@ -60,62 +58,66 @@ const items = [
 ];
 
 export function AppSidebar() {
-  // const { isMobile } = useSidebar();
   const location = useLocation();
   const isActive = (item: { url: string }) =>
     location.pathname.includes(`/dashboard/${item.url}`);
 
   return (
-    <Sidebar className="bg-stone-400 border-none">
+    <Sidebar className="bg-stone-800 text-stone-100 border-none min-h-screen">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-3xl font-bold py-8 mb-5 text-center text-white tracking-widest">
+          <SidebarGroupLabel className="text-3xl font-bold py-8 mb-5 text-center text-green-400 tracking-widest">
             AttendEase
           </SidebarGroupLabel>
-          <Separator className="bg-white mb-5" />
+          <Separator className="bg-stone-600 mb-5" />
           <SidebarGroupContent>
-            <SidebarMenu className=" space-y-5">
+            <SidebarMenu className="space-y-5">
               {items.map((item) => {
                 const active = isActive(item);
 
                 return (
                   <SidebarMenuItem
                     key={item.title}
-                    className={`p-2 transition-colors duration-200 ${
+                    className={`p-2 transition-transform transform-gpu hover:scale-[1.02] duration-200 ${
                       active
-                        ? "  rounded-xl shadow-2xs bg-white"
-                        : "  transition-all duration-200 rounded-xl "
+                        ? "bg-green-500/90 text-white shadow-xl rounded-xl"
+                        : "hover:bg-stone-700 text-stone-300 rounded-xl"
                     }`}
                   >
                     <SidebarMenuButton asChild isActive={active}>
-                      <Link to={`/dashboard/${item.url}`}>
-                        <item.icon fontSize={20} />
-                        <span className="">{item.title}</span>
+                      <Link
+                        to={`/dashboard/${item.url}`}
+                        className="flex items-center gap-2"
+                      >
+                        <item.icon size={20} />
+                        <span>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
               })}
-              <SidebarFooter className="fixed bottom-2 left-0 bg-white rounded-xl">
+
+              {/* Footer */}
+              <SidebarFooter className="bg-stone-700 text-white rounded-xl mt-28">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton>
-                      <User2 />
-                      lawalyusuf356@gmail.com
-                      <ChevronUp className="ml-auto" />
+                    <SidebarMenuButton className="flex items-center gap-2 p-2 w-full text-sm font-medium">
+                      <User2 size={18} />
+                      lawalysl356@gmail.com
+                      <ChevronUp className="ml-auto" size={18} />
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     side="top"
                     className="w-[--radix-popper-anchor-width] bg-white border-none"
                   >
-                    <DropdownMenuItem className="hover:bg-stone-800 hover:text-white transition-colors duration-200">
+                    <DropdownMenuItem className="hover:bg-green-600 hover:text-white transition-colors duration-200">
                       <span>Profile</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:bg-stone-800 hover:text-white transition-colors duration-200">
+                    <DropdownMenuItem className="hover:bg-green-600 hover:text-white transition-colors duration-200">
                       <span>Billing</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:bg-stone-800 hover:text-white transition-colors duration-200">
+                    <DropdownMenuItem className="hover:bg-green-600 hover:text-white transition-colors duration-200">
                       <span>Sign out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
