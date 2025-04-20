@@ -57,7 +57,19 @@ const chartData = [
 
 const Home: React.FC = () => {
   const username = "Yusola";
-  const today = new Date().toLocaleDateString();
+  const [today, setToday] = React.useState(() => new Date().toLocaleString());
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setToday(
+        new Date().toLocaleString("en-US", {
+          hour12: true,
+        })
+      );
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -65,7 +77,7 @@ const Home: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Welcome Back, @{username} 👋</h2>
-          <p className="text-sm text-muted-foreground">Today is {today}</p>
+          <p className="text-sm text-muted-foreground">{today}</p>
         </div>
       </div>
 
