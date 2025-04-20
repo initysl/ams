@@ -26,41 +26,13 @@ function App() {
 
           {/*Dashboard routes with layout and outlet */}
           <Route path="/dashboard" element={<Layout />}>
-            <Route index element={<Home />} />
+            <Route index element={<Navigate to="/dashboard/home" replace />} />
             <Route path="home" element={<Home />} />
-            <Route
-              path="attendance"
-              element={
-                <div>
-                  <Attendance />
-                </div>
-              }
-            />
-            <Route
-              path="settings"
-              element={
-                <>
-                  <Settings />
-                </>
-              }
-            />
-            <Route
-              path="scan"
-              element={
-                <>
-                  <ScanQR />
-                </>
-              }
-            />
-            <Route
-              path="generate"
-              element={
-                <>
-                  <GenerateQR />
-                </>
-              }
-            />
-            {/* <Route path="profile" element={<><Settings/></>} /> */}
+            <Route path="attendance" element={<Attendance />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="scan" element={<ScanQR />} />
+            <Route path="generate" element={<GenerateQR />} />
+            {/* <Route path="profile" element={<Settings />} /> */}
           </Route>
 
           <Route path="*" element={<Navigate to="/" />} />

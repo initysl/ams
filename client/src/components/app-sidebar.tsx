@@ -17,6 +17,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 import {
@@ -58,12 +59,19 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const { isMobile } = useSidebar();
+
   const location = useLocation();
   const isActive = (item: { url: string }) =>
     location.pathname.includes(`/dashboard/${item.url}`);
 
   return (
-    <Sidebar className="bg-stone-800 text-stone-100 border-none min-h-screen">
+    <Sidebar
+      collapsible="offcanvas"
+      className={`border-none min-h-screen ${
+        isMobile ? "bg-blue-800 text-white" : "bg-stone-800 text-stone-100"
+      }`}
+    >
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-3xl font-bold py-8 mb-5 text-center text-green-400 tracking-widest">
@@ -98,13 +106,13 @@ export function AppSidebar() {
               })}
 
               {/* Footer */}
-              <SidebarFooter className="bg-stone-700 text-white rounded-xl mt-28">
+              <SidebarFooter className="bg-stone-700 text-white rounded-xl mt-24">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton className="flex items-center gap-2 p-2 w-full text-sm font-medium">
-                      <User2 size={18} />
-                      lawalysl356@gmail.com
+                    <SidebarMenuButton className="flex items-center gap-2 p-2 w-full text-sm font-medium text-ellipsis">
                       <ChevronUp className="ml-auto" size={18} />
+                      <User2 size={18} />
+                      lawalyusuf356@gmail.com
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
