@@ -5,28 +5,28 @@
       "title": "Attendance Tracking",
       "value": "Real-time",
       "description": "Monitor attendance records in real-time for better management.",
-      "image": "/images/attendance_tracking.png"
+      "icon": "CalendarCheck"
     },
     {
       "id": 2,
       "title": "Detailed Reports",
       "value": "Comprehensive",
       "description": "Generate detailed attendance reports for analysis and decision-making.",
-      "image": "/images/detailed_reports.png"
+      "icon": "FileBarChart"
     },
     {
       "id": 3,
       "title": "Notifications",
       "value": "Instant Alerts",
       "description": "Receive instant notifications for absences or late arrivals.",
-      "image": "/images/notifications.png"
+      "icon": "BellRing"
     },
     {
       "id": 4,
       "title": "User-Friendly Interface",
       "value": "Easy to Use",
       "description": "Simplified interface for seamless attendance management.",
-      "image": "/images/user_friendly_interface.png"
+      "icon": "LayoutDashboard"
     }
   ]
 }
