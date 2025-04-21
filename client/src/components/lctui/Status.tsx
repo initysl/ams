@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import { Button } from "../ui/button";
 import { Card, CardTitle } from "../ui/card";
 
 export const Status = () => {
@@ -8,6 +10,10 @@ export const Status = () => {
         <p className="text-sm text-gray-800">
           0 students marked present so far.
         </p>
+        <p className="text-sm text-gray-800">Download Attendance.</p>
+        <Link to="/dashboard/attendance">
+          <Button className=" bg-white cursor-pointer">View Attendance</Button>
+        </Link>
       </Card>
     </div>
   );
