@@ -25,7 +25,8 @@ function App() {
           <Route path="/" element={<SplashScreen />} />
           <Route path="/auth" element={<AuthForm />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/forget-pass" element={<ForgetPass />} />
+          <Route path="/recover" element={<ForgetPass />} />
+          {/* Work on the below route, rmove */}
           <Route path="/reset-password" element={<ResetPass />} />
           {/*Dashboard routes with layout and outlet */}
           <Route path="/dashboard" element={<Layout />}>

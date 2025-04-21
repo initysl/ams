@@ -199,11 +199,8 @@ const AuthForm: React.FC = () => {
                 </label>
               </div>
               <div className="text-right">
-                <Link
-                  to="forget-pass"
-                  className="text-blue-500 hover:underline"
-                >
-                  Forget Password
+                <Link to="recover" className="text-blue-500 hover:underline">
+                  Forgotten Password?
                 </Link>
               </div>
             </>

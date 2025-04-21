@@ -45,7 +45,7 @@ const VerifyEmail: React.FC = () => {
   }, [token]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[50vh] ">
+    <div className="flex flex-col items-center justify-center min-h-svh ">
       {/* Spinner */}
       {isVerifying && (
         <>
