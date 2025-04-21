@@ -6,8 +6,10 @@ const logger = require("../middlewares/log");
 const { validationResult } = require("express-validator");
 const SECRET_KEY = process.env.JWT_SECRET;
 const asyncHandler = require("express-async-handler");
-const sendVerificationEmail = require("../utils/verifyEmail");
-const sendResetPasswordEmail = require("../utils/resetPassword");
+const {
+  sendVerificationEmail,
+  sendResetPasswordEmail,
+} = require("../utils/sendEmail");
 
 const upload = require("../utils/multerConfig");
 // Ensure you store jwt using cookies here
@@ -83,8 +85,13 @@ const login = asyncHandler(async (req, res) => {
   }
 
   if (!user.isVerified) {
+    const token = jwt.sign({ id: user._id }, SECRET_KEY, {
+      expiresIn: "1h",
+    });
+    await sendVerificationEmail(user.email, token);
     return res.status(400).json({
-      message: "Please verify your email before logging in.",
+      message:
+        "Verification email sent.Please verify your email before logging in.",
     });
   }
 
@@ -156,7 +163,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
 });
 
 // Forget Password
-const forgetPassword = asyncHandler(async (req, res) => {
+const forgotPassword = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ message: errors.array() });
@@ -166,6 +173,14 @@ const forgetPassword = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email });
   if (!user) {
     return res.status(400).json({ message: "User does not exist" });
+  }
+  if (!user.isVerified) {
+    const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
+    await sendVerificationEmail(user.email, token);
+    return res.status(400).json({
+      message:
+        "Verification email sent.Please verify your email before resetting your password.",
+    });
   }
   const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
   await sendResetPasswordEmail(user.email, token);
@@ -226,4 +241,11 @@ const logout = asyncHandler(async (req, res) => {
   logger.info(`User logged out: ${req.user.email}`);
 });
 
-module.exports = { register, login, verifyEmail, logout };
+module.exports = {
+  register,
+  login,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
+  logout,
+};

@@ -8,3 +8,4 @@ Add a password pattern, user can't use symbols or special characters for pass ..
 Add profile picture... Done
 Add confirm password... Done
 Show recently attendance marked for student
+Forget and reset password..........

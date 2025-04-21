@@ -56,19 +56,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  useEffect(() => {
-    // Automatically fetch user if already logged in (cookie exists)
-    api
-      .get("/profile/me", { withCredentials: true })
-      .then((response) => {
-        if (response.data.success) {
-          setUser(response.data.user);
-        }
-      })
-      .catch(() => {
-        setUser(null);
-      });
-  }, []);
+  // useEffect(() => {
+  //   // Automatically fetch user if already logged in (cookie exists)
+  //   api
+  //     .get("/profile/me", { withCredentials: true })
+  //     .then((response) => {
+  //       if (response.data.success) {
+  //         setUser(response.data.user);
+  //       }
+  //     })
+  //     .catch(() => {
+  //       setUser(null);
+  //     });
+  // }, []);
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>

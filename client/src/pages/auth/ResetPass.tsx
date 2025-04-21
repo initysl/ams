@@ -1,6 +1,6 @@
+import api from "@/lib/axios";
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import axios from "axios";
 
 const ResetPass: React.FC = () => {
   const [password, setPassword] = useState("");
@@ -25,7 +25,7 @@ const ResetPass: React.FC = () => {
     }
 
     try {
-      await axios.post("/api/auth/reset-password", { token, password });
+      await api.post("/auth/reset-password", { token, password });
       setSuccess(true);
       setTimeout(() => navigate("/login"), 3000); // Redirect to login after 3 seconds
     } catch (err: any) {

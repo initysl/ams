@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const logger = require("../middlewares/log");
 const { validationResult } = require("express-validator");
 const asyncHandler = require("express-async-handler");
-const sendVerificationEmail = require("../utils/verifyEmail");
+const { sendVerificationEmail } = require("../utils/sendEmail");
 
 // Get User Profile
 const getUserProfile = asyncHandler(async (req, res) => {
