@@ -27,7 +27,7 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/recover" element={<ForgetPass />} />
           {/* Work on the below route, rmove */}
-          <Route path="/reset-password" element={<ResetPass />} />
+          <Route path="/reset" element={<ResetPass />} />
           {/*Dashboard routes with layout and outlet */}
           <Route path="/dashboard" element={<Layout />}>
             <Route index element={<Navigate to="/dashboard/home" replace />} />

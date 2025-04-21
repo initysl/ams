@@ -161,7 +161,7 @@ const AuthForm: React.FC = () => {
                 <input
                   id="email"
                   type="email"
-                  autoComplete="email"
+                  autoComplete="on"
                   {...register("email")}
                   placeholder="Email address"
                   className="w-full p-2 bg-gray-100 rounded-sm focus:ring-2 focus:ring-slate-400 focus:outline-none"
@@ -176,7 +176,7 @@ const AuthForm: React.FC = () => {
                 <input
                   id="password"
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete="on"
                   {...register("password")}
                   placeholder="Password"
                   className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
@@ -210,7 +210,7 @@ const AuthForm: React.FC = () => {
                 <div>
                   <input
                     id="name"
-                    autoComplete="name"
+                    autoComplete="on"
                     {...register("name")}
                     placeholder="Full Name"
                     className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
@@ -225,7 +225,7 @@ const AuthForm: React.FC = () => {
                   <input
                     id="email"
                     type="email"
-                    autoComplete="email"
+                    autoComplete="on"
                     {...register("email")}
                     placeholder="Email"
                     className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
@@ -239,7 +239,7 @@ const AuthForm: React.FC = () => {
                 <div>
                   <input
                     id="department"
-                    autoComplete="department"
+                    autoComplete="on"
                     {...register("department")}
                     placeholder="Department"
                     className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
@@ -253,7 +253,7 @@ const AuthForm: React.FC = () => {
                 <div>
                   <input
                     id="matricNumber"
-                    autoComplete="matricNumber"
+                    autoComplete="on"
                     {...register("matricNumber")}
                     placeholder="Matric Number (2021/36000)"
                     className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
@@ -268,7 +268,7 @@ const AuthForm: React.FC = () => {
                   <input
                     id="password"
                     type="password"
-                    autoComplete="new-password"
+                    autoComplete="on"
                     {...register("password")}
                     placeholder="Password"
                     className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"

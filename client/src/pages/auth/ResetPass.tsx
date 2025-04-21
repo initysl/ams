@@ -1,71 +1,158 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card";
 import api from "@/lib/axios";
-import React, { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import React from "react";
+import { FieldErrors, useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
+import { z } from "zod";
+import { EyeIcon, EyeOff } from "lucide-react";
+
+const resetPassSchema = z
+  .object({
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z
+      .string()
+      .min(6, "Confirm Password must be at least 6 characters"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+  });
+
+type ResetPassForm = z.infer<typeof resetPassSchema>;
 
 const ResetPass: React.FC = () => {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ResetPassForm>({
+    resolver: zodResolver(resetPassSchema),
+  });
+
+  const resetPassErrors = errors as FieldErrors<ResetPassForm>;
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
+  const token = searchParams.get("token");
 
-    const token = searchParams.get("token");
-    if (!token) {
-      setError("Invalid or missing reset token");
-      return;
-    }
+  const resetPassMutation = useMutation({
+    mutationFn: async (data: ResetPassForm) => {
+      if (!token) {
+        throw new Error("Token is missing");
+      }
+      const response = await api.post(
+        "/auth/reset",
+        { ...data, token },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message);
+      navigate("/login");
+    },
+    onError: (error) => {
+      toast.error(
+        (error as any)?.response?.data?.message || "An error occurred"
+      );
+    },
+  });
 
-    try {
-      await api.post("/auth/reset-password", { token, password });
-      setSuccess(true);
-      setTimeout(() => navigate("/login"), 3000); // Redirect to login after 3 seconds
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Something went wrong");
-    }
+  const onSubmit = (data: ResetPassForm) => {
+    resetPassMutation.mutate(data);
   };
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   return (
-    <div className="reset-pass-container">
-      <h1>Reset Password</h1>
-      {success ? (
-        <p>
-          Your password has been reset successfully. Redirecting to login...
-        </p>
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="password">New Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-          </div>
-          {error && <p className="error">{error}</p>}
-          <button type="submit">Reset Password</button>
-        </form>
-      )}
+    <div className="flex justify-center items-center h-screen">
+      <Card className="w-full max-w-md p-6 shadow-lg rounded-lg bg-white">
+        <CardTitle className="text-2xl text-center">
+          <h1>Reset password</h1>
+        </CardTitle>
+        <CardDescription className="text-gray-600 text-lg text-center">
+          <p>Enter your new password</p>
+        </CardDescription>
+        <CardContent>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-10"
+          >
+            <div className="space-y-8">
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  autoComplete="on"
+                  {...register("password")}
+                  placeholder="Enter new password"
+                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-2 text-gray-500"
+                >
+                  {showPassword ? <EyeOff /> : <EyeIcon />}
+                </button>
+                {resetPassErrors.password && (
+                  <p className="text-red-500 text-sm">
+                    {resetPassErrors.password.message}
+                  </p>
+                )}
+              </div>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  autoComplete="off"
+                  {...register("confirmPassword")}
+                  placeholder="Confirm new password"
+                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-2 top-2 text-gray-500"
+                >
+                  {showConfirmPassword ? <EyeOff /> : <EyeIcon />}
+                </button>
+                {resetPassErrors.confirmPassword && (
+                  <p className="text-red-500 text-sm">
+                    {resetPassErrors.confirmPassword.message}
+                  </p>
+                )}
+              </div>
+              {resetPassErrors.root?.message && (
+                <p className="text-red-500 text-sm">
+                  {resetPassErrors.root.message}
+                </p>
+              )}
+            </div>
+            <Button
+              className="bg-stone-500 hover:bg-stone-700 text-white hover:shadow-3xl hover:ease-in-out cursor-pointer"
+              disabled={resetPassMutation.isPending}
+            >
+              {resetPassMutation.isPending ? "Resetting..." : "Reset Password"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };

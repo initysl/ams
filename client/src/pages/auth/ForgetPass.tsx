@@ -51,9 +51,11 @@ const ForgetPass: React.FC = () => {
   return (
     <div className="flex justify-center items-center h-screen">
       <Card className="w-full max-w-md p-6 shadow-lg rounded-lg bg-white">
-        <CardTitle className="text-2xl font-bold">Forgot Password</CardTitle>
-        <CardDescription className="text-gray-600  text-lg">
-          Enter your email address to receive a password reset link.
+        <CardTitle className="text-2xl">
+          <h1>Forgot Password</h1>
+        </CardTitle>
+        <CardDescription className="text-gray-600 text-lg">
+          <p>Enter your email address to receive a password reset link.</p>
         </CardDescription>
         <form
           onSubmit={handleSubmit(onSubmit)}

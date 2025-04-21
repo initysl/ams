@@ -175,19 +175,16 @@ const forgotPassword = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "User does not exist" });
   }
   if (!user.isVerified) {
-    const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
-    await sendVerificationEmail(user.email, token);
     return res.status(400).json({
-      message:
-        "Verification email sent.Please verify your email before resetting your password.",
+      message: "Please atempt login to verify your email.",
     });
   }
   const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
   await sendResetPasswordEmail(user.email, token);
   res.status(200).json({
-    message: "Reset password email sent successfully",
+    message: "Password reset link sent",
   });
-  logger.info(`Reset password email sent to: ${user.email}`);
+  logger.info(`Password reset link sent to: ${user.email}`);
 });
 
 // Reset Password
