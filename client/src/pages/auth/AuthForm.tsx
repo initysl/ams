@@ -7,6 +7,7 @@ import api from "@/lib/axios";
 import { toast } from "sonner"; // for user feedback
 import { Button } from "../../components/ui/button";
 import Profilebox from "@/components/ui/Profilebox";
+import { Link } from "react-router-dom";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -196,6 +197,14 @@ const AuthForm: React.FC = () => {
                 <label htmlFor="remember" className="text-sm text-gray-600">
                   Remember me
                 </label>
+              </div>
+              <div className="text-right">
+                <Link
+                  to="forget-pass"
+                  className="text-blue-500 hover:underline"
+                >
+                  Forget Password
+                </Link>
               </div>
             </>
           ) : (

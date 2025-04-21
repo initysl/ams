@@ -67,7 +67,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar
-      collapsible="offcanvas"
+      collapsible="icon"
       className={`border-none min-h-screen ${
         isMobile ? "bg-blue-800 text-white" : "bg-stone-800 text-stone-100"
       }`}

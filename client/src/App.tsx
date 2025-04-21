@@ -14,6 +14,8 @@ import Attendance from "./pages/dashboard/Attendance";
 import Settings from "./pages/dashboard/Settings";
 import GenerateQR from "./pages/dashboard/GenerateQR";
 import ScanQR from "./pages/dashboard/ScanQR";
+import ForgetPass from "./pages/auth/ForgetPass";
+import ResetPass from "./pages/auth/ResetPass";
 
 function App() {
   return (
@@ -23,7 +25,8 @@ function App() {
           <Route path="/" element={<SplashScreen />} />
           <Route path="/auth" element={<AuthForm />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
-
+          <Route path="/forget-pass" element={<ForgetPass />} />
+          <Route path="/reset-password" element={<ResetPass />} />
           {/*Dashboard routes with layout and outlet */}
           <Route path="/dashboard" element={<Layout />}>
             <Route index element={<Navigate to="/dashboard/home" replace />} />

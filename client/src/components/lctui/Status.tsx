@@ -12,7 +12,7 @@ export const Status = () => {
         </p>
         <p className="text-sm text-gray-800">Download Attendance.</p>
         <Link to="/dashboard/attendance">
-          <Button className=" bg-white cursor-pointer">View Attendance</Button>
+          <Button className=" bg-white  cursor-pointer">View Attendance</Button>
         </Link>
       </Card>
     </div>

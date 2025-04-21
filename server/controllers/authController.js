@@ -7,6 +7,8 @@ const { validationResult } = require("express-validator");
 const SECRET_KEY = process.env.JWT_SECRET;
 const asyncHandler = require("express-async-handler");
 const sendVerificationEmail = require("../utils/verifyEmail");
+const sendResetPasswordEmail = require("../utils/resetPassword");
+
 const upload = require("../utils/multerConfig");
 // Ensure you store jwt using cookies here
 
@@ -151,6 +153,63 @@ const verifyEmail = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json({ success: true, message: "Email verified successfully!" });
+});
+
+// Forget Password
+const forgetPassword = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array() });
+  }
+
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(400).json({ message: "User does not exist" });
+  }
+  const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
+  await sendResetPasswordEmail(user.email, token);
+  res.status(200).json({
+    message: "Reset password email sent successfully",
+  });
+  logger.info(`Reset password email sent to: ${user.email}`);
+});
+
+// Reset Password
+const resetPassword = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array() });
+  }
+  const { token, newPassword, confirmPassword } = req.body;
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ message: "Passwords do not match" });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, SECRET_KEY);
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid or expired token." });
+  }
+
+  const user = await User.findById(decoded.id);
+  if (!user) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid verification link." });
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  user.password = hashedPassword;
+  await user.save();
+
+  res
+    .status(200)
+    .json({ success: true, message: "Password reset successfully!" });
 });
 
 // Logout; Handle this in frontend using cookies
