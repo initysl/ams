@@ -30,6 +30,6 @@ router.post("/login", validateLogin, loginLimiter, login);
 router.get("/verify-email", verifyEmail);
 router.post("/logout", authMiddleware, logout);
 router.post("/recover", forgotPassword);
-router.post("/reset", authMiddleware, resetPassword);
+router.post("/reset", resetPassword);
 
 module.exports = router;

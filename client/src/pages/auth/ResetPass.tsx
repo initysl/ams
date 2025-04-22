@@ -18,10 +18,10 @@ import { EyeIcon, EyeOff } from "lucide-react";
 
 const resetPassSchema = z
   .object({
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    newPassword: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(6, "Confirm your password"),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
@@ -98,7 +98,7 @@ const ResetPass: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   id="password"
                   autoComplete="on"
-                  {...register("password")}
+                  {...register("newPassword")}
                   placeholder="Enter new password"
                   className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
                 />
@@ -109,9 +109,9 @@ const ResetPass: React.FC = () => {
                 >
                   {showPassword ? <EyeOff /> : <EyeIcon />}
                 </button>
-                {resetPassErrors.password && (
+                {resetPassErrors.newPassword && (
                   <p className="text-red-500 text-sm">
-                    {resetPassErrors.password.message}
+                    {resetPassErrors.newPassword.message}
                   </p>
                 )}
               </div>
