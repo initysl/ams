@@ -63,7 +63,7 @@ const ResetPass: React.FC = () => {
     },
     onSuccess: (data) => {
       toast.success(data.message);
-      navigate("/login");
+      navigate("/auth");
     },
     onError: (error) => {
       toast.error(

@@ -8,6 +8,7 @@ import { toast } from "sonner"; // for user feedback
 import { Button } from "../../components/ui/button";
 import Profilebox from "@/components/ui/Profilebox";
 import { Link } from "react-router-dom";
+import { EyeIcon, EyeOff } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -126,6 +127,9 @@ const AuthForm: React.FC = () => {
     }
   };
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   return (
     <div className="flex justify-center items-center min-h-svh p-2">
       <div className="bg-white p-8 rounded-tr-xl rounded-bl-xl shadow-2xl w-full max-w-2xl transition-all duration-500">
@@ -172,15 +176,22 @@ const AuthForm: React.FC = () => {
                   </p>
                 )}
               </div>
-              <div>
+              <div className="relative">
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="on"
                   {...register("password")}
                   placeholder="Password"
                   className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-2 text-gray-500"
+                >
+                  {showPassword ? <EyeOff /> : <EyeIcon />}
+                </button>
                 {loginErrors.password && (
                   <p className="text-red-500 text-sm mt-1">
                     {loginErrors.password.message}
@@ -199,7 +210,7 @@ const AuthForm: React.FC = () => {
                 </label>
               </div>
               <div className="text-right">
-                <Link to="recover" className="text-blue-500 hover:underline">
+                <Link to="/recover" className="text-blue-500 hover:underline">
                   Forgotten Password?
                 </Link>
               </div>
@@ -264,30 +275,44 @@ const AuthForm: React.FC = () => {
                     </p>
                   )}
                 </div>
-                <div>
+                <div className="relative">
                   <input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     autoComplete="on"
                     {...register("password")}
                     placeholder="Password"
                     className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2 top-2 text-gray-500"
+                  >
+                    {showPassword ? <EyeOff /> : <EyeIcon />}
+                  </button>
                   {registerErrors.password && (
                     <p className="text-red-500 text-sm mt-1">
                       {registerErrors.password.message}
                     </p>
                   )}
                 </div>
-                <div>
+                <div className="relative">
                   <input
                     id="confirmPassword"
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     autoComplete="off"
                     {...register("confirmPassword")}
                     placeholder="Confirm Password"
                     className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-2 top-2 text-gray-500"
+                  >
+                    {showConfirmPassword ? <EyeOff /> : <EyeIcon />}
+                  </button>
                   {registerErrors.confirmPassword && (
                     <p className="text-red-500 text-sm mt-1">
                       {registerErrors.confirmPassword.message}

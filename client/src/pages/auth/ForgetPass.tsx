@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import api from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
 import { useForm, FieldErrors } from "react-hook-form";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
