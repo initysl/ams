@@ -193,7 +193,8 @@ const resetPassword = asyncHandler(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ message: errors.array() });
   }
-  const { token, newPassword, confirmPassword } = req.body;
+  const { newPassword, confirmPassword } = req.body;
+  const token = req.params();
 
   if (newPassword !== confirmPassword) {
     return res.status(400).json({ message: "Passwords do not match" });
