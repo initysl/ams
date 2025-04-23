@@ -20,17 +20,17 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
         .json({ error: "Unauthorized. Only lecturers can generate QR codes" });
     }
 
-    const { courseCode, description, level, expiryMinutes } = req.body;
-    if (!courseCode || !description || !expiryMinutes) {
+    const { courseCode, courseTitle, level, expiryMinutes } = req.body;
+    if (!courseCode || !courseTitle || !expiryMinutes) {
       return res.status(400).json({
-        error: "Course code, description, level, and expiry time are required",
+        error: "Course code, courseTitle, level, and expiry time are required",
       });
     }
 
     // Create a new lecture session
     const lectureSession = new LectureSession({
       courseCode,
-      description,
+      courseTitle,
       level,
       sessionStart: new Date(),
       sessionEnd: moment().add(expiryMinutes, "minutes").toDate(),
@@ -43,7 +43,7 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
 
     // Generate JWT token with session ID
     const token = jwt.sign(
-      { sessionId, courseCode, description, level, expiryTime },
+      { sessionId, courseCode, courseTitle, level, expiryTime },
       process.env.JWT_SECRET,
       { expiresIn: expiryMinutes * 60 } // Convert minutes to seconds
     );
@@ -171,8 +171,35 @@ const getAttendanceReport = asyncHandler(async (req, res) => {
   }
 });
 
+// Get Recently Marked Attendance
+const recentlyMarkedAttendance = asyncHandler(async (req, res) => {
+  try {
+    const { matricNumber } = req.user;
+    if (!matricNumber) {
+      return res.status(401).json({ error: "Unauthorized. Please log in" });
+    }
+    const lectureSessions = await LectureSession.find({
+      "attendanceRecords.matricNumber": matricNumber,
+    });
+    const recentSessions = lectureSessions.map((session) => ({
+      sessionId: session._id,
+      courseCode: session.courseCode,
+      courseTitle: session.courseTitle,
+      level: session.level,
+      status: session.attendanceRecords.find(
+        (record) => record.matricNumber === matricNumber
+      ).status,
+    }));
+    res.status(200).json(recentSessions);
+  } catch (error) {
+    console.error("Error fetching recent attendance:", error);
+    res.status(500).json({ error: "Error fetching recent attendance" });
+  }
+});
+
 module.exports = {
   generateAttendanceQRCode,
   markAttendance,
   getAttendanceReport,
+  recentlyMarkedAttendance,
 };

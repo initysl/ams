@@ -3,6 +3,7 @@ const {
   generateAttendanceQRCode,
   markAttendance,
   getAttendanceReport,
+  recentlyMarkedAttendance,
 } = require("../controllers/attendanceController");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 const { validateSessionId } = require("../middlewares/validationMiddleware");
@@ -16,5 +17,7 @@ router.get(
   validateSessionId,
   getAttendanceReport
 );
+
+router.get("/recent-attendance", authMiddleware, recentlyMarkedAttendance);
 
 module.exports = router;
