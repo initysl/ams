@@ -181,6 +181,9 @@ const recentlyMarkedAttendance = asyncHandler(async (req, res) => {
     const lectureSessions = await LectureSession.find({
       "attendanceRecords.matricNumber": matricNumber,
     });
+    if (!lectureSessions || lectureSessions.length === 0) {
+      return res.status(404).json({ error: "No recent attendance found" });
+    }
     const recentSessions = lectureSessions.map((session) => ({
       sessionId: session._id,
       courseCode: session.courseCode,
