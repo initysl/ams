@@ -16,26 +16,30 @@ import GenerateQR from "./pages/dashboard/GenerateQR";
 import ScanQR from "./pages/dashboard/ScanQR";
 import ForgetPass from "./pages/auth/ForgetPass";
 import ResetPass from "./pages/auth/ResetPass";
-import { useAuth } from "./context/AuthContext"; // Import useAuth hook
+import ProtectedRoute from "./context/ProtectedRoutes";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
-  const { isAuthenticated } = useAuth(); // Use the authentication state
+  // const { isAuthenticated } = useAuth();
 
   return (
     <div className="bg-stone-300">
       <Router>
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<SplashScreen />} />
           <Route path="/auth" element={<AuthForm />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/recover" element={<ForgetPass />} />
           <Route path="/reset" element={<ResetPass />} />
 
-          {/* Protected Dashboard routes */}
+          {/* Protected Dashboard routes using ProtectedRoute component */}
           <Route
             path="/dashboard"
             element={
-              isAuthenticated ? <Layout /> : <Navigate to="/auth" replace />
+              <ProtectedRoute redirectTo="/auth">
+                <Layout />
+              </ProtectedRoute>
             }
           >
             <Route index element={<Navigate to="/dashboard/home" replace />} />
@@ -46,6 +50,7 @@ function App() {
             <Route path="generate" element={<GenerateQR />} />
           </Route>
 
+          {/* Redirect to splash screen for unknown routes */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>

@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link, useLocation } from "react-router-dom";
 import { Separator } from "./ui/separator";
+import { useAuth } from "@/context/AuthContext";
 
 // Menu items.
 const items = [
@@ -65,6 +66,11 @@ export function AppSidebar() {
   const isActive = (item: { url: string }) =>
     location.pathname.includes(`/dashboard/${item.url}`);
 
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
+  if (!isAuthenticated) {
+    return null; // or redirect to login page
+  }
   return (
     <Sidebar
       collapsible="icon"
@@ -112,7 +118,7 @@ export function AppSidebar() {
                     <SidebarMenuButton className="flex items-center gap-2 p-2 w-full text-sm font-medium text-ellipsis">
                       <ChevronUp className="ml-auto" size={18} />
                       <User2 size={18} />
-                      lawalyusuf356@gmail.com
+                      {user.email}
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent

@@ -12,6 +12,7 @@ import rawCardData from "@/components/json/card.json";
 import { Status } from "@/components/lctui/Status";
 import { Activity } from "@/components/lctui/Activity";
 import { Chart } from "@/components/general/Chart";
+import { useAuth } from "@/context/AuthContext";
 
 type CardItem = {
   id: number;
@@ -52,12 +53,16 @@ const Home: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const { user } = useAuth();
+
   return (
     <div className="space-y-8">
       {/* Top Section with Date and Profile */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Welcome Back, @{username} 👋</h2>
+          <h2 className="text-2xl font-bold">
+            Welcome Back, {user?.matricNumber}
+          </h2>
           <p className="text-sm text-muted-foreground">{today}</p>
         </div>
       </div>

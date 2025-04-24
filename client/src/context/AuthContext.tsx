@@ -5,19 +5,19 @@ import {
   useState,
   ReactNode,
   useEffect,
-  useRef,
 } from "react";
 
 type User = {
   matricNumber?: string | null;
   email: string;
-  profilePicture?: string | null;
+  profilePic?: string | null;
   role: "student" | "lecturer";
 };
 
 type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -28,6 +28,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const isAuthenticated = !!user;
 
   const login = async (credentials: { email: string; password: string }) => {
@@ -36,12 +37,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         withCredentials: true, // Needed for sending/receiving cookies
       });
 
+      // Check if there's a user object in the response
       if (response.data.user) {
         setUser(response.data.user);
       } else {
-        throw new Error("Login failed");
+        throw new Error(response.data.message || "Login failed");
       }
-      return response.data;
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -59,33 +60,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const hasFetched = useRef(false);
-
   useEffect(() => {
-    if (!hasFetched.current) {
-      hasFetched.current = true;
+    const fetchUser = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get("user/profile/me", {
+          withCredentials: true,
+        });
 
-      const fetchUser = async () => {
-        try {
-          const response = await api.get("user/profile/me", {
-            withCredentials: true,
-          });
-          if (response.data.success) {
-            setUser(response.data.user);
-            console.log("User fetched from cookie:", response.data.user);
-          }
-        } catch (error) {
-          console.error("Error fetching user:", error);
-          setUser(null);
+        // Check if the response has the user object
+        if (response.data.user) {
+          setUser(response.data.user);
+          console.log("User authenticated from session:", response.data.user);
         }
-      };
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-      fetchUser();
-    }
-  }, []); // Empty dependency array
+    fetchUser();
+  }, []); // Empty dependency array - only run once on mount
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated, isLoading, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
