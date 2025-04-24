@@ -1,49 +1,44 @@
+// AuthForm.tsx
 import React, { useState } from "react";
-import { useForm, SubmitHandler, FieldErrors } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import api from "@/lib/axios";
-import { toast } from "sonner"; // for user feedback
 import { Button } from "../../components/ui/button";
-import Profilebox from "@/components/ui/Profilebox";
-import { Link } from "react-router-dom";
-import { EyeIcon, EyeOff, Loader } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Loader } from "lucide-react";
+import LoginForm from "./LoginForm";
+import RegisterForm from "./RegisterForm";
+import { useAuth } from "@/context/AuthContext"; // Import the useAuth hook
+import { useNavigate } from "react-router-dom"; // For navigation after login
 
-const loginSchema = z.object({
-  email: z.string().email("Invalid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  remember: z.boolean().optional(),
-});
+// Define interface for API error
+interface ApiError extends Error {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
 
-const registerSchema = z
-  .object({
-    name: z.string().min(5, "Name is required"),
-    email: z.string().email("Invalid email"),
-    department: z.string().min(3, "Department is required"),
-    matricNumber: z
-      .string()
-      .min(10, "Matric number must be at least 10 characters")
-      .or(z.literal("").optional()),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Confirm your password"),
-    profilePic: z.any().optional(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-
-type LoginFields = z.infer<typeof loginSchema>;
-type RegisterFields = z.infer<typeof registerSchema>;
+// Define types for register data
+interface RegisterData {
+  name: string;
+  email: string;
+  department: string;
+  matricNumber?: string;
+  password: string;
+  confirmPassword: string;
+  profilePic?: File;
+}
 
 const AuthForm: React.FC = () => {
   const [isSignIn, setIsSignIn] = useState(true);
-
   const [profilePic, setProfilePic] = useState<File | null>(null);
-
   const [previewURL, setPreviewURL] = useState<string>("");
+  const navigate = useNavigate();
+
+  // Use the auth context
+  const { login } = useAuth();
+
   // Handle image change from Profilebox
   const handleImageChange = (file: File) => {
     const validTypes = ["image/jpeg", "image/png", "image/jpg"];
@@ -55,36 +50,28 @@ const AuthForm: React.FC = () => {
     setPreviewURL(URL.createObjectURL(file));
   };
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<LoginFields | RegisterFields>({
-    resolver: zodResolver(isSignIn ? loginSchema : registerSchema),
-  });
-
-  const loginErrors = errors as FieldErrors<LoginFields>;
-  const registerErrors = errors as FieldErrors<RegisterFields>;
-
-  // === Login Mutation ===
-
+  // === Login Mutation using AuthContext ===
   const loginMutation = useMutation({
-    mutationFn: (data: LoginFields) => api.post("auth/login", data),
-    onSuccess: (res) => {
-      toast.success(`Signed in successfully: ${res.data.message}`);
-      reset();
+    mutationFn: async (credentials: { email: string; password: string }) => {
+      return login(credentials);
     },
-    onError: (err: any) => {
+    onSuccess: () => {
+      toast.success("Signed in successfully!");
+      // Redirect to dashboard or home page after successful login
+      navigate("/dashboard/home");
+    },
+    onError: (err: ApiError) => {
       toast.error(
-        `Sign in failed: ${err.response?.data?.message || "Unknown error"}`
+        `Sign in failed: ${
+          err.response?.data?.message || "Invalid credentials"
+        }`
       );
     },
   });
 
   // === Register Mutation ===
   const registerMutation = useMutation({
-    mutationFn: async (data: RegisterFields) => {
+    mutationFn: async (data: RegisterData) => {
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("email", data.email);
@@ -107,29 +94,25 @@ const AuthForm: React.FC = () => {
     },
     onSuccess: (res) => {
       toast.success(`Registered successfully: ${res.data.message}`);
-      reset();
       setProfilePic(null);
       setPreviewURL("");
+      // Automatically switch to sign in form after successful registration
+      setIsSignIn(true);
     },
-    onError: (err: any) => {
+    onError: (err: ApiError) => {
       toast.error(
         `Registration failed: ${err.response?.data?.message || "Unknown error"}`
       );
     },
   });
 
-  const onSubmit: SubmitHandler<LoginFields | RegisterFields> = async (
-    data
-  ) => {
-    if (isSignIn) {
-      loginMutation.mutate(data as LoginFields);
-    } else {
-      registerMutation.mutate(data as RegisterFields);
-    }
+  const handleLoginSubmit = (data: { email: string; password: string }) => {
+    loginMutation.mutate(data);
   };
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const handleRegisterSubmit = (data: RegisterData) => {
+    registerMutation.mutate(data);
+  };
 
   return (
     <div className="flex justify-center items-center min-h-svh p-2">
@@ -144,213 +127,54 @@ const AuthForm: React.FC = () => {
               : "Create an account to get started"}
           </p>
         </div>
+
         <h2 className="text-2xl font-bold text-green-600 mb-6">
-          <div className="flex justify-between items-center">
-            {isSignIn ? "Sign In" : "Register"}
-            {!isSignIn && (
-              <Profilebox
-                profilePic={
-                  previewURL ||
-                  `${import.meta.env.VITE_API_URL}images/default.png`
-                }
-                onImageChange={handleImageChange}
-              />
-            )}
-          </div>
+          {isSignIn ? "Sign In" : "Register"}
         </h2>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {isSignIn ? (
-            <>
-              <div>
-                <Input
-                  id="email"
-                  type="email"
-                  autoComplete="on"
-                  {...register("email")}
-                  placeholder="Email address"
-                  className="w-full p-2 bg-gray-100 rounded-sm focus:ring-2 focus:ring-slate-400 focus:outline-none"
-                />
-                {loginErrors.email && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {loginErrors.email.message}
-                  </p>
-                )}
-              </div>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="on"
-                  {...register("password")}
-                  placeholder="Password"
-                  className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2 top-2 text-gray-500"
-                >
-                  {showPassword ? <EyeOff /> : <EyeIcon />}
-                </button>
-                {loginErrors.password && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {loginErrors.password.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-x-2">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  {...register("remember")}
-                  className="accent-green-600"
-                />
-                <label htmlFor="remember" className="text-sm text-gray-600">
-                  Remember me
-                </label>
-              </div>
-              <div className="text-right">
-                <Link to="/recover" className="text-blue-500 hover:underline">
-                  Forgotten Password?
-                </Link>
-              </div>
-            </>
-          ) : (
-            <div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <Input
-                    id="name"
-                    autoComplete="on"
-                    {...register("name")}
-                    placeholder="Full Name"
-                    className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-                  />
-                  {registerErrors.name && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {registerErrors.name.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Input
-                    id="email"
-                    type="email"
-                    autoComplete="on"
-                    {...register("email")}
-                    placeholder="Email"
-                    className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-                  />
-                  {registerErrors.email && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {registerErrors.email.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Input
-                    id="department"
-                    autoComplete="on"
-                    {...register("department")}
-                    placeholder="Department"
-                    className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-                  />
-                  {registerErrors.department && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {registerErrors.department.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Input
-                    id="matricNumber"
-                    autoComplete="on"
-                    {...register("matricNumber")}
-                    placeholder="Matric Number (2021/36000)"
-                    className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-                  />
-                  {registerErrors.matricNumber && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {registerErrors.matricNumber.message}
-                    </p>
-                  )}
-                </div>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="on"
-                    {...register("password")}
-                    placeholder="Password"
-                    className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-2 top-2 text-gray-500"
-                  >
-                    {showPassword ? <EyeOff /> : <EyeIcon />}
-                  </button>
-                  {registerErrors.password && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {registerErrors.password.message}
-                    </p>
-                  )}
-                </div>
-                <div className="relative">
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    autoComplete="off"
-                    {...register("confirmPassword")}
-                    placeholder="Confirm Password"
-                    className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-2 top-2 text-gray-500"
-                  >
-                    {showConfirmPassword ? <EyeOff /> : <EyeIcon />}
-                  </button>
-                  {registerErrors.confirmPassword && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {registerErrors.confirmPassword.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+        {isSignIn ? (
+          <LoginForm
+            onSubmit={handleLoginSubmit}
+            isPending={loginMutation.isPending}
+          />
+        ) : (
+          <RegisterForm
+            onSubmit={handleRegisterSubmit}
+            isPending={registerMutation.isPending}
+            previewURL={
+              previewURL || `${import.meta.env.VITE_API_URL}images/default.png`
+            }
+            onImageChange={handleImageChange}
+          />
+        )}
 
-          <div className="flex flex-col items-center mt-8 space-y-4">
-            <Button
-              type="submit"
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg"
-              disabled={loginMutation.isPending || registerMutation.isPending}
+        <div className="flex flex-col items-center mt-8 space-y-4">
+          <Button
+            type="submit"
+            form={isSignIn ? "login-form" : "register-form"}
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg"
+            disabled={loginMutation.isPending || registerMutation.isPending}
+          >
+            {loginMutation.isPending || registerMutation.isPending ? (
+              <Loader className="w-4 h-4 animate-spin" />
+            ) : isSignIn ? (
+              "Sign In"
+            ) : (
+              "Register"
+            )}
+          </Button>
+
+          <p className="text-sm text-gray-600">
+            {isSignIn ? "Don't have an account?" : "Already have an account?"}
+            <button
+              type="button"
+              onClick={() => setIsSignIn(!isSignIn)}
+              className="text-blue-600 hover:underline ml-1"
             >
-              {loginMutation.isPending || registerMutation.isPending ? (
-                <Loader className="w-4 h-4 animate-spin" />
-              ) : isSignIn ? (
-                "Sign In"
-              ) : (
-                "Register"
-              )}
-            </Button>
-
-            <p className="text-sm text-gray-600">
-              {isSignIn ? "Don't have an account?" : "Already have an account?"}
-              <button
-                type="button"
-                onClick={() => setIsSignIn(!isSignIn)}
-                className="text-blue-600 hover:underline ml-1"
-              >
-                {isSignIn ? "Sign Up" : "Sign In"}
-              </button>
-            </p>
-          </div>
-        </form>
+              {isSignIn ? "Sign Up" : "Sign In"}
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );

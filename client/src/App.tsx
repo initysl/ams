@@ -3,7 +3,7 @@ import {
   Routes,
   Route,
   Navigate,
-} from "react-router-dom"; // ✅ fixed this line!
+} from "react-router-dom";
 import SplashScreen from "./pages/splash/SplashScreen";
 import AuthForm from "./pages/auth/AuthForm";
 import VerifyEmail from "./pages/email/VerifyEmail";
@@ -16,8 +16,11 @@ import GenerateQR from "./pages/dashboard/GenerateQR";
 import ScanQR from "./pages/dashboard/ScanQR";
 import ForgetPass from "./pages/auth/ForgetPass";
 import ResetPass from "./pages/auth/ResetPass";
+import { useAuth } from "./context/AuthContext"; // Import useAuth hook
 
 function App() {
+  const { isAuthenticated } = useAuth(); // Use the authentication state
+
   return (
     <div className="bg-stone-300">
       <Router>
@@ -26,17 +29,21 @@ function App() {
           <Route path="/auth" element={<AuthForm />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/recover" element={<ForgetPass />} />
-          {/* Work on the below route, rmove */}
           <Route path="/reset" element={<ResetPass />} />
-          {/*Dashboard routes with layout and outlet */}
-          <Route path="/dashboard" element={<Layout />}>
+
+          {/* Protected Dashboard routes */}
+          <Route
+            path="/dashboard"
+            element={
+              isAuthenticated ? <Layout /> : <Navigate to="/auth" replace />
+            }
+          >
             <Route index element={<Navigate to="/dashboard/home" replace />} />
             <Route path="home" element={<Home />} />
             <Route path="attendance" element={<Attendance />} />
             <Route path="settings" element={<Settings />} />
             <Route path="scan" element={<ScanQR />} />
             <Route path="generate" element={<GenerateQR />} />
-            {/* <Route path="profile" element={<Settings />} /> */}
           </Route>
 
           <Route path="*" element={<Navigate to="/" />} />

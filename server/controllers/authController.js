@@ -70,7 +70,7 @@ const login = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: errors.array() });
   }
 
-  const { email, password, remember } = req.body;
+  const { email, password } = req.body;
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -119,7 +119,7 @@ const login = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: remember ? 5 * 24 * 60 * 60 * 1000 : undefined, // 5 days
+    maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
   });
 
   res.status(200).json({

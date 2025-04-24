@@ -2,21 +2,24 @@ import api from "@/lib/axios";
 import {
   createContext,
   useContext,
-  useEffect,
   useState,
   ReactNode,
+  useEffect,
 } from "react";
 
 type User = {
   name: string;
   matricNumber?: string;
   email: string;
+  password: string;
+  department: string;
   profilePic?: string;
   role: "student" | "lecturer";
 };
 
 type AuthContextType = {
   user: User | null;
+  isAuthenticated: boolean;
   login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -27,10 +30,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
+  const isAuthenticated = !!user;
 
   const login = async (credentials: { email: string; password: string }) => {
     try {
-      const response = await api.post("/auth/login", credentials, {
+      const response = await api.post("auth/login", credentials, {
         withCredentials: true, // Needed for sending/receiving cookies
       });
 
@@ -47,7 +51,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const logout = async () => {
     try {
-      await api.post("/auth/logout", null, {
+      await api.post("auth/logout", null, {
         withCredentials: true,
       });
       setUser(null);
@@ -56,22 +60,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  // useEffect(() => {
-  //   // Automatically fetch user if already logged in (cookie exists)
-  //   api
-  //     .get("/profile/me", { withCredentials: true })
-  //     .then((response) => {
-  //       if (response.data.success) {
-  //         setUser(response.data.user);
-  //       }
-  //     })
-  //     .catch(() => {
-  //       setUser(null);
-  //     });
-  // }, []);
+  useEffect(() => {
+    // Automatically fetch user if already logged in (cookie exists)
+    api
+      .get("user/profile/me", { withCredentials: true })
+      .then((response) => {
+        if (response.data.success) {
+          setUser(response.data.user);
+        }
+      })
+      .catch(() => {
+        setUser(null);
+      });
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
