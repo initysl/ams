@@ -27,7 +27,7 @@ interface RegisterData {
   department: string;
   password: string;
   confirmPassword: string;
-  profilePic?: File | null;
+  profilePicture?: File | null;
 }
 
 const AuthForm: React.FC = () => {

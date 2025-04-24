@@ -9,12 +9,9 @@ import {
 } from "react";
 
 type User = {
-  name: string;
   matricNumber?: string | null;
   email: string;
-  password: string;
-  department: string;
-  profilePic?: string | null;
+  profilePicture?: string | null;
   role: "student" | "lecturer";
 };
 
@@ -39,11 +36,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         withCredentials: true, // Needed for sending/receiving cookies
       });
 
-      if (response.data.success) {
+      if (response.data.user) {
         setUser(response.data.user);
       } else {
         throw new Error("Login failed");
       }
+      return response.data;
     } catch (error) {
       console.error("Login error:", error);
       throw error;
