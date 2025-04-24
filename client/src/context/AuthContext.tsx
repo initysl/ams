@@ -5,15 +5,16 @@ import {
   useState,
   ReactNode,
   useEffect,
+  useRef,
 } from "react";
 
 type User = {
   name: string;
-  matricNumber?: string;
+  matricNumber?: string | null;
   email: string;
   password: string;
   department: string;
-  profilePic?: string;
+  profilePic?: string | null;
   role: "student" | "lecturer";
 };
 
@@ -60,19 +61,30 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const hasFetched = useRef(false);
+
   useEffect(() => {
-    // Automatically fetch user if already logged in (cookie exists)
-    api
-      .get("user/profile/me", { withCredentials: true })
-      .then((response) => {
-        if (response.data.success) {
-          setUser(response.data.user);
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+
+      const fetchUser = async () => {
+        try {
+          const response = await api.get("user/profile/me", {
+            withCredentials: true,
+          });
+          if (response.data.success) {
+            setUser(response.data.user);
+            console.log("User fetched from cookie:", response.data.user);
+          }
+        } catch (error) {
+          console.error("Error fetching user:", error);
+          setUser(null);
         }
-      })
-      .catch(() => {
-        setUser(null);
-      });
-  }, []);
+      };
+
+      fetchUser();
+    }
+  }, []); // Empty dependency array
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>

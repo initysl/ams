@@ -12,6 +12,12 @@ const getUserProfile = asyncHandler(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ message: errors.array() });
   }
+
+  // Check if user is authenticated
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  // Find user by ID
   const user = await User.findById(req.user._id);
   if (user) {
     res.json({
@@ -33,6 +39,11 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ message: errors.array() });
+  }
+
+  // Check if user is authenticated
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
   const user = await User.findById(req.user._id).select("+password");
@@ -129,6 +140,12 @@ const deleteUserProfile = asyncHandler(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ message: errors.array() });
   }
+
+  // Check if user is authenticated
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   const user = await User.findById(req.user._id);
 
   if (!user) {

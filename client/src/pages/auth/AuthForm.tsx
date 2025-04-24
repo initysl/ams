@@ -22,12 +22,12 @@ interface ApiError extends Error {
 // Define types for register data
 interface RegisterData {
   name: string;
+  matricNumber?: string | null;
   email: string;
   department: string;
-  matricNumber?: string;
   password: string;
   confirmPassword: string;
-  profilePic?: File;
+  profilePic?: File | null;
 }
 
 const AuthForm: React.FC = () => {
