@@ -14,7 +14,8 @@ import { FieldErrors, useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
-import { EyeIcon, EyeOff } from "lucide-react";
+import { EyeIcon, EyeOff, Loader } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const resetPassSchema = z
   .object({
@@ -50,7 +51,7 @@ const ResetPass: React.FC = () => {
         throw new Error("Token is missing");
       }
       const response = await api.post(
-        "/auth/reset",
+        "auth/reset",
         { ...data, token },
         {
           headers: {
@@ -94,7 +95,7 @@ const ResetPass: React.FC = () => {
           >
             <div className="space-y-8">
               <div className="relative">
-                <input
+                <Input
                   type={showPassword ? "text" : "password"}
                   id="password"
                   autoComplete="on"
@@ -116,7 +117,7 @@ const ResetPass: React.FC = () => {
                 )}
               </div>
               <div className="relative">
-                <input
+                <Input
                   type={showConfirmPassword ? "text" : "password"}
                   id="confirmPassword"
                   autoComplete="off"
@@ -147,7 +148,11 @@ const ResetPass: React.FC = () => {
               className="bg-stone-500 hover:bg-stone-700 text-white hover:shadow-3xl hover:ease-in-out cursor-pointer"
               disabled={resetPassMutation.isPending}
             >
-              {resetPassMutation.isPending ? "Resetting..." : "Reset Password"}
+              {resetPassMutation.isPending ? (
+                <Loader className="w-4 h-4 animate-spin" />
+              ) : (
+                "Reset Password"
+              )}
             </Button>
           </form>
         </CardContent>

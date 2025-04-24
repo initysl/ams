@@ -8,7 +8,8 @@ import { toast } from "sonner"; // for user feedback
 import { Button } from "../../components/ui/button";
 import Profilebox from "@/components/ui/Profilebox";
 import { Link } from "react-router-dom";
-import { EyeIcon, EyeOff } from "lucide-react";
+import { EyeIcon, EyeOff, Loader } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -69,7 +70,7 @@ const AuthForm: React.FC = () => {
   // === Login Mutation ===
 
   const loginMutation = useMutation({
-    mutationFn: (data: LoginFields) => api.post("/auth/login", data),
+    mutationFn: (data: LoginFields) => api.post("auth/login", data),
     onSuccess: (res) => {
       toast.success(`Signed in successfully: ${res.data.message}`);
       reset();
@@ -98,7 +99,7 @@ const AuthForm: React.FC = () => {
         formData.append("profilePicture", profilePic);
       }
 
-      return api.post("/auth/register", formData, {
+      return api.post("auth/register", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -162,7 +163,7 @@ const AuthForm: React.FC = () => {
           {isSignIn ? (
             <>
               <div>
-                <input
+                <Input
                   id="email"
                   type="email"
                   autoComplete="on"
@@ -177,7 +178,7 @@ const AuthForm: React.FC = () => {
                 )}
               </div>
               <div className="relative">
-                <input
+                <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="on"
@@ -198,7 +199,7 @@ const AuthForm: React.FC = () => {
                   </p>
                 )}
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="space-x-2">
                 <input
                   type="checkbox"
                   id="remember"
@@ -219,7 +220,7 @@ const AuthForm: React.FC = () => {
             <div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <input
+                  <Input
                     id="name"
                     autoComplete="on"
                     {...register("name")}
@@ -233,7 +234,7 @@ const AuthForm: React.FC = () => {
                   )}
                 </div>
                 <div>
-                  <input
+                  <Input
                     id="email"
                     type="email"
                     autoComplete="on"
@@ -248,7 +249,7 @@ const AuthForm: React.FC = () => {
                   )}
                 </div>
                 <div>
-                  <input
+                  <Input
                     id="department"
                     autoComplete="on"
                     {...register("department")}
@@ -262,7 +263,7 @@ const AuthForm: React.FC = () => {
                   )}
                 </div>
                 <div>
-                  <input
+                  <Input
                     id="matricNumber"
                     autoComplete="on"
                     {...register("matricNumber")}
@@ -276,7 +277,7 @@ const AuthForm: React.FC = () => {
                   )}
                 </div>
                 <div className="relative">
-                  <input
+                  <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     autoComplete="on"
@@ -298,7 +299,7 @@ const AuthForm: React.FC = () => {
                   )}
                 </div>
                 <div className="relative">
-                  <input
+                  <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     autoComplete="off"
@@ -329,11 +330,13 @@ const AuthForm: React.FC = () => {
               className="bg-green-600 hover:bg-green-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg"
               disabled={loginMutation.isPending || registerMutation.isPending}
             >
-              {loginMutation.isPending || registerMutation.isPending
-                ? "Please wait..."
-                : isSignIn
-                ? "Sign In"
-                : "Register"}
+              {loginMutation.isPending || registerMutation.isPending ? (
+                <Loader className="w-4 h-4 animate-spin" />
+              ) : isSignIn ? (
+                "Sign In"
+              ) : (
+                "Register"
+              )}
             </Button>
 
             <p className="text-sm text-gray-600">

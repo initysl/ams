@@ -6,6 +6,8 @@ import { useForm, FieldErrors } from "react-hook-form";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Loader } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const recoverSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -26,7 +28,7 @@ const ForgetPass: React.FC = () => {
 
   const recoverMutation = useMutation({
     mutationFn: async (data: RecoverForm) => {
-      const response = await api.post("/auth/recover", data, {
+      const response = await api.post("auth/recover", data, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -60,7 +62,7 @@ const ForgetPass: React.FC = () => {
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-6 flex flex-col items-center justify-center"
         >
-          <input
+          <Input
             id="email"
             type="email"
             autoComplete="on"
@@ -77,7 +79,11 @@ const ForgetPass: React.FC = () => {
             className="bg-stone-500 hover:bg-stone-700 text-white hover:shadow-3xl hover:ease-in-out cursor-pointer "
             disabled={recoverMutation.isPending}
           >
-            {recoverMutation.isPending ? "Sending..." : "Request link"}
+            {recoverMutation.isPending ? (
+              <Loader className="w-4 h-4 animate-spin" />
+            ) : (
+              "Request link"
+            )}
           </Button>
         </form>
       </Card>

@@ -20,10 +20,10 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
         .json({ error: "Unauthorized. Only lecturers can generate QR codes" });
     }
 
-    const { courseCode, courseTitle, level, expiryMinutes } = req.body;
-    if (!courseCode || !courseTitle || !expiryMinutes) {
+    const { courseCode, courseTitle, level, duration } = req.body;
+    if (!courseCode || !courseTitle || !duration) {
       return res.status(400).json({
-        error: "Course code, courseTitle, level, and expiry time are required",
+        error: "Course code, courseTitle, level, and duration are required",
       });
     }
 
@@ -33,7 +33,7 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
       courseTitle,
       level,
       sessionStart: new Date(),
-      sessionEnd: moment().add(expiryMinutes, "minutes").toDate(),
+      sessionEnd: moment().add(duration, "minutes").toDate(),
     });
 
     await lectureSession.save();
@@ -45,7 +45,7 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
     const token = jwt.sign(
       { sessionId, courseCode, courseTitle, level, expiryTime },
       process.env.JWT_SECRET,
-      { expiresIn: expiryMinutes * 60 } // Convert minutes to seconds
+      { expiresIn: duration * 60 } // Convert minutes to seconds
     );
 
     // Generate QR Code
