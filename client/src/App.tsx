@@ -20,7 +20,7 @@ import ProtectedRoute from "./context/ProtectedRoutes";
 import { useAuth } from "./context/AuthContext";
 
 function App() {
-  // const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="bg-stone-300">

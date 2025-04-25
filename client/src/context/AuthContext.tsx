@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const login = async (credentials: { email: string; password: string }) => {
     try {
       const response = await api.post("auth/login", credentials, {
-        withCredentials: true, // Needed for sending/receiving cookies
+        withCredentials: true,
       });
 
       // Check if there's a user object in the response
