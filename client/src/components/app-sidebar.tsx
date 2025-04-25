@@ -31,26 +31,16 @@ import { Separator } from "./ui/separator";
 import { useAuth } from "@/context/AuthContext";
 
 // Menu items.
-const items = [
+const commonItems = [
   {
     title: "Home",
     url: "home",
     icon: Home,
   },
   {
-    title: "Generate QRCode",
-    url: "generate",
-    icon: QrCodeIcon,
-  },
-  {
     title: "Attendance",
     url: "attendance",
     icon: ListCheck,
-  },
-  {
-    title: "Scan QrCode",
-    url: "scan",
-    icon: ScanQrCode,
   },
   {
     title: "Settings",
@@ -59,18 +49,42 @@ const items = [
   },
 ];
 
+const lecturerItems = [
+  {
+    title: "Generate QRCode",
+    url: "generate",
+    icon: QrCodeIcon,
+  },
+];
+
+const studentItems = [
+  {
+    title: "Scan QrCode",
+    url: "scan",
+    icon: ScanQrCode,
+  },
+];
+
 export function AppSidebar() {
   const { isMobile } = useSidebar();
-
   const location = useLocation();
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  // Determine which items to show based on user role
   const isActive = (item: { url: string }) =>
     location.pathname.includes(`/dashboard/${item.url}`);
 
-  const { user } = useAuth();
-  const isAuthenticated = !!user;
-  if (!isAuthenticated) {
-    return null; // or redirect to login page
-  }
+  // Combine common items with role-specific items
+  const displayItems = [
+    ...commonItems,
+    ...(user.role === "lecturer" ? lecturerItems : []),
+    ...(user.role === "student" ? studentItems : []),
+  ];
   return (
     <Sidebar
       collapsible="icon"
@@ -86,7 +100,7 @@ export function AppSidebar() {
           <Separator className="bg-stone-600 mb-5" />
           <SidebarGroupContent>
             <SidebarMenu className="space-y-5">
-              {items.map((item) => {
+              {displayItems.map((item) => {
                 const active = isActive(item);
 
                 return (

@@ -68,6 +68,8 @@ export default function GenerateQRPage() {
 
   const onSubmit = (data: QRData) => mutate(data);
 
+  const { user } = useAuth();
+
   return (
     <>
       <h1 className="text-2xl text-center text-pretty font-bold mb-6">
@@ -100,7 +102,7 @@ export default function GenerateQRPage() {
             </div>
             <div className="flex-1 space-y-2">
               <Label>Level</Label>
-              <Input placeholder="11:30 AM" {...register("level")} />
+              <Input placeholder="400" {...register("level")} />
               {errors.level && (
                 <p className="text-red-500 text-sm">{errors.level.message}</p>
               )}
