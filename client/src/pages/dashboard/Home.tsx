@@ -77,7 +77,7 @@ const Home: React.FC = () => {
             }`}
           >
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex justify-between items-center">
                 <CardTitle className="text-lg font-semibold">
                   {text.title}
                 </CardTitle>

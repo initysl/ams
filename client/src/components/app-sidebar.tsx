@@ -130,9 +130,13 @@ export function AppSidebar() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <SidebarMenuButton className="flex items-center gap-2 p-2 w-full text-sm font-medium text-ellipsis">
-                      <ChevronUp className="ml-auto" size={18} />
-                      <User2 size={18} />
+                      <img
+                        src={user.profilePic ?? "/images/default.png"}
+                        alt="Profile"
+                        className="w-6 h-6 rounded-full"
+                      />
                       {user.email}
+                      <ChevronUp className="" size={18} />
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent

@@ -3,14 +3,14 @@
     {
       "id": 1,
       "title": "Attendance Tracking",
-      "value": "Real-time",
+      "value": "Seamlessly track attendance real-time",
       "description": "Monitor attendance records in real-time for better management.",
       "icon": "CalendarCheck"
     },
     {
       "id": 2,
       "title": "Detailed Reports",
-      "value": "Comprehensive",
+      "value": "Comprehensive attendance data",
       "description": "Generate detailed attendance reports for analysis and decision-making.",
       "icon": "FileBarChart"
     },

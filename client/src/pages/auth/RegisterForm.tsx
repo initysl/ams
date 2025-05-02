@@ -104,7 +104,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             id="matricNumber"
             autoComplete="on"
             {...register("matricNumber")}
-            placeholder="Matric Number (2021/36000)"
+            placeholder="Matric No for students. e.g 2021/36000 "
             className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
           />
           {errors.matricNumber && (
