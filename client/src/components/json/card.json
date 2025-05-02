@@ -11,22 +11,23 @@
       "id": 2,
       "title": "Detailed Reports",
       "value": "Comprehensive attendance data",
-      "description": "Generate detailed attendance reports for analysis and decision-making.",
+      "description": "View, manage and generate detailed attendance reports for analysis and decision-making.",
       "icon": "FileBarChart"
     },
+
     {
       "id": 3,
-      "title": "Notifications",
-      "value": "Instant Alerts",
-      "description": "Receive instant notifications for absences or late arrivals.",
-      "icon": "BellRing"
-    },
-    {
-      "id": 4,
       "title": "User-Friendly Interface",
       "value": "Easy to Use",
       "description": "Simplified interface for seamless attendance management.",
       "icon": "LayoutDashboard"
+    },
+    {
+      "id": 4,
+      "title": "Help & Support",
+      "value": "Get help and support for any issues encountered",
+      "description": "Send us feedbacks on ways to improve.",
+      "icon": "HelpCircle"
     }
   ]
 }

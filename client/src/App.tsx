@@ -45,9 +45,9 @@ function App() {
             <Route index element={<Navigate to="/dashboard/home" replace />} />
             <Route path="home" element={<Home />} />
             <Route path="attendance" element={<Attendance />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="scan" element={<ScanQR />} />
             <Route path="generate" element={<GenerateQR />} />
+            <Route path="scan" element={<ScanQR />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
 
           {/* Redirect to splash screen for unknown routes */}

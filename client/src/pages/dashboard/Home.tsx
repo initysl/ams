@@ -38,7 +38,6 @@ const Icon = ({ name }: { name: keyof typeof Icons }) => {
 };
 
 const Home: React.FC = () => {
-  const username = "Matric";
   const [today, setToday] = React.useState(() => new Date().toLocaleString());
 
   React.useEffect(() => {
@@ -61,7 +60,7 @@ const Home: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">
-            Welcome Back, {user?.matricNumber}
+            Welcome Back {user?.matricNumber}
           </h2>
           <p className="text-sm text-muted-foreground">{today}</p>
         </div>

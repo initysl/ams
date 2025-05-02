@@ -87,7 +87,7 @@ export function AppSidebar() {
   ];
   return (
     <Sidebar
-      collapsible="icon"
+      collapsible="offcanvas"
       className={`border-none min-h-screen ${
         isMobile ? "bg-blue-800 text-white" : "bg-stone-800 text-stone-100"
       }`}
@@ -154,6 +154,25 @@ export function AppSidebar() {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+              </SidebarFooter>
+              <SidebarFooter className="mt-2">
+                <div>
+                  {/* <div className="flex justify-between items-center px-4 py-2">
+                    <Link to="https://twitter.com" className="text-stone-400 hover:text-white">
+                      <X size={18} />
+                    </Link>
+                    <Link to="https://github.com" className="text-stone-400 hover:text-white">
+                      <GitCommitHorizontal size={18} />
+                    </Link>
+                    <Link to="https://linkedin.com" className="text-stone-400 hover:text-white">
+                      < size={18} />
+                    </Link>
+                    </div> */}
+                  <div className="text-center text-md font-bold text-stone-400">
+                    &copy; {new Date().getFullYear()} AttendEase. All rights
+                    reserved.
+                  </div>
+                </div>
               </SidebarFooter>
             </SidebarMenu>
           </SidebarGroupContent>

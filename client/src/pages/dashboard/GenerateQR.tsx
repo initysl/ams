@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
 import api from "@/lib/axios";
+import { useAuth } from "@/context/AuthContext";
 
 const qrSchema = z.object({
   courseTitle: z.string().min(5, "Course title is required"),
@@ -66,7 +67,7 @@ export default function GenerateQRPage() {
     return () => clearInterval(timer);
   }, [expiresIn]);
 
-  const onSubmit = (data: QRData) => mutate(data);
+  // const onSubmit = (data: QRData) => mutate(data);
 
   const { user } = useAuth();
 
@@ -76,7 +77,7 @@ export default function GenerateQRPage() {
         Generate QR Code for Attendance
       </h1>
       <div className="max-w-3xl mx-auto mt-10 p-4 rounded-xl bg-white shadow-lg">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
+        <form className="space-y-10">
           <div className="space-y-2">
             <Label>Course Title</Label>
             <Input
