@@ -28,11 +28,13 @@ const SplashScreen: React.FC = () => {
     navigate("/auth");
   };
   return (
-    <div className="splash-screen flex flex-col items-center justify-center min-h-svh">
-      <div className="space-y-10">
+    <div className="splash-screen flex flex-col items-center justify-center min-h-svh p-4">
+      <div className="space-y-6 md:space-y-10">
         {/* Logo and Title */}
-        <div className="flex row items-center justify-center ">
-          <h1 className="text-3xl font-bold text-green-600">AttendEase</h1>
+        <div className="flex relative bottom-10 md:bottom-0 items-center justify-center">
+          <h1 className="text-3xl md:text-3xl font-bold text-green-600">
+            AttendEase
+          </h1>
         </div>
 
         <motion.div
@@ -49,14 +51,20 @@ const SplashScreen: React.FC = () => {
             },
           }}
         >
-          <img src={logo} alt="App logo" className="max-w-sm" />
+          <img
+            src={logo}
+            alt="App logo"
+            className="w-full max-w-[280px] md:max-w-sm mx-auto"
+          />
         </motion.div>
       </div>
-      <div className="space-y-5 text-center">
-        <p className="text-lg font-bold">Your Attendance Management Solution</p>
+      <div className="space-y-4 md:space-y-5 text-center mt-6">
+        <p className="text-base md:text-lg font-bold">
+          Your Attendance Management Solution
+        </p>
 
         {/* Animated paragraph with fixed height container */}
-        <div className="relative min-h-[30px] flex items-center justify-center">
+        <div className="relative h-[60px] md:h-[30px] flex items-center justify-center px-4">
           <AnimatePresence mode="popLayout">
             <motion.p
               key={index}
@@ -64,7 +72,7 @@ const SplashScreen: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.6 }}
-              className="font-light text-pretty absolute"
+              className="font-light text-sm md:text-base text-pretty absolute"
             >
               {messages[index]}
             </motion.p>
@@ -74,7 +82,7 @@ const SplashScreen: React.FC = () => {
         <div>
           <Button
             onClick={handleGetStated}
-            className="bg-stone-700 text-white  hover:shadow-3xl hover:ease-in-out cursor-pointer "
+            className="bg-stone-700 text-white hover:shadow-3xl hover:ease-in-out cursor-pointer"
           >
             Get Started
             <ArrowRightCircleIcon size={10} className="ml-1 animate-pulse" />

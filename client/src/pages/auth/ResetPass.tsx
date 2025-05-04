@@ -80,8 +80,8 @@ const ResetPass: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <Card className="w-full max-w-md p-6 shadow-lg rounded-lg bg-white">
+    <div className="flex justify-center items-center min-h-svh p-3">
+      <Card className="w-full max-w-md p-4 rounded-none rounded-tr-xl rounded-bl-xl bg-white">
         <CardTitle className="text-2xl text-center">
           <h1>Reset password</h1>
         </CardTitle>

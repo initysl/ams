@@ -116,7 +116,7 @@ const AuthForm: React.FC = () => {
 
   return (
     <div className="flex justify-center items-center min-h-svh p-2">
-      <div className="bg-white p-8 rounded-tr-xl rounded-bl-xl shadow-2xl w-full max-w-2xl transition-all duration-500">
+      <div className="bg-white p-8 rounded-tr-xl rounded-bl-xl shadow-2xl max-w-2xl transition-all duration-500">
         <div className="text-center space-y-2 mb-10">
           <h1 className="text-4xl font-extrabold text-gray-800">
             Welcome to <span className="text-green-600">AttendEase</span>

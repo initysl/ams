@@ -50,8 +50,8 @@ const ForgetPass: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-svh">
-      <Card className="w-full max-w-md p-6 shadow-lg rounded-lg bg-white">
+    <div className="flex justify-center items-center min-h-svh p-3">
+      <Card className="w-full max-w-md p-4 rounded-none rounded-tr-xl rounded-bl-xl  bg-white">
         <CardTitle className="text-2xl">
           <h1>Forgot Password</h1>
         </CardTitle>
