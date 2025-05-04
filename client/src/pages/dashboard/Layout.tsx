@@ -5,11 +5,11 @@ import React from "react";
 
 const Layout: React.FC = () => {
   return (
-    <SidebarProvider className="p-2 flex">
+    <SidebarProvider className="flex">
       <AppSidebar />
-      <main className="flex-grow p-4">
+      <main className="flex-grow p-2">
         <SidebarTrigger className="fixed bg-white shadow-3xl text-green-500" />
-        <div className=" mt-10">
+        <div className="px-8 mt-10">
           <Outlet />
         </div>
       </main>
