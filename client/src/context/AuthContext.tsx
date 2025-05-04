@@ -8,9 +8,10 @@ import {
 } from "react";
 
 type User = {
+  name: string;
   matricNumber?: string | null;
   email: string;
-  profilePic?: string | null;
+  profilePicture?: string | null;
   role: "student" | "lecturer";
 };
 
