@@ -17,10 +17,8 @@ import ScanQR from "./pages/dashboard/ScanQR";
 import ForgetPass from "./pages/auth/ForgetPass";
 import ResetPass from "./pages/auth/ResetPass";
 import ProtectedRoute from "./context/ProtectedRoutes";
-import { useAuth } from "./context/AuthContext";
 
 function App() {
-  const { isAuthenticated } = useAuth();
 
   return (
     <div className="bg-stone-300">
@@ -55,7 +53,7 @@ function App() {
         </Routes>
       </Router>
 
-      <Toaster richColors position="top-right" closeButton />
+      <Toaster richColors position="top-center" closeButton />
     </div>
   );
 }

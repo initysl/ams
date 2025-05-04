@@ -21,9 +21,9 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
     }
 
     const { courseCode, courseTitle, level, duration } = req.body;
-    if (!courseCode || !courseTitle || !duration) {
+    if (!courseCode || !courseTitle || !level || !duration) {
       return res.status(400).json({
-        error: "Course code, courseTitle, level, and duration are required",
+        error: "courseCode, courseTitle, level, and duration are required",
       });
     }
 
@@ -41,7 +41,7 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
     const sessionId = lectureSession._id.toString();
     const expiryTime = lectureSession.sessionEnd.toISOString();
 
-    // Generate JWT token with session ID
+    // Generate JWT token with session ID and course details
     const token = jwt.sign(
       { sessionId, courseCode, courseTitle, level, expiryTime },
       process.env.JWT_SECRET,
@@ -58,7 +58,17 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
       );
     }
 
-    res.status(200).json({ qrCodeUrl, sessionId, expiryTime });
+    res.status(200).json({
+      qrCodeUrl,
+      sessionId,
+      expiryTime,
+      courseDetails: {
+        courseCode,
+        courseTitle,
+        level,
+        duration,
+      },
+    });
   } catch (error) {
     console.error("Error generating QR code:", error);
     res.status(500).json({ error: "Error generating QR code" });

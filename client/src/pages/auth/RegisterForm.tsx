@@ -50,12 +50,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   });
 
   return (
-    <form
-      id="register-form"
-      onSubmit={handleSubmit(onSubmit)}
-      className="space-y-6"
-    >
-      <div className="flex justify-end mb-4">
+    <form id="register-form" onSubmit={handleSubmit(onSubmit)}>
+      <div className="mb-4 w-fit ">
         <Profilebox profilePic={previewURL} onImageChange={onImageChange} />
       </div>
 
