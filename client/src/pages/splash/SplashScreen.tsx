@@ -54,7 +54,7 @@ const SplashScreen: React.FC = () => {
           <img
             src={logo}
             alt="App logo"
-            className="w-full max-w-[280px] md:max-w-sm mx-auto"
+            className="w-full max-w-[300px] md:max-w-xs mx-auto"
           />
         </motion.div>
       </div>

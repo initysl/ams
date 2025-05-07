@@ -18,8 +18,13 @@ import ForgetPass from "./pages/auth/ForgetPass";
 import ResetPass from "./pages/auth/ResetPass";
 import ProtectedRoute from "./context/ProtectedRoutes";
 
-function App() {
+// Import settings pages (these need to be created)
+// import SettingsLayout from "./pages/dashboard/settings/SettingsLayout";
+// import ProfileSettings from "./pages/dashboard/settings/ProfileSettings";
+// import AboutSettings from "./pages/dashboard/settings/AboutSettings";
+// import FeedbackSettings from "./pages/dashboard/settings/FeedbackSettings";
 
+function App() {
   return (
     <div className="bg-stone-300">
       <Router>
@@ -45,7 +50,18 @@ function App() {
             <Route path="attendance" element={<Attendance />} />
             <Route path="generate" element={<GenerateQR />} />
             <Route path="scan" element={<ScanQR />} />
-            <Route path="settings" element={<Settings />} />
+
+            {/* Settings section with nested routes */}
+            <Route path="settings" element={<Settings />}>
+              {/* Redirect to profile when just "/dashboard/settings" is accessed */}
+              {/* <Route
+                index
+                element={<Navigate to="/dashboard/settings/profile" replace />}
+              />
+              <Route path="profile" element={<ProfileSettings />} />
+              <Route path="about" element={<AboutSettings />} />
+              <Route path="feedback" element={<FeedbackSettings />} /> */}
+            </Route>
           </Route>
 
           {/* Redirect to splash screen for unknown routes */}
