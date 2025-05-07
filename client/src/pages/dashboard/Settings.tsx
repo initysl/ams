@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Outlet, NavLink } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/context/AuthContext";
@@ -23,7 +23,7 @@ const Settings = () => {
               <img
                 src={
                   user?.profilePicture ||
-                  `${import.meta.env.VITE_API_URL}/images/default.png`
+                  `${import.meta.env.VITE_API_URL}images/default.png`
                 }
                 className="w-32 h-32 rounded-full object-cover"
                 alt="profilepic"

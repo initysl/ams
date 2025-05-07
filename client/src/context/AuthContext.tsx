@@ -3,9 +3,11 @@ import {
   createContext,
   useContext,
   useState,
-  ReactNode,
   useEffect,
+  useMemo,
+  ReactNode,
 } from "react";
+import { toast } from "sonner"; // or use your preferred toast library
 
 type User = {
   name: string;
@@ -22,6 +24,7 @@ type AuthContextType = {
   isLoading: boolean;
   login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
+  refetchUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,7 +34,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const isAuthenticated = !!user;
+  const isAuthenticated = Boolean(user);
 
   const login = async (credentials: { email: string; password: string }) => {
     try {
@@ -39,14 +42,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         withCredentials: true,
       });
 
-      // Check if there's a user object in the response
       if (response.data.user) {
         setUser(response.data.user);
+        toast.success("Login successful!");
       } else {
         throw new Error(response.data.message || "Login failed");
       }
-    } catch (error) {
-      console.error("Login error:", error);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Login failed");
       throw error;
     }
   };
@@ -61,42 +64,66 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         }
       );
       setUser(null);
+      toast.success("Logged out successfully.");
     } catch (error) {
+      toast.error("Logout failed.");
       console.error("Logout error:", error);
     }
   };
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        setIsLoading(true);
-        const response = await api.get("user/profile/me", {
-          withCredentials: true,
-        });
+  const fetchUser = async () => {
+    try {
+      setIsLoading(true);
+      const response = await api.get("user/profile/me", {
+        withCredentials: true,
+      });
 
-        // Check if the response has the user object
-        if (response.data.user) {
-          setUser(response.data.user);
-          console.log("User authenticated from session:", response.data.user);
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-        setUser(null);
-      } finally {
-        setIsLoading(false);
+      if (response.data.user) {
+        setUser(response.data.user);
+        // console.log("User authenticated from session:", response.data.user);
       }
-    };
+    } catch (error) {
+      setUser(null);
+      toast.error("Session expired or unauthorized.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchUser();
-  }, []); // Empty dependency array - only run once on mount
+  }, []);
 
-  return (
-    <AuthContext.Provider
-      value={{ user, isAuthenticated, isLoading, login, logout }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const refetchUser = async () => {
+    try {
+      setIsLoading(true);
+      const response = await api.get("user/profile/me", {
+        withCredentials: true,
+      });
+      if (response.data.user) {
+        setUser(response.data.user);
+      }
+    } catch (error) {
+      setUser(null);
+      toast.error("Failed to refresh user session.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const value = useMemo(
+    () => ({
+      user,
+      isAuthenticated,
+      isLoading,
+      login,
+      logout,
+      refetchUser,
+    }),
+    [user, isAuthenticated, isLoading]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {
