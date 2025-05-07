@@ -17,12 +17,9 @@ import ScanQR from "./pages/dashboard/ScanQR";
 import ForgetPass from "./pages/auth/ForgetPass";
 import ResetPass from "./pages/auth/ResetPass";
 import ProtectedRoute from "./context/ProtectedRoutes";
-
-// Import settings pages (these need to be created)
-// import SettingsLayout from "./pages/dashboard/settings/SettingsLayout";
-// import ProfileSettings from "./pages/dashboard/settings/ProfileSettings";
-// import AboutSettings from "./pages/dashboard/settings/AboutSettings";
-// import FeedbackSettings from "./pages/dashboard/settings/FeedbackSettings";
+import Feedback from "./pages/dashboard/Settings/Feedback";
+import About from "./pages/dashboard/Settings/About";
+import Profile from "./pages/dashboard/Settings/Profile";
 
 function App() {
   return (
@@ -54,13 +51,13 @@ function App() {
             {/* Settings section with nested routes */}
             <Route path="settings" element={<Settings />}>
               {/* Redirect to profile when just "/dashboard/settings" is accessed */}
-              {/* <Route
+              <Route
                 index
                 element={<Navigate to="/dashboard/settings/profile" replace />}
               />
-              <Route path="profile" element={<ProfileSettings />} />
-              <Route path="about" element={<AboutSettings />} />
-              <Route path="feedback" element={<FeedbackSettings />} /> */}
+              <Route path="profile" element={<Profile />} />
+              <Route path="about" element={<About />} />
+              <Route path="feedback" element={<Feedback />} />
             </Route>
           </Route>
 

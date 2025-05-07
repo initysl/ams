@@ -12,15 +12,9 @@ import {
 
 const Settings = () => {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/auth");
-  };
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 p-4">
+    <div className="flex flex-col md:flex-row gap-6 ">
       {/* Sidebar with navigation */}
       <Card className="bg-white md:max-w-xs w-full">
         <CardContent>
@@ -88,7 +82,8 @@ const Settings = () => {
                   <ChevronRight className="w-5 h-5" />
                 </NavLink>
                 <button
-                  onClick={handleLogout}
+                  onClick={logout}
+                  type="button"
                   className="flex space-x-2 items-center w-full p-3 hover:bg-gray-100 cursor-pointer rounded-md"
                 >
                   <LogOut className="text-red-500 w-5 h-5" />

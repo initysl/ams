@@ -9,8 +9,9 @@ import {
 
 type User = {
   name: string;
-  matricNumber?: string | null;
   email: string;
+  matricNumber?: string | null;
+  department: string;
   profilePicture?: string | null;
   role: "student" | "lecturer";
 };
