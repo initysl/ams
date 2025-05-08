@@ -156,7 +156,7 @@ const AuthForm: React.FC = () => {
             disabled={loginMutation.isPending || registerMutation.isPending}
           >
             {loginMutation.isPending || registerMutation.isPending ? (
-              <Loader className="w-4 h-4 animate-spin" />
+              <Loader className="h-5 w-5 animate-spin" />
             ) : isSignIn ? (
               "Sign In"
             ) : (

@@ -80,7 +80,7 @@ const ForgetPass: React.FC = () => {
             disabled={recoverMutation.isPending}
           >
             {recoverMutation.isPending ? (
-              <Loader className="w-4 h-4 animate-spin" />
+              <Loader className="h-5 w-5 animate-spin" />
             ) : (
               "Request link"
             )}

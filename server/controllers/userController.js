@@ -5,6 +5,7 @@ const logger = require("../middlewares/log");
 const { validationResult } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 const { sendVerificationEmail } = require("../utils/sendEmail");
+const Feedback = require("../models/Feedback");
 
 // Get User Profile
 const getUserProfile = asyncHandler(async (req, res) => {
@@ -161,8 +162,33 @@ const deleteUserProfile = asyncHandler(async (req, res) => {
   res.json({ message: "User profile deleted successfully" });
 });
 
+// User Feedback
+const userFeedback = asyncHandler(async (req, res) => {
+  try {
+    const { category, message, email } = req.body;
+
+    if (!category || !message) {
+      return res
+        .status(400)
+        .json({ message: "Category and message are required" });
+    }
+
+    const feedback = new Feedback({
+      category,
+      message,
+      email,
+    });
+
+    await feedback.save();
+    res.status(201).json({ message: "Feedback submitted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = {
   getUserProfile,
   updateUserProfile,
   deleteUserProfile,
+  userFeedback,
 };

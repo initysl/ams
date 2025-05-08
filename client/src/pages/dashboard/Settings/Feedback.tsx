@@ -1,5 +1,9 @@
 import { Button } from "@/components/ui/button";
+import api from "@/lib/axios";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
+import { Loader } from "lucide-react";
 
 type FeedbackFormInputs = {
   category: string;
@@ -15,10 +19,23 @@ const Feedback = () => {
     formState: { errors },
   } = useForm<FeedbackFormInputs>();
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (data: FeedbackFormInputs) => {
+      const res = await api.post("user/feedback", data);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("Feedback submitted successfully!");
+      reset();
+    },
+    onError: (error: any) => {
+      toast.error("Failed to submit feedback. Please try again.");
+      console.error(error);
+    },
+  });
+
   const onSubmit = (data: FeedbackFormInputs) => {
-    console.log("Feedback submitted:", data);
-    alert("Thank you for your feedback!");
-    reset(); // Clear the form
+    mutate(data);
   };
 
   return (
@@ -89,8 +106,16 @@ const Feedback = () => {
           )}
         </div>
 
-        <Button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-          Submit Feedback
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+        >
+          {isPending ? (
+            <Loader className="h-5 w-5 animate-spin" />
+          ) : (
+            "Submit Feedback"
+          )}
         </Button>
       </form>
     </div>

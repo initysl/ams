@@ -4,6 +4,7 @@ const {
   getUserProfile,
   updateUserProfile,
   deleteUserProfile,
+  userFeedback,
 } = require("../controllers/userController");
 const {
   validateProfileUpdate,
@@ -26,5 +27,8 @@ router.put(
 
 // DELETE user profile
 router.delete("/profile/delete", authMiddleware, deleteUserProfile);
+
+// POST feedback
+router.post("/feedback", authMiddleware, userFeedback);
 
 module.exports = router;
