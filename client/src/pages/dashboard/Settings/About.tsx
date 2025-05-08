@@ -8,9 +8,9 @@ const About = () => {
           <h3 className="text-lg font-medium">Application Information</h3>
           <p className="text-gray-600">
             This application is designed to manage attendance tracking using QR
-            codes in tetiary institution. It provides an easy way for lecturers
-            to generate QR codes for classes and for students to scan these
-            codes to mark their attendance.
+            codes in tetiary institution(s). It provides an easy way for
+            lecturers to generate QR codes for classes and for students to scan
+            these codes to mark their attendance.
           </p>
         </div>
 
