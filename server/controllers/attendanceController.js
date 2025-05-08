@@ -123,14 +123,16 @@ const markAttendance = asyncHandler(async (req, res) => {
     }
 
     // Add student to attendance list
-    lectureSession.attendanceRecords.push({
-      student: student._id, // Store student ID for reference
-      name,
-      matricNumber,
-      courseCode,
-      level,
-      status: "present",
-    });
+    const record = {
+      student: student._id,
+      name: name.trim(), // Preserve casing (optional: capitalize)
+      matricNumber: matricNumber.trim().toUpperCase(),
+      courseCode: courseCode.trim().toUpperCase(),
+      level: level.trim(),
+      status: "PRESENT",
+    };
+
+    lectureSession.attendanceRecords.push(record);
 
     await lectureSession.save();
 

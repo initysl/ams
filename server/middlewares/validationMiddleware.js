@@ -1,9 +1,9 @@
-const { check, body } = require("express-validator");
+const { check } = require("express-validator");
 
 // Registration Validation
 const validateRegistration = [
   check("name")
-    .customSanitizer((value) => value.trim())
+    .customSanitizer((value) => value.trim()) // preserve internal spaces
     .isLength({ min: 5 })
     .withMessage("Name must be at least 5 characters long"),
 
@@ -16,7 +16,7 @@ const validateRegistration = [
     .optional(),
 
   check("department")
-    .customSanitizer((value) => value.trim().replace(/\s+/g, ""))
+    .customSanitizer((value) => value.trim()) // preserve internal spaces
     .isLength({ min: 3 })
     .withMessage("Department must be at least 3 characters long"),
 
@@ -40,7 +40,6 @@ const validateLogin = [
   check("email").isEmail().withMessage("Invalid email address"),
 
   check("password")
-    //trim()
     .customSanitizer((value) => value.replace(/\s+/g, ""))
     .matches(/^[A-Za-z0-9/]+$/)
     .withMessage("Password can only contain letters and numbers")
@@ -51,7 +50,6 @@ const validateLogin = [
 // Session ID Validation
 const validateSessionId = [
   check("sessionId")
-    //trim()
     .customSanitizer((value) => value.replace(/\s+/g, ""))
     .isMongoId()
     .withMessage("Invalid session ID"),
@@ -61,7 +59,7 @@ const validateSessionId = [
 const validateProfileUpdate = [
   check("name")
     .optional()
-    .customSanitizer((value) => value.trim().replace(/\s+/g, ""))
+    .customSanitizer((value) => value.trim()) // preserve internal spaces
     .isLength({ min: 5 })
     .withMessage("Name must be at least 5 characters long"),
 
@@ -80,13 +78,12 @@ const validateProfileUpdate = [
 
   check("department")
     .optional()
-    .customSanitizer((value) => value.trim().replace(/\s+/g, ""))
+    .customSanitizer((value) => value.trim()) // preserve internal spaces
     .isLength({ min: 3 })
     .withMessage("Department must be at least 3 characters long"),
 
   check("password")
     .optional()
-    //trim()
     .customSanitizer((value) => value.replace(/\s+/g, ""))
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),

@@ -137,6 +137,7 @@ const Profile = () => {
             <label className="block text-sm font-medium mb-1">Email</label>
             <Input
               type="email"
+              className="text-ellipsis"
               {...register("email")}
               placeholder="you@example.com"
             />
@@ -179,23 +180,21 @@ const Profile = () => {
                 )}
               </div>
             )}
-
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                New Password
-              </label>
-              <Input
-                type="password"
-                {...register("password")}
-                placeholder="Leave blank to keep current password"
-              />
-              {errors.password && (
-                <p className="text-red-500 text-sm">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
+          </div>
+          {/* Password */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              New Password
+            </label>
+            <Input
+              type="password"
+              className="text-ellipsis"
+              {...register("password")}
+              placeholder="Leave blank to keep current password"
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
+            )}
           </div>
         </div>
 
