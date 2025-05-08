@@ -41,6 +41,7 @@ const Settings = () => {
               }
               className="w-32 h-32 rounded-full object-cover"
               alt="profilepic"
+              crossOrigin="use-credentials"
             />
             <div className="mt-4 text-center">
               <ul className="space-y-2">

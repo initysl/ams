@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/context/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,25 +9,37 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import Profilebox from "@/components/ui/Profilebox";
 
 const profileSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(5, "Name is required"),
   email: z.string().email("Invalid email format"),
   department: z.string().min(3, "Department is required"),
   matricNumber: z
     .string()
     .min(10)
-    .regex(/^\d{4}\/\d+$/, {
-      message: "Invalid matric number",
-    })
+    .regex(/^\d{4}\/\d+$/, { message: "Invalid matric number" })
     .optional(),
   password: z.string().optional(),
+  profilePic: z.any().optional(),
 });
 
 type ProfileFields = z.infer<typeof profileSchema>;
 
 const Profile = () => {
+  const [profilePic, setProfilePic] = useState<File | null>(null);
+  const [previewURL, setPreviewURL] = useState<string>("");
   const { user, refetchUser } = useAuth();
+
+  const handleImageChange = (file: File) => {
+    const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Only JPG, JPEG, and PNG files are allowed");
+      return;
+    }
+    setProfilePic(file);
+    setPreviewURL(URL.createObjectURL(file));
+  };
 
   const {
     register,
@@ -46,18 +58,35 @@ const Profile = () => {
         department: user.department,
         matricNumber: user.matricNumber || "",
       });
+      if (user.profilePicture) setPreviewURL(user.profilePicture);
     }
   }, [user, reset]);
 
-  const { mutate: updateProfile, isPending } = useMutation({
+  const updateMutation = useMutation({
     mutationFn: async (data: ProfileFields) => {
-      const payload = {
-        ...data,
-        matricNumber: user?.role === "student" ? data.matricNumber : undefined,
-      };
+      const formData = new FormData();
 
-      const response = await api.put("user/profile/update", payload, {
+      formData.append("name", data.name);
+      formData.append("email", data.email);
+      formData.append("department", data.department);
+
+      if (user?.role === "student" && data.matricNumber) {
+        formData.append("matricNumber", data.matricNumber);
+      }
+
+      if (data.password) {
+        formData.append("password", data.password);
+      }
+
+      if (profilePic) {
+        formData.append("profilePicture", profilePic);
+      }
+
+      const response = await api.put("user/profile/update", formData, {
         withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       return response.data;
@@ -74,19 +103,21 @@ const Profile = () => {
   });
 
   const onSubmit = (data: ProfileFields) => {
-    updateProfile(data);
+    updateMutation.mutate(data);
   };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-3xl font-bold mb-6 text-center">Update Profile</h2>
 
-      <form
-        onSubmit={handleSubmit(onSubmit, () =>
-          toast.error("Please fix form errors before submitting.")
-        )}
-        className="space-y-6"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="w-fit">
+          <Profilebox
+            profilePic={previewURL}
+            onImageChange={handleImageChange}
+          />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Name */}
           <div>
@@ -129,8 +160,8 @@ const Profile = () => {
             )}
           </div>
 
-          {/* Matric Number and Password */}
           <div className="space-y-6">
+            {/* Matric Number (Only for students) */}
             {user?.role === "student" && (
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -149,6 +180,7 @@ const Profile = () => {
               </div>
             )}
 
+            {/* Password */}
             <div>
               <label className="block text-sm font-medium mb-1">
                 New Password
@@ -156,7 +188,7 @@ const Profile = () => {
               <Input
                 type="password"
                 {...register("password")}
-                placeholder="Leave empty to keep current password"
+                placeholder="Leave blank to keep current password"
               />
               {errors.password && (
                 <p className="text-red-500 text-sm">
@@ -167,14 +199,14 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Submit Button */}
+        {/* Submit */}
         <div>
           <Button
             type="submit"
-            disabled={isPending}
+            disabled={updateMutation.isPending}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
           >
-            {isPending ? (
+            {updateMutation.isPending ? (
               <Loader className="animate-spin h-5 w-5" />
             ) : (
               "Save Changes"
