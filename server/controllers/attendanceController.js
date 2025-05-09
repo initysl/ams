@@ -84,12 +84,12 @@ const markAttendance = asyncHandler(async (req, res) => {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
       if (err.name === "TokenExpiredError") {
-        return res.status(400).json({ error: "QR Code has expired" });
+        return res.status(400).json({ error: "QRrrrrrrrrr Code has expired" });
       }
       return res.status(400).json({ error: "Invalid token" });
     }
 
-    const { sessionId, expiryTime, courseCode, level } = decoded;
+    const { sessionId, courseCode, courseTitle, level, expiryTime } = decoded;
 
     if (!mongoose.Types.ObjectId.isValid(sessionId)) {
       return res.status(400).json({ error: "Invalid session ID format" });
@@ -102,12 +102,6 @@ const markAttendance = asyncHandler(async (req, res) => {
     const student = req.user;
     if (!student) {
       return res.status(401).json({ error: "Unauthorized user" });
-    }
-
-    if (student.role !== "student") {
-      return res
-        .status(403)
-        .json({ error: "Only students can mark attendance" });
     }
 
     const { name, matricNumber } = student;
@@ -130,6 +124,7 @@ const markAttendance = asyncHandler(async (req, res) => {
       name: name.trim(),
       matricNumber: matricNumber.trim().toUpperCase(),
       courseCode: courseCode.trim().toUpperCase(),
+      courseTitle: courseTitle.trim(),
       level: level.trim(),
       status: "PRESENT",
     };
