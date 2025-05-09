@@ -11,7 +11,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/axios";
 import { Loader, FileQuestion } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Table } from "@/components/ui/table";
@@ -29,6 +29,14 @@ const Attendance = () => {
   const [records, setRecords] = useState<AttendanceRecord[] | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Load records from session storage on mount
+  useEffect(() => {
+    const saved = sessionStorage.getItem("attendanceRecords");
+    if (saved) {
+      setRecords(JSON.parse(saved));
+    }
+  }, []);
+
   const fetchAttendance = async () => {
     setLoading(true);
     try {
@@ -37,6 +45,10 @@ const Attendance = () => {
         withCredentials: true,
       });
       setRecords(response.data);
+      sessionStorage.setItem(
+        "attendanceRecords",
+        JSON.stringify(response.data)
+      );
       toast.success("Attendance records fetched successfully");
     } catch (error: any) {
       if (error?.response?.data?.error) {
@@ -49,11 +61,17 @@ const Attendance = () => {
     }
   };
 
+  const clearRecords = () => {
+    setRecords(null);
+    sessionStorage.removeItem("attendanceRecords");
+    toast.info("Attendance records cleared");
+  };
+
   return (
     <div className="space-y-5 flex flex-col items-center justify-center">
       <h2 className="font-semibold text-xl text-center">Attendance Records</h2>
 
-      <Card className="flex flex-col justify-center items-center bg-white mt-5 max-w-3xl">
+      <Card className="flex flex-col justify-center items-center bg-white mt-5 max-w-full">
         <CardContent className="p-5">
           <div className="flex flex-col md:flex-row justify-center items-center gap-2 w-full">
             <Input
@@ -69,7 +87,17 @@ const Attendance = () => {
             >
               {loading ? <Loader className="animate-spin w-4 h-4" /> : "Enter"}
             </Button>
+            {records && (
+              <Button
+                onClick={clearRecords}
+                variant="outline"
+                className="w-full md:w-auto"
+              >
+                Clear Records
+              </Button>
+            )}
           </div>
+
           <div className="mt-20 px-4">
             {loading && (
               <div className="text-center text-gray-500">
@@ -93,8 +121,8 @@ const Attendance = () => {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="max-w-[250px] overflow-x-auto border rounded-md">
-                    <Table className="min-w-[500px] text-sm">
+                  <div className="w-full max-w-[250px] md:max-w-full overflow-x-auto border rounded-md">
+                    <Table className="min-w-[500px] md:w-full text-sm">
                       <TableHeader>
                         <TableRow>
                           <TableHead>Course</TableHead>
@@ -133,11 +161,6 @@ const Attendance = () => {
           </div>
         </CardContent>
       </Card>
-      {/* <Card className="bg-yellow-500 text-white">
-        <CardContent>
-          <p>Seamlessly track and view your attendance records in one click </p>
-        </CardContent>
-      </Card> */}
     </div>
   );
 };
