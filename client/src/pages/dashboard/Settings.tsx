@@ -103,7 +103,7 @@ const Settings = () => {
                 className="flex space-x-2 items-center w-full p-3 hover:bg-gray-100 cursor-pointer rounded-md"
               >
                 <LogOut className="text-red-500 w-5 h-5" />
-                <span>Logout</span>
+                <span>Sign Out</span>
               </button>
             </div>
           </div>

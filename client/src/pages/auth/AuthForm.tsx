@@ -56,8 +56,6 @@ const AuthForm: React.FC = () => {
       return login(credentials);
     },
     onSuccess: () => {
-      toast.success("Signed in successfully!");
-      // Redirect to dashboard or home page after successful login
       navigate("/dashboard/home");
     },
     onError: (err: ApiError) => {

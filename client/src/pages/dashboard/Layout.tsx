@@ -9,7 +9,7 @@ const Layout: React.FC = () => {
       <AppSidebar />
       <main className="flex-grow p-2">
         <SidebarTrigger className="fixed bg-white shadow-3xl text-green-500" />
-        <div className="px-8 mt-10">
+        <div className="p-2 mt-10">
           <Outlet />
         </div>
       </main>

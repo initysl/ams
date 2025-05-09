@@ -17,6 +17,6 @@ router.get(
   validateSessionId,
   getAttendanceReport
 );
-router.get("/recent-attendance", authMiddleware, recentlyMarkedAttendance);
+router.get("/record", authMiddleware, recentlyMarkedAttendance);
 
 module.exports = router;
