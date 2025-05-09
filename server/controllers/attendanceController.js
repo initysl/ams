@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const LectureSession = require("../models/LectureSession");
 const jwt = require("jsonwebtoken");
 const QRCode = require("qrcode");
-const moment = require("moment");
+const { addMinutes, isAfter, formatISO, parseISO } = require("date-fns");
 const asyncHandler = require("express-async-handler");
 const logger = require("../middlewares/log");
 
@@ -17,7 +17,7 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
     if (req.user.role !== "lecturer") {
       return res
         .status(401)
-        .json({ error: "Unauthorized. Only lecturers can generate QR codes" });
+        .json({ error: "Only lecturers can generate QR codes" });
     }
 
     const { courseCode, courseTitle, level, duration } = req.body;
@@ -27,28 +27,28 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
       });
     }
 
-    // Create a new lecture session
+    const sessionStart = new Date();
+    const sessionEnd = addMinutes(sessionStart, duration);
+
     const lectureSession = new LectureSession({
       courseCode,
       courseTitle,
       level,
-      sessionStart: new Date(),
-      sessionEnd: moment().add(duration, "minutes").toDate(),
+      sessionStart,
+      sessionEnd,
     });
 
     await lectureSession.save();
 
     const sessionId = lectureSession._id.toString();
-    const expiryTime = lectureSession.sessionEnd.toISOString();
+    const expiryTime = formatISO(sessionEnd);
 
-    // Generate JWT token with session ID and course details
     const token = jwt.sign(
       { sessionId, courseCode, courseTitle, level, expiryTime },
       process.env.JWT_SECRET,
-      { expiresIn: duration * 60 } // Convert minutes to seconds
+      { expiresIn: duration * 60 }
     );
 
-    // Generate QR Code
     const qrCodeUrl = await QRCode.toDataURL(token);
     qrGenerationCount++;
 
@@ -62,12 +62,7 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
       qrCodeUrl,
       sessionId,
       expiryTime,
-      courseDetails: {
-        courseCode,
-        courseTitle,
-        level,
-        duration,
-      },
+      courseDetails: { courseCode, courseTitle, level, duration },
     });
   } catch (error) {
     console.error("Error generating QR code:", error);
@@ -84,19 +79,23 @@ const markAttendance = asyncHandler(async (req, res) => {
       return res.status(400).json({ error: "QR Code token is required" });
     }
 
-    // Verify JWT token from the QR code
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded sessionId:", decoded.sessionId); // Debug purpose
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      if (err.name === "TokenExpiredError") {
+        return res.status(400).json({ error: "QR Code has expired" });
+      }
+      return res.status(400).json({ error: "Invalid token" });
+    }
 
     const { sessionId, expiryTime, courseCode, level } = decoded;
 
-    // Validate sessionId
     if (!mongoose.Types.ObjectId.isValid(sessionId)) {
       return res.status(400).json({ error: "Invalid session ID format" });
     }
 
-    // Check if token is expired
-    if (moment().isAfter(expiryTime)) {
+    if (isAfter(new Date(), parseISO(expiryTime))) {
       return res.status(400).json({ error: "QR Code has expired" });
     }
 
@@ -105,15 +104,19 @@ const markAttendance = asyncHandler(async (req, res) => {
       return res.status(401).json({ error: "Unauthorized user" });
     }
 
+    if (student.role !== "student") {
+      return res
+        .status(403)
+        .json({ error: "Only students can mark attendance" });
+    }
+
     const { name, matricNumber } = student;
 
-    // Find lecture session
     const lectureSession = await LectureSession.findById(sessionId);
     if (!lectureSession) {
       return res.status(404).json({ error: "Session not found" });
     }
 
-    // Check if student already marked attendance
     const alreadyMarked = lectureSession.attendanceRecords.some(
       (record) => record.matricNumber === matricNumber
     );
@@ -122,10 +125,9 @@ const markAttendance = asyncHandler(async (req, res) => {
       return res.status(400).json({ error: "Attendance already marked" });
     }
 
-    // Add student to attendance list
     const record = {
       student: student._id,
-      name: name.trim(), // Preserve casing (optional: capitalize)
+      name: name.trim(),
       matricNumber: matricNumber.trim().toUpperCase(),
       courseCode: courseCode.trim().toUpperCase(),
       level: level.trim(),
@@ -133,7 +135,6 @@ const markAttendance = asyncHandler(async (req, res) => {
     };
 
     lectureSession.attendanceRecords.push(record);
-
     await lectureSession.save();
 
     res.status(200).json({ message: "Attendance marked successfully" });
@@ -143,36 +144,33 @@ const markAttendance = asyncHandler(async (req, res) => {
   }
 });
 
-// Generate Attedance Report
+// Get Attendance Report
 const getAttendanceReport = asyncHandler(async (req, res) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ error: "Unauthorized. Please log in" });
+    if (!req.user || req.user.role !== "lecturer") {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized. Lecturer access only" });
     }
-    if (req.user.role !== "lecturer") {
-      return res.status(401).json({
-        error: "Unauthorized. Only lecturers can generate attendance reports",
-      });
-    }
+
     const { sessionId } = req.params;
     if (!mongoose.Types.ObjectId.isValid(sessionId)) {
-      console.log("Requested sessionId:", sessionId); //Debug purpose
       return res.status(400).json({ error: "Invalid session ID format" });
     }
+
     const lectureSession = await LectureSession.findById(sessionId);
     if (!lectureSession) {
       return res.status(404).json({ error: "Session not found" });
     }
-    const { attendanceRecords } = lectureSession;
-    const report = attendanceRecords.map((record) => {
-      return {
-        name: record.name,
-        matricNumber: record.matricNumber,
-        courseCode: record.courseCode,
-        level: record.level,
-        status: record.status,
-      };
-    });
+
+    const report = lectureSession.attendanceRecords.map((record) => ({
+      name: record.name,
+      matricNumber: record.matricNumber,
+      courseCode: record.courseCode,
+      level: record.level,
+      status: record.status,
+    }));
+
     logger.info(
       `Attendance report generated for lecture session: ${sessionId}`
     );
@@ -183,19 +181,22 @@ const getAttendanceReport = asyncHandler(async (req, res) => {
   }
 });
 
-// Get Recently Marked Attendance
+// Recently Marked Attendance
 const recentlyMarkedAttendance = asyncHandler(async (req, res) => {
   try {
     const { matricNumber } = req.user;
     if (!matricNumber) {
       return res.status(401).json({ error: "Unauthorized. Please log in" });
     }
+
     const lectureSessions = await LectureSession.find({
       "attendanceRecords.matricNumber": matricNumber,
     });
-    if (!lectureSessions || lectureSessions.length === 0) {
+
+    if (!lectureSessions.length) {
       return res.status(404).json({ error: "No recent attendance found" });
     }
+
     const recentSessions = lectureSessions.map((session) => ({
       sessionId: session._id,
       courseCode: session.courseCode,
@@ -203,8 +204,9 @@ const recentlyMarkedAttendance = asyncHandler(async (req, res) => {
       level: session.level,
       status: session.attendanceRecords.find(
         (record) => record.matricNumber === matricNumber
-      ).status,
+      )?.status,
     }));
+
     res.status(200).json(recentSessions);
   } catch (error) {
     console.error("Error fetching recent attendance:", error);

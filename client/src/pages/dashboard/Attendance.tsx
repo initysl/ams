@@ -50,7 +50,7 @@ const Attendance = () => {
   };
 
   return (
-    <div>
+    <div className="space-y-5">
       <h2 className="font-semibold text-xl text-center">Attendance Records</h2>
 
       <Card className="flex flex-col justify-center items-center bg-white mt-5 max-w-2xl mx-auto">
@@ -127,6 +127,11 @@ const Attendance = () => {
               )}
             </AnimatePresence>
           </div>
+        </CardContent>
+      </Card>
+      <Card className="bg-yellow-500 text-white">
+        <CardContent>
+          <p>Seamlessly track and view your attendance records in one click </p>
         </CardContent>
       </Card>
     </div>
