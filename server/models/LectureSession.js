@@ -7,7 +7,7 @@ const attendanceRecordSchema = new mongoose.Schema(
     matricNumber: { type: String, required: true },
     courseCode: { type: String, required: true },
     level: { type: String },
-    status: { type: String, enum: ["PRESENT"], default: "PRESENT" },
+    status: { type: String, default: "present" },
   },
   { _id: false } // Prevents a separate _id for each attendance record (optional)
 );

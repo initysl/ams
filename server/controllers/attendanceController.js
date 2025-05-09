@@ -126,7 +126,7 @@ const markAttendance = asyncHandler(async (req, res) => {
       courseCode: courseCode.trim().toUpperCase(),
       courseTitle: courseTitle.trim(),
       level: level.trim(),
-      status: "PRESENT",
+      status: "present",
     };
 
     lectureSession.attendanceRecords.push(record);

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/axios";
-import { Loader, FileQuestion } from "lucide-react";
+import { Loader, FileQuestion, BookOpenCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,7 +20,7 @@ type AttendanceRecord = {
   courseTitle: string;
   courseCode: string;
   level: string;
-  status: "present" | "absent";
+  status: "present";
 };
 
 const Attendance = () => {
@@ -144,7 +144,7 @@ const Attendance = () => {
                                 className={`px-2 py-1 rounded-full text-sm font-semibold ${
                                   record.status === "present"
                                     ? "bg-green-100 text-green-700"
-                                    : "bg-red-100 text-red-600"
+                                    : "bg-red-100 text-yellow-600"
                                 }`}
                               >
                                 {record.status}
@@ -158,6 +158,31 @@ const Attendance = () => {
                 </motion.div>
               )}
             </AnimatePresence>
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="flex flex-col justify-center items-center bg-yellow-100 mt-5 max-w-full">
+        <CardContent>
+          <div className="flex flex-col items-center">
+            <div className=" flex items-center justify-center gap-2 mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Attendance Summary
+              </h2>
+              <BookOpenCheck className="h-10 w-10 text-yellow-600 " />
+            </div>
+            {records && records.length > 0 ? (
+              <p className="text-gray-600">
+                You have attended{" "}
+                {
+                  records.filter(
+                    (r) => r.status.trim().toLowerCase() === "present"
+                  ).length
+                }{" "}
+                out of {records.length} classe(s).
+              </p>
+            ) : (
+              <p className="text-gray-500">No records available.</p>
+            )}
           </div>
         </CardContent>
       </Card>
