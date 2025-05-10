@@ -206,7 +206,7 @@ const recentlyMarkedAttendance = asyncHandler(async (req, res) => {
         courseTitle: session.courseTitle,
         level: session.level,
         status: studentRecord?.status,
-        date: studentRecord?.date || session.sessionStart, // Fallback to session start if record date is missing
+        date: studentRecord?.date || session.sessionStart,
         exactDate: studentRecord ? new Date(studentRecord.date) : null,
       };
     });

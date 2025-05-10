@@ -20,6 +20,9 @@ import {
   BarChart3,
   Award,
   Clock,
+  Trash2,
+  Search,
+  ListFilter,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -123,39 +126,37 @@ const Attendance = () => {
             (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
           )
           .slice(0, 5)
-      : filteredRecords
+      : [...filteredRecords].sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        )
     : null;
 
   return (
-    <div className="container mx-auto  space-y-6">
+    <div className="container mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="font-semibold text-xl md:text-2xl">
-          Attendance Dashboard
-        </h2>
+        <h2 className="font-semibold text-xl md:text-2xl">Attendance Record</h2>
 
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <Input
-            type="text"
-            placeholder="Search courses..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full sm:w-64"
-          />
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search courses..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 w-full"
+            />
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Fetch Controls & Table */}
         <div className="md:col-span-2">
           <Card className="bg-white shadow-sm">
             <CardHeader className="pb-2">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-gray-500" />
-                  {selectedView === "all" ? "All Records" : "Recent Records"}
-                </CardTitle>
-
                 <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2">
                   <Input
                     type="text"
@@ -175,27 +176,47 @@ const Attendance = () => {
                   </Button>
                   {records && (
                     <Button
+                      className="bg-red-500 hover:bg-red-600 text-white"
                       onClick={clearRecords}
                       variant="outline"
                       size="icon"
                     >
                       <span className="sr-only">Clear</span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        viewBox="0 0 16 16"
-                      >
-                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
-                        <path
-                          fillRule="evenodd"
-                          d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
-                        />
-                      </svg>
+                      <Trash2 />
                     </Button>
                   )}
                 </div>
+
+                {records && records.length > 0 && (
+                  <div className="flex gap-2 text-sm">
+                    <Button
+                      variant={selectedView === "all" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedView("all")}
+                      className={
+                        selectedView === "all"
+                          ? "bg-yellow-500 text-white hover:bg-yellow-600"
+                          : ""
+                      }
+                    >
+                      All Records
+                    </Button>
+                    <Button
+                      variant={
+                        selectedView === "recent" ? "default" : "outline"
+                      }
+                      size="sm"
+                      onClick={() => setSelectedView("recent")}
+                      className={
+                        selectedView === "recent"
+                          ? "bg-teal-500 text-white hover:bg-teal-600"
+                          : ""
+                      }
+                    >
+                      Recent 5
+                    </Button>
+                  </div>
+                )}
               </div>
             </CardHeader>
             <CardContent className="p-4">
@@ -230,6 +251,26 @@ const Attendance = () => {
                 </div>
               )}
 
+              {searchTerm && filteredRecords && filteredRecords.length > 0 && (
+                <div className="mb-3 flex items-center gap-2 text-sm text-blue-600">
+                  <ListFilter className="h-4 w-4" />
+                  <span>
+                    Found {filteredRecords.length} matching records for "
+                    {searchTerm}"
+                  </span>
+                  {searchTerm && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs py-0 h-6"
+                      onClick={() => setSearchTerm("")}
+                    >
+                      Clear
+                    </Button>
+                  )}
+                </div>
+              )}
+
               <AnimatePresence>
                 {!loading &&
                   displayedRecords &&
@@ -240,7 +281,7 @@ const Attendance = () => {
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <div className="overflow-x-auto  sm:mx-0 sm:rounded-lg borde">
+                      <div className="overflow-x-auto sm:mx-0 border rounded-md">
                         <Table className="min-w-full">
                           <TableHeader>
                             <TableRow>
@@ -314,9 +355,17 @@ const Attendance = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => setSelectedView("all")}
+                              className="text-blue-600 hover:text-blue-700"
                             >
                               View All ({filteredRecords.length}) Records
                             </Button>
+                          </div>
+                        )}
+
+                      {selectedView === "all" &&
+                        displayedRecords.length > 10 && (
+                          <div className="mt-4 text-center text-sm text-gray-500">
+                            Showing all {displayedRecords.length} records
                           </div>
                         )}
                     </motion.div>
@@ -432,7 +481,7 @@ const Attendance = () => {
           )}
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Stats Cards */}
         <Card className="bg-white shadow-sm">
           <CardHeader className="pb-2">
