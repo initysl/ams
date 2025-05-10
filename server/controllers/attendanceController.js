@@ -185,6 +185,7 @@ const recentlyMarkedAttendance = asyncHandler(async (req, res) => {
       return res.status(401).json({ error: "Unauthorized. Please log in" });
     }
 
+    // Find all lecture sessions where this student has marked attendance
     const lectureSessions = await LectureSession.find({
       "attendanceRecords.matricNumber": matricNumber,
     });
@@ -193,18 +194,25 @@ const recentlyMarkedAttendance = asyncHandler(async (req, res) => {
       return res.status(404).json({ error: "No recent attendance found" });
     }
 
-    const recentSessions = lectureSessions.map((session) => ({
-      sessionId: session._id,
-      courseCode: session.courseCode,
-      courseTitle: session.courseTitle,
-      level: session.level,
-      status: session.attendanceRecords.find(
+    // Map the sessions to the format we want to return
+    const recentSessions = lectureSessions.map((session) => {
+      const studentRecord = session.attendanceRecords.find(
         (record) => record.matricNumber === matricNumber
-      )?.status,
-      date: session.attendanceRecords.find(
-        (record) => record.matricNumber === matricNumber
-      )?.date,
-    }));
+      );
+
+      return {
+        sessionId: session._id,
+        courseCode: session.courseCode,
+        courseTitle: session.courseTitle,
+        level: session.level,
+        status: studentRecord?.status,
+        date: studentRecord?.date || session.sessionStart, // Fallback to session start if record date is missing
+        exactDate: studentRecord ? new Date(studentRecord.date) : null,
+      };
+    });
+
+    // Sort by date (most recent first)
+    recentSessions.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     res.status(200).json(recentSessions);
   } catch (error) {

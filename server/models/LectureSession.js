@@ -8,7 +8,7 @@ const attendanceRecordSchema = new mongoose.Schema(
     courseCode: { type: String, required: true },
     level: { type: String },
     status: { type: String, default: "present" },
-    date: { type: Date, default: Date.now },
+    date: { type: Date, required: true },
   },
   { _id: false } // Prevents a separate _id for each attendance record (optional)
 );

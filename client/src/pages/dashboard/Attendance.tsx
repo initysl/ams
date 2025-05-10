@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   TableHeader,
@@ -7,21 +7,30 @@ import {
   TableHead,
   TableBody,
   TableCell,
+  Table,
 } from "@/components/ui/table";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/axios";
-import { Loader, FileQuestion, BookOpenCheck } from "lucide-react";
+import {
+  Loader,
+  FileQuestion,
+  BookOpenCheck,
+  Calendar,
+  CheckCircle2,
+  BarChart3,
+  Award,
+  Clock,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Table } from "@/components/ui/table";
 
 type AttendanceRecord = {
   courseTitle: string;
   courseCode: string;
   level: string;
   status: "present";
-  date: number;
+  date: string | number;
 };
 
 const Attendance = () => {
@@ -29,6 +38,8 @@ const Attendance = () => {
   const [matricNumber] = useState(user?.matricNumber || "");
   const [records, setRecords] = useState<AttendanceRecord[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [selectedView, setSelectedView] = useState<"all" | "recent">("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const saved = sessionStorage.getItem("attendanceRecords");
@@ -64,6 +75,7 @@ const Attendance = () => {
     toast.info("Attendance records cleared");
   };
 
+  // Calculate statistics
   const presentCount =
     records?.filter((r) => r.status.trim().toLowerCase() === "present")
       .length || 0;
@@ -72,166 +84,426 @@ const Attendance = () => {
     ? Math.round((presentCount / totalCount) * 100)
     : 0;
 
+  // Get courses and their attendance counts
+  const coursesAttended = records
+    ? Array.from(new Set(records.map((record) => record.courseCode))).length
+    : 0;
+
+  // Get most recent class
+  const mostRecentClass =
+    records && records.length > 0
+      ? [...records].sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        )[0]
+      : null;
+
+  // Get least attended course
+  const courseAttendance = records
+    ? records.reduce((acc: Record<string, number>, record) => {
+        const key = `${record.courseCode} - ${record.courseTitle}`;
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {})
+    : {};
+
+  // Filter records based on search term
+  const filteredRecords = records
+    ? records.filter(
+        (record) =>
+          record.courseTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          record.courseCode.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : null;
+
+  // Get displayed records based on view selection
+  const displayedRecords = filteredRecords
+    ? selectedView === "recent"
+      ? [...filteredRecords]
+          .sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          )
+          .slice(0, 5)
+      : filteredRecords
+    : null;
+
   return (
-    <div className="space-y-5 max-w-7xl mx-auto">
-      <h2 className="font-semibold text-xl ">Attendance Records</h2>
+    <div className="container mx-auto  space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="font-semibold text-xl md:text-2xl">
+          Attendance Dashboard
+        </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {/* Input & Fetch */}
-        <Card className="bg-white col-span-1 md:col-span-2">
-          <CardContent className="p-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              <Input
-                type="text"
-                value={matricNumber}
-                readOnly
-                className="cursor-not-allowed bg-gray-100"
-              />
-              <Button
-                onClick={fetchAttendance}
-                className="bg-blue-500 text-white w-full"
-                disabled={loading}
-              >
-                {loading ? (
-                  <Loader className="animate-spin w-4 h-4" />
-                ) : (
-                  "Get Records"
-                )}
-              </Button>
-              {records && (
-                <Button
-                  onClick={clearRecords}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Clear Records
-                </Button>
-              )}
-            </div>
-            <div className="mt-10">
-              {loading && (
-                <div className="text-center text-gray-500">
-                  <Loader className="mx-auto h-6 w-6 animate-spin" />
-                  <p>Fetching records...</p>
-                </div>
-              )}
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Input
+            type="text"
+            placeholder="Search courses..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full sm:w-64"
+          />
+        </div>
+      </div>
 
-              {!loading && records?.length === 0 && (
-                <div className="flex flex-col items-center text-gray-500 mt-4">
-                  <FileQuestion className="h-10 w-10 mb-2" />
-                  <p>No attendance records found.</p>
-                </div>
-              )}
+      {/* Main Content */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Fetch Controls & Table */}
+        <div className="md:col-span-2">
+          <Card className="bg-white shadow-sm">
+            <CardHeader className="pb-2">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-gray-500" />
+                  {selectedView === "all" ? "All Records" : "Recent Records"}
+                </CardTitle>
 
-              {/* Attendance Table */}
-              <AnimatePresence>
-                {!loading && records && records.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
+                <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2">
+                  <Input
+                    type="text"
+                    value={matricNumber}
+                    readOnly
+                    className="cursor-not-allowed bg-gray-100 sm:w-36"
+                  />
+                  <Button
+                    onClick={fetchAttendance}
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                    disabled={loading}
                   >
-                    <div className="w-full overflow-x-auto border rounded-md">
-                      <Table className="min-w-[500px] w-full text-sm">
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Course</TableHead>
-                            <TableHead>Code</TableHead>
-                            <TableHead>Level</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Date</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {records.map((record, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="truncate max-w-[200px]">
-                                {record.courseTitle}
-                              </TableCell>
-                              <TableCell>{record.courseCode}</TableCell>
-                              <TableCell>{record.level}</TableCell>
-                              <TableCell>
-                                <span
-                                  className={`px-2 py-1 rounded-full text-sm font-semibold ${
-                                    record.status === "present"
-                                      ? "bg-green-100 text-green-700"
-                                      : "bg-red-100 text-red-600"
-                                  }`}
-                                >
-                                  {record.status}
-                                </span>
-                              </TableCell>
-                              <TableCell>
-                                {new Date(record.date).toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    year: "numeric",
-                                    month: "2-digit",
-                                    day: "2-digit",
-                                  }
-                                )}
-                              </TableCell>
+                    {loading ? (
+                      <Loader className="animate-spin w-4 h-4 mr-2" />
+                    ) : null}
+                    {loading ? "Loading..." : "Get Records"}
+                  </Button>
+                  {records && (
+                    <Button
+                      onClick={clearRecords}
+                      variant="outline"
+                      size="icon"
+                    >
+                      <span className="sr-only">Clear</span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                        <path
+                          fillRule="evenodd"
+                          d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+                        />
+                      </svg>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4">
+              {loading && (
+                <div className="text-center py-12">
+                  <Loader className="mx-auto h-8 w-8 animate-spin text-blue-500" />
+                  <p className="mt-2 text-gray-500">
+                    Fetching your attendance records...
+                  </p>
+                </div>
+              )}
+
+              {!loading && !records && (
+                <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                  <Calendar className="h-16 w-16 mb-4 opacity-20" />
+                  <div>
+                    <p className="font-medium">No attendance records loaded</p>
+                    <p className="text-sm text-gray-400 mt-1">
+                      Click "Get Records" to fetch your attendance history
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {!loading && filteredRecords?.length === 0 && (
+                <div className="flex flex-col items-center py-12 text-gray-500">
+                  <FileQuestion className="h-12 w-12 mb-3 text-gray-300" />
+                  <p className="font-medium">No matching records found</p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Try adjusting your search or view settings
+                  </p>
+                </div>
+              )}
+
+              <AnimatePresence>
+                {!loading &&
+                  displayedRecords &&
+                  displayedRecords.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="overflow-x-auto  sm:mx-0 sm:rounded-lg borde">
+                        <Table className="min-w-full">
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="font-medium">
+                                Course
+                              </TableHead>
+                              <TableHead className="font-medium">
+                                Code
+                              </TableHead>
+                              <TableHead className="font-medium">
+                                Level
+                              </TableHead>
+                              <TableHead className="font-medium">
+                                Status
+                              </TableHead>
+                              <TableHead className="font-medium">
+                                Date
+                              </TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </motion.div>
-                )}
+                          </TableHeader>
+                          <TableBody>
+                            {displayedRecords.map((record, index) => (
+                              <TableRow
+                                key={index}
+                                className="hover:bg-gray-50"
+                              >
+                                <TableCell
+                                  className="max-w-[200px] truncate font-medium"
+                                  title={record.courseTitle}
+                                >
+                                  {record.courseTitle}
+                                </TableCell>
+                                <TableCell className="whitespace-nowrap">
+                                  {record.courseCode}
+                                </TableCell>
+                                <TableCell>{record.level}</TableCell>
+                                <TableCell>
+                                  <span
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                      record.status === "present"
+                                        ? "bg-green-100 text-green-700"
+                                        : "bg-red-100 text-red-600"
+                                    }`}
+                                  >
+                                    {record.status}
+                                  </span>
+                                </TableCell>
+                                <TableCell className="whitespace-nowrap">
+                                  {record.date
+                                    ? new Date(record.date).toLocaleDateString(
+                                        "en-US",
+                                        {
+                                          year: "numeric",
+                                          month: "short",
+                                          day: "numeric",
+                                        }
+                                      )
+                                    : "—"}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+
+                      {selectedView === "recent" &&
+                        filteredRecords &&
+                        filteredRecords.length > 5 && (
+                          <div className="mt-4 text-center">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setSelectedView("all")}
+                            >
+                              View All ({filteredRecords.length}) Records
+                            </Button>
+                          </div>
+                        )}
+                    </motion.div>
+                  )}
               </AnimatePresence>
-            </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Summary & Stats */}
+        <div className="space-y-6">
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-blue-700">
+                <BookOpenCheck className="h-5 w-5" />
+                Attendance Summary
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {totalCount > 0 ? (
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-gray-600">
+                      You've attended <strong>{presentCount}</strong> out of{" "}
+                      <strong>{totalCount}</strong> classes.
+                    </p>
+
+                    <div className="mt-3 w-full bg-white rounded-full h-3">
+                      <div
+                        className="bg-blue-500 h-3 rounded-full"
+                        style={{ width: `${attendancePercentage}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-right text-sm mt-1 text-blue-600 font-medium">
+                      {attendancePercentage}% Attendance
+                    </p>
+                  </div>
+
+                  <div className="pt-2 border-t border-blue-100">
+                    <p className="text-sm text-gray-600 font-medium">
+                      Course Breakdown:
+                    </p>
+                    <ul className="mt-2 space-y-1">
+                      {Object.entries(courseAttendance)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 3)
+                        .map(([course, count], index) => (
+                          <li
+                            key={index}
+                            className="flex justify-between items-center text-sm"
+                          >
+                            <span className="truncate" title={course}>
+                              {course}
+                            </span>
+                            <span className="font-medium text-blue-700">
+                              {count} classes
+                            </span>
+                          </li>
+                        ))}
+                    </ul>
+                    {Object.keys(courseAttendance).length > 3 && (
+                      <p className="text-xs text-gray-500 mt-2">
+                        + {Object.keys(courseAttendance).length - 3} more
+                        courses
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+                  <p>No attendance records available.</p>
+                  <p className="text-sm mt-1">
+                    Click "Get Records" to fetch your data.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {records && records.length > 0 && (
+            <Card className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-amber-700">
+                  <Clock className="h-5 w-5" />
+                  Recent Activity
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {mostRecentClass && (
+                  <div className="space-y-3">
+                    <div className="p-3 bg-white rounded-lg border border-amber-100">
+                      <p className="font-medium text-amber-800">
+                        {mostRecentClass.courseTitle}
+                      </p>
+                      <div className="flex justify-between mt-1">
+                        <p className="text-sm text-gray-500">
+                          {mostRecentClass.courseCode}
+                        </p>
+                        <p className="text-sm text-amber-600">
+                          {new Date(mostRecentClass.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-gray-600">
+                      Last attended course was{" "}
+                      <strong>{mostRecentClass.courseTitle}</strong>
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* Stats Cards */}
+        <Card className="bg-white shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-gray-500 flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-500" />
+              Classes Attended
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-green-600">{presentCount}</p>
+            <p className="text-sm text-gray-500">out of {totalCount} total</p>
           </CardContent>
         </Card>
 
-        {/* Attendance Summary */}
-        <Card className="bg-yellow-100 col-span-1 flex flex-col justify-center">
-          <CardContent className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <h2 className="font-semibold text-gray-800">Summary</h2>
-              <BookOpenCheck className="text-yellow-600 h-6 w-6" />
-            </div>
-            {totalCount > 0 ? (
-              <p className="text-gray-600">
-                Attended <strong>{presentCount}</strong> of{" "}
-                <strong>{totalCount}</strong> classes.
-              </p>
-            ) : (
-              <p className="text-gray-500">No records available.</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Total Attended */}
-        <Card className="bg-green-50 col-span-1">
-          <CardContent className="p-4 text-center">
-            <p className="text-green-700 font-bold text-xl">{presentCount}</p>
-            <p className="text-gray-500">Classes Attended</p>
-          </CardContent>
-        </Card>
-
-        {/* Attendance Percentage */}
-        <Card className="bg-blue-50 col-span-1">
-          <CardContent className="p-4 text-center">
-            <p className="text-blue-700 font-bold text-xl">
+        <Card className="bg-white shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-gray-500 flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-blue-500" />
+              Attendance Rate
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-blue-600">
               {attendancePercentage}%
             </p>
-            <p className="text-gray-500">Attendance Rate</p>
+            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+              <div
+                className="bg-blue-600 h-2.5 rounded-full"
+                style={{ width: `${attendancePercentage}%` }}
+              ></div>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Most Recent Attendance */}
-        <Card className="bg-purple-50 col-span-1">
-          <CardContent className="p-4 text-center">
-            {records && records.length > 0 ? (
+        <Card className="bg-white shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-gray-500 flex items-center gap-2">
+              <Award className="h-4 w-4 text-purple-500" />
+              Courses
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-purple-600">
+              {coursesAttended}
+            </p>
+            <p className="text-sm text-gray-500">unique courses</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-gray-500 flex items-center gap-2">
+              <Clock className="h-4 w-4 text-amber-500" />
+              Last Attended
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {mostRecentClass ? (
               <>
-                <p className="text-purple-700 font-bold">
-                  {records[records.length - 1].courseTitle}
+                <p
+                  className="text-lg font-medium text-amber-600 truncate"
+                  title={mostRecentClass.courseTitle}
+                >
+                  {mostRecentClass.courseCode}
                 </p>
-                <p className="text-gray-500 text-sm">Most Recent Class</p>
+                <p className="text-sm text-gray-500">
+                  {new Date(mostRecentClass.date).toLocaleDateString()}
+                </p>
               </>
             ) : (
-              <p className="text-gray-500">No recent class</p>
+              <p className="text-sm text-gray-500">No classes yet</p>
             )}
           </CardContent>
         </Card>
