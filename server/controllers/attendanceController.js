@@ -127,6 +127,7 @@ const markAttendance = asyncHandler(async (req, res) => {
       courseTitle: courseTitle.trim(),
       level: level.trim(),
       status: "present",
+      date: new Date(),
     };
 
     lectureSession.attendanceRecords.push(record);
@@ -200,6 +201,9 @@ const recentlyMarkedAttendance = asyncHandler(async (req, res) => {
       status: session.attendanceRecords.find(
         (record) => record.matricNumber === matricNumber
       )?.status,
+      date: session.attendanceRecords.find(
+        (record) => record.matricNumber === matricNumber
+      )?.date,
     }));
 
     res.status(200).json(recentSessions);

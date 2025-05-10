@@ -21,6 +21,7 @@ type AttendanceRecord = {
   courseCode: string;
   level: string;
   status: "present";
+  date: number;
 };
 
 const Attendance = () => {
@@ -139,6 +140,7 @@ const Attendance = () => {
                             <TableHead>Code</TableHead>
                             <TableHead>Level</TableHead>
                             <TableHead>Status</TableHead>
+                            <TableHead>Date</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -159,6 +161,16 @@ const Attendance = () => {
                                 >
                                   {record.status}
                                 </span>
+                              </TableCell>
+                              <TableCell>
+                                {new Date(record.date).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "2-digit",
+                                    day: "2-digit",
+                                  }
+                                )}
                               </TableCell>
                             </TableRow>
                           ))}
