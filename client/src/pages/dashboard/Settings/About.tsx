@@ -22,7 +22,7 @@ const About = () => {
         <div>
           <h3 className="text-lg font-medium">Developer</h3>
           <p className="text-gray-600">
-            Developed by Yusuf Lawal | TheFirstStudio
+            Developed by Yusuf Lawal @ TheFirstStudio
           </p>
         </div>
 

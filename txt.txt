@@ -1,4 +1,4 @@
-Ensure to remove all console.log
+Ensure to remove all console.log and toast session expired
 # NODE_ENV = production
 Use normal rafce in normal components
 
