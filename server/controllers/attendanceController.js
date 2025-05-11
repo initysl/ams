@@ -195,7 +195,7 @@ const getLectureSessions = asyncHandler(async (req, res) => {
 
     // For debugging
     console.log(
-      `Found ${lectureSessions.length} sessions for lecturer ID: ${req.user._id}`
+      `Found ${lectureSessions.length} lecture sessions for lecturer ID: ${req.user._id}`
     );
 
     // Format the data to match frontend expectations
