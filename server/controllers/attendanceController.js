@@ -36,6 +36,7 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
       level,
       sessionStart,
       sessionEnd,
+      lecturer: req.user._id,
     });
 
     await lectureSession.save();
@@ -177,6 +178,42 @@ const getAttendanceReport = asyncHandler(async (req, res) => {
   }
 });
 
+// Get Lecture Sessions
+const getLectureSessions = asyncHandler(async (req, res) => {
+  try {
+    // Check if user is a lecturer
+    if (req.user.role !== "lecturer") {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized. Lecturer access only" });
+    }
+
+    // Get all lecture sessions created by this lecturer
+    const lectureSessions = await LectureSession.find({
+      lecturer: req.user._id,
+    }).sort({ createdAt: -1 }); // Sort by creation date, newest first
+
+    // For debugging
+    console.log(
+      `Found ${lectureSessions.length} sessions for lecturer ID: ${req.user._id}`
+    );
+
+    // Format the data to match frontend expectations
+    const formattedSessions = lectureSessions.map((session) => ({
+      _id: session._id,
+      courseCode: session.courseCode,
+      courseTitle: session.courseTitle || "Untitled Course",
+      date: session.sessionStart, // Using sessionStart as date for the frontend
+    }));
+
+    // Return the sessions - send array directly as expected by frontend
+    res.status(200).json(formattedSessions);
+  } catch (error) {
+    console.error("Error fetching lecture sessions:", error);
+    res.status(500).json({ error: "Error fetching lecture sessions" });
+  }
+});
+
 // Recently Marked Attendance
 const recentlyMarkedAttendance = asyncHandler(async (req, res) => {
   try {
@@ -225,5 +262,6 @@ module.exports = {
   generateAttendanceQRCode,
   markAttendance,
   getAttendanceReport,
+  getLectureSessions,
   recentlyMarkedAttendance,
 };

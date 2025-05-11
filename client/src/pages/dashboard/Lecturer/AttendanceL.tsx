@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,20 +42,19 @@ type LectureSession = {
   courseCode: string;
   courseTitle: string;
   date: string;
-  time: string;
-  location: string;
 };
 
 type AttendanceRecord = {
   name: string;
   matricNumber: string;
+  courseTitle: string;
   courseCode: string;
   level: string;
   status: string;
+  date: string | number;
 };
 
 const AttendanceL = () => {
-  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
   const [sessions, setSessions] = useState<LectureSession[]>([]);
@@ -90,7 +88,7 @@ const AttendanceL = () => {
   const fetchLectureSessions = async () => {
     setLoading(true);
     try {
-      const response = await api.get("/lecture/sessions", {
+      const response = await api.get("attendance/lecture", {
         withCredentials: true,
       });
       setSessions(response.data);
@@ -111,7 +109,7 @@ const AttendanceL = () => {
 
     setReportLoading(true);
     try {
-      const response = await api.get(`/attendance/report/${sessionId}`, {
+      const response = await api.get(`attendance/report/${sessionId}`, {
         withCredentials: true,
       });
       setReport(response.data.report);
@@ -179,13 +177,6 @@ const AttendanceL = () => {
     <div className="container mx-auto space-y-6 pb-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="font-semibold text-xl md:text-2xl">Attendance Report</h2>
-        <div className="text-sm text-gray-500">
-          {user?.name && (
-            <span>
-              Logged in as <span className="font-medium">{user.name}</span>
-            </span>
-          )}
-        </div>
       </div>
 
       {/* Session Selection */}
@@ -269,10 +260,6 @@ const AttendanceL = () => {
                         day: "numeric",
                       }
                     )}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <BookOpen className="inline h-4 w-4 mr-1" />
-                    {selectedSessionData.location}
                   </p>
                 </div>
               </div>

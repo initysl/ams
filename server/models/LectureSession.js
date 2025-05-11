@@ -22,6 +22,11 @@ const lectureSessionSchema = new mongoose.Schema(
     sessionStart: { type: Date, required: true },
     sessionEnd: { type: Date, required: true },
     attendanceRecords: [attendanceRecordSchema], // Array of students who marked attendance
+    lecturer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   { timestamps: true }
 );

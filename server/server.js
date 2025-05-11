@@ -43,7 +43,7 @@ app.use(
 connectDB();
 
 // Routes
-app.use("/api/lecture", lectureRoutes);
+// app.use("/api/lecture", lectureRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
