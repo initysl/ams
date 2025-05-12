@@ -180,9 +180,9 @@ const AttendanceL = () => {
       </div>
 
       {/* Session Selection */}
-      <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-100 shadow-sm">
+      <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-100 shadow-sm ">
         <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-purple-700">
+          <CardTitle className="flex items-center gap-2 text-blue-700">
             <Calendar className="h-5 w-5" />
             Select Lecture Session
           </CardTitle>
@@ -198,7 +198,7 @@ const AttendanceL = () => {
                 <SelectTrigger className="w-full bg-white">
                   <SelectValue placeholder="Select a lecture session" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   {sessions.length === 0 && loading && (
                     <div className="flex items-center justify-center py-2 text-gray-500">
                       <Loader className="h-4 w-4 animate-spin mr-2" />
@@ -223,7 +223,7 @@ const AttendanceL = () => {
               <Button
                 onClick={() => generateReport(selectedSession)}
                 disabled={!selectedSession || reportLoading}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               >
                 {reportLoading ? (
                   <>
@@ -241,7 +241,7 @@ const AttendanceL = () => {
             <div className="mt-4 p-3 bg-white rounded-lg border border-purple-100">
               <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
                 <div>
-                  <p className="font-medium text-purple-800">
+                  <p className="font-medium text-yellow-800">
                     {selectedSessionData.courseTitle}
                   </p>
                   <p className="text-sm text-gray-600">
@@ -414,10 +414,10 @@ const AttendanceL = () => {
           </div>
 
           {/* Attendance Table */}
-          <Card className="bg-white shadow-sm overflow-hidden">
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
+          <Card className="bg-white shadow-sm max-w-[350px] md:w-full overflow-x-auto">
+            <CardContent className="p-2">
+              <div className="border rounded-md">
+                <Table className="w-full">
                   <TableHeader>
                     <TableRow>
                       <TableHead className="font-medium">Name</TableHead>
@@ -432,7 +432,7 @@ const AttendanceL = () => {
                   <TableBody>
                     {filteredReport.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8">
+                        <TableCell colSpan={5} className=" text-center py-8">
                           <AlertCircle className="mx-auto h-8 w-8 text-gray-300 mb-2" />
                           <p className="text-gray-500">
                             No matching records found
@@ -489,7 +489,7 @@ const AttendanceL = () => {
           </p>
           <Button
             onClick={() => generateReport(selectedSession)}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            className="bg-yellow-600 hover:bg-yellow-700 text-white"
           >
             Generate Report
           </Button>

@@ -282,8 +282,8 @@ const AttendanceS = () => {
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <div className="overflow-x-auto sm:mx-0 sm:rounded-lg">
-                        <Table className="min-w-full">
+                      <div className="overflow-x-auto sm:mx-0 border rounded-md">
+                        <Table className="min-w-full ">
                           <TableHeader>
                             <TableRow>
                               <TableHead className="font-medium">
