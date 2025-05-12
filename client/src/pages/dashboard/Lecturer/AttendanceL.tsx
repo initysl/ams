@@ -269,7 +269,7 @@ const AttendanceL = () => {
       </Card>
 
       {/* Attendance Table */}
-      <div className="bg-white overflow-x-auto border rounded-lg shadow-sm">
+      <div className="bg-white overflow-x-auto rounded-md shadow-sm">
         {/* Regular Table for Medium and Up Screens */}
         <div className="hidden md:block">
           <table className="min-w-full divide-y divide-gray-200">
