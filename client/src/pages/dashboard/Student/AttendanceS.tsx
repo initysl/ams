@@ -144,7 +144,7 @@ const AttendanceS = () => {
               placeholder="Search courses..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 w-full"
+              className="pl-9 w-full rounded-md"
             />
           </div>
         </div>
@@ -282,7 +282,7 @@ const AttendanceS = () => {
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <div className="overflow-x-auto sm:mx-0 border rounded-md">
+                      <Card className="bg-white overflow-x-auto sm:mx-0 border rounded-md">
                         <Table className="min-w-full ">
                           <TableHeader>
                             <TableRow>
@@ -346,7 +346,7 @@ const AttendanceS = () => {
                             ))}
                           </TableBody>
                         </Table>
-                      </div>
+                      </Card>
 
                       {selectedView === "recent" &&
                         filteredRecords &&

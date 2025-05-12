@@ -268,6 +268,173 @@ const AttendanceL = () => {
         </CardContent>
       </Card>
 
+      {/* Attendance Table */}
+      <div className="bg-white overflow-x-auto border rounded-lg shadow-sm">
+        {/* Regular Table for Medium and Up Screens */}
+        <div className="hidden md:block">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Name
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Matric Number
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Course Code
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Level
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredReport.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center">
+                    <AlertCircle className="mx-auto h-8 w-8 text-gray-300 mb-2" />
+                    <p className="text-gray-500">No matching records found</p>
+                  </td>
+                </tr>
+              ) : (
+                filteredReport.map((record, index) => (
+                  <tr key={index} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {record.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {record.matricNumber}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {record.courseCode}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {record.level}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          record.status.toLowerCase() === "present"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-600"
+                        }`}
+                      >
+                        {record.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="md:hidden">
+          {filteredReport.length === 0 ? (
+            <div className="text-center py-8">
+              <AlertCircle className="mx-auto h-8 w-8 text-gray-300 mb-2" />
+              <p className="text-gray-500">No matching records found</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-200">
+              {filteredReport.map((record, index) => (
+                <div key={index} className="p-4 hover:bg-gray-50">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="font-medium text-gray-900">
+                      {record.name}
+                    </div>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        record.status.toLowerCase() === "present"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-600"
+                      }`}
+                    >
+                      {record.status}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-500 mb-1">
+                    <span className="font-medium">Matric:</span>{" "}
+                    {record.matricNumber}
+                  </div>
+                  <div className="text-sm text-gray-500 mb-1">
+                    <span className="font-medium">Course:</span>{" "}
+                    {record.courseCode}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    <span className="font-medium">Level:</span> {record.level}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Filter and Export Controls */}
+      <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4">
+        <div className="flex flex-1 flex-col sm:flex-row gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search by name or matric number..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 rounded-md"
+            />
+          </div>
+
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-40 bg-yellow-100 hover:bg-yellow-400 border-none">
+              <div className="flex items-center">
+                <Filter className="h-4 w-4 mr-2" />
+                <span>Status</span>
+              </div>
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              <SelectItem className="hover:bg-amber-300" value="all">
+                All Statuses
+              </SelectItem>
+              <SelectItem className="hover:bg-teal-300" value="present">
+                Present
+              </SelectItem>
+              <SelectItem className="hover:bg-indigo-300" value="absent">
+                Absent
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <Button
+          onClick={exportToCSV}
+          variant="outline"
+          className="flex items-center gap-2 bg-green-100 hover:bg-green-400 border-none"
+        >
+          <Download className="h-4 w-4" />
+          Export to CSV
+        </Button>
+      </div>
+
       {/* Report Content */}
       {report.length > 0 && (
         <motion.div
@@ -277,7 +444,7 @@ const AttendanceL = () => {
         >
           {/* Statistics Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-yellow-100 shadow-sm">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
                   <div>
@@ -293,7 +460,7 @@ const AttendanceL = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-white ">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
                   <div>
@@ -309,7 +476,7 @@ const AttendanceL = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-white">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
                   <div>
@@ -325,7 +492,7 @@ const AttendanceL = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-green-100">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
                   <div>
@@ -362,7 +529,7 @@ const AttendanceL = () => {
                   {levels.map((level) => (
                     <div
                       key={level}
-                      className="p-3 bg-gray-50 rounded-lg border border-gray-100"
+                      className="p-3 bg-gray-200 rounded-lg border border-gray-100"
                     >
                       <p className="text-sm text-gray-500">Level {level}</p>
                       <p className="text-xl font-semibold text-gray-700">
@@ -374,99 +541,6 @@ const AttendanceL = () => {
               </CardContent>
             </Card>
           )}
-
-          {/* Filter and Export Controls */}
-          <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4">
-            <div className="flex flex-1 flex-col sm:flex-row gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search by name or matric number..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-40">
-                  <div className="flex items-center">
-                    <Filter className="h-4 w-4 mr-2" />
-                    <span>Status</span>
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="present">Present</SelectItem>
-                  <SelectItem value="absent">Absent</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Button
-              onClick={exportToCSV}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Export to CSV
-            </Button>
-          </div>
-
-          {/* Attendance Table */}
-          <Card className="bg-white shadow-sm max-w-[350px] md:w-full overflow-x-auto">
-            <CardContent className="p-2">
-              <div className="border rounded-md">
-                <Table className="w-full">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="font-medium">Name</TableHead>
-                      <TableHead className="font-medium">
-                        Matric Number
-                      </TableHead>
-                      <TableHead className="font-medium">Course Code</TableHead>
-                      <TableHead className="font-medium">Level</TableHead>
-                      <TableHead className="font-medium">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredReport.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className=" text-center py-8">
-                          <AlertCircle className="mx-auto h-8 w-8 text-gray-300 mb-2" />
-                          <p className="text-gray-500">
-                            No matching records found
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredReport.map((record, index) => (
-                        <TableRow key={index} className="hover:bg-gray-50">
-                          <TableCell className="font-medium">
-                            {record.name}
-                          </TableCell>
-                          <TableCell>{record.matricNumber}</TableCell>
-                          <TableCell>{record.courseCode}</TableCell>
-                          <TableCell>{record.level}</TableCell>
-                          <TableCell>
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                record.status.toLowerCase() === "present"
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-red-100 text-red-600"
-                              }`}
-                            >
-                              {record.status}
-                            </span>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
 
           {filteredReport.length > 0 && (
             <div className="text-sm text-gray-500 mt-4 text-center">
