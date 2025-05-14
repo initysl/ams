@@ -28,7 +28,7 @@ type CardItem = {
 const cardData: { cards: CardItem[] } = rawCardData as { cards: CardItem[] };
 const cardColors = [
   "bg-gray-200",
-  "bg-green-400",
+  "bg-orange-200",
   "bg-yellow-100",
   "bg-purple-100",
 ];
