@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -6,9 +6,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-
 import * as Icons from "lucide-react";
-
 import rawCardData from "@/components/json/card.json";
 import { Status } from "@/components/lctui/Status";
 import { Activity } from "@/components/lctui/Activity";
@@ -43,7 +41,9 @@ const Icon = ({ name }: { name: keyof typeof Icons }) => {
 };
 
 const Home: React.FC = () => {
-  const [today, setToday] = React.useState(() => new Date().toLocaleString());
+  const [today, setToday] = useState(() => new Date().toLocaleString());
+  const [flipImage, setFlipImage] = useState(img1);
+  const [isFlipped, setIsFlipped] = useState(false);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -76,16 +76,31 @@ const Home: React.FC = () => {
         <div className="lg:col-span-2 lg:row-span-1 max-w-full rounded-xl bg-white shadow-sm">
           <div className="md:flex h-full">
             {/* Image Section */}
-            <div className="md:w-1/2">
-              <img
-                className="h-48 w-full object-cover md:h-full md:w-full rounded-t-xl md:rounded-l-xl md:rounded-tr-none"
-                src={img1}
-                alt="Modern building architecture"
-              />
+            <div
+              className="md:w-1/2"
+              onMouseEnter={() => setIsFlipped(true)}
+              onMouseLeave={() => setIsFlipped(false)}
+            >
+              <div
+                className={`relative w-full h-full transform-style-preserve-3d transition-transform duration-700 ${
+                  isFlipped ? "rotate-y-180" : ""
+                }`}
+              >
+                <img
+                  className="absolute backface-hidden h-52 w-full object-cover md:h-full md:w-full rounded-t-xl md:rounded-l-xl md:rounded-tr-none"
+                  src={img1}
+                  alt="A boy with a phone displaying a QR code image in a classroom"
+                />
+                <img
+                  className=" backface-hidden transform rotate-y-180 h-52 w-full object-cover md:h-full md:w-full rounded-t-xl md:rounded-l-xl md:rounded-tr-none"
+                  src={img2}
+                  alt="A boy with a phone displaying a QR code image in a classroom"
+                />
+              </div>
             </div>
 
             {/* Text Content */}
-            <div className="p-4 flex flex-col justify-center space-y-2">
+            <div className="p-4 md:py-8 flex flex-col justify-center space-y-2">
               <div className="text-sm font-semibold tracking-wide text-indigo-500 uppercase mb-1">
                 Your Digital Attendance Management System Solution!
               </div>
@@ -99,7 +114,7 @@ const Home: React.FC = () => {
                 A fully digital attendance management system that allows you to
                 manage your attendance with ease. No more paper trails or manual
                 tracking. With our system, you can easily track attendance,
-                generate reports, and manage your team all in one place.
+                generate reports, and manage your attendance all in one place.
               </p>
             </div>
           </div>
