@@ -46,10 +46,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setUser(response.data.user);
         toast.success("Signed in successful!");
       } else {
-        throw new Error(response.data.message || "Login failed");
+        throw new Error(response.data.message || "Sign in failed");
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Login failed");
+      toast.error(error?.response?.data?.message || "Sign in failed");
       throw error;
     }
   };

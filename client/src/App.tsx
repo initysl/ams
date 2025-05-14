@@ -66,7 +66,7 @@ function App() {
         </Routes>
       </Router>
 
-      <Toaster richColors position="top-center" closeButton />
+      <Toaster richColors position="top-right" closeButton />
     </div>
   );
 }

@@ -8,10 +8,14 @@ import {
 } from "@/components/ui/card";
 
 import * as Icons from "lucide-react";
+
 import rawCardData from "@/components/json/card.json";
 import { Status } from "@/components/lctui/Status";
 import { Activity } from "@/components/lctui/Activity";
 import { Chart } from "@/components/general/Chart";
+import img1 from "@/assets/images/card/qrb.png";
+import img2 from "@/assets/images/card/qrw.png";
+
 import { useAuth } from "@/context/AuthContext";
 
 type CardItem = {
@@ -68,30 +72,63 @@ const Home: React.FC = () => {
 
       {/* Card Summary Grid */}
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="lg:col-span-2 lg:row-span-1 max-w-full rounded-xl bg-white shadow-md">
+          <div className="md:flex h-full">
+            {/* Image Section */}
+            <div className="md:w-1/2">
+              <img
+                className="h-48 w-full object-cover md:h-full md:w-full rounded-t-xl md:rounded-l-xl md:rounded-tr-none"
+                src={img1}
+                alt="Modern building architecture"
+              />
+            </div>
+
+            {/* Text Content */}
+            <div className="p-2 md:p-4 flex flex-col justify-center">
+              <div className="text-sm font-semibold tracking-wide text-indigo-500 uppercase mb-1">
+                Company Retreats
+              </div>
+              <a
+                href="#"
+                className="block text-xl leading-tight font-bold text-gray-900 hover:underline"
+              >
+                Incredible accommodation for your team
+              </a>
+              <p className="mt-2 text-gray-600">
+                Looking to take your team away on a retreat to enjoy awesome
+                food and take in some sunshine? We have a list of places to do
+                just that.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Cards */}
         {cardData.cards.map((text) => (
           <Card
             key={text.id}
-            className={`bg-white shadow-md transition hover:shadow-xl rounded-xl ${
+            className={`bg-white shadow-md hover:shadow-xl transition rounded-xl p-4 flex flex-col justify-between ${
               cardColors[text.id % cardColors.length]
             }`}
           >
-            <CardHeader>
+            <CardHeader className="p-0 mb-2">
               <div className="flex justify-between items-center">
-                <CardTitle className="text-lg font-semibold">
+                <CardTitle className="text-base font-semibold">
                   {text.title}
                 </CardTitle>
-                <Icon name={text.icon} />
+                <Icon name={text.icon} className="text-indigo-500" />
               </div>
-              <CardDescription className="text-sm mt-1 text-muted-foreground">
+              <CardDescription className="text-sm text-muted-foreground mt-1">
                 {text.description}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <p className="text-sm text-gray-700 font-medium">{text.value}</p>
             </CardContent>
           </Card>
         ))}
       </div>
+
       {/* Visual Stats Chart */}
       <Chart />
       {/* Extra Info Cards */}
@@ -102,16 +139,6 @@ const Home: React.FC = () => {
           <p className="text-sm text-gray-800">
             "Tech Seminar" scheduled for April 25.
           </p>
-        </Card>
-        <Card className="p-5 bg-purple-100">
-          <CardTitle className="mb-1">Quick Actions</CardTitle>
-          <ul className="text-sm list-disc pl-4 text-gray-800">
-            <li>Generate QR Code</li>
-            <li>View Attendance Log</li>
-            <li>Download Attendance Log</li>
-            <li>Project QR Code</li>
-            <li>Download QR Code</li>
-          </ul>
         </Card>
       </div>
       <Activity />

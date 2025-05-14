@@ -2,10 +2,10 @@
   "cards": [
     {
       "id": 1,
-      "title": "Attendance Tracking",
-      "value": "Seamlessly track attendance real-time",
-      "description": "Monitor attendance records in real-time for better management.",
-      "icon": "CalendarCheck"
+      "title": "Attendance Management Made Easy",
+      "value": "Seamlessly track attendance real-time using time-based QR Code",
+      "description": "Generate QR Code to monitor attendance records in real-time.",
+      "icon": "QrCode"
     },
     {
       "id": 2,

@@ -58,13 +58,9 @@ const AuthForm: React.FC = () => {
     onSuccess: () => {
       navigate("/dashboard/home");
     },
-    onError: (err: ApiError) => {
-      toast.error(
-        `Sign in failed: ${
-          err.response?.data?.message || "Invalid credentials"
-        }`
-      );
-    },
+    // onError: (err: ApiError) => {
+    //   toast.error(`Sign in failed: ${err.response?.data?.message}`);
+    // },
   });
 
   // === Register Mutation ===

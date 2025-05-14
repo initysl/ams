@@ -1,15 +1,9 @@
 import { useState, useEffect } from "react";
 import api from "@/lib/axios";
 import { Button } from "@/components/ui/button";
+import { jsPDF } from "jspdf";
+import { autoTable } from "jspdf-autotable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-  Table,
-} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
@@ -21,21 +15,19 @@ import { Input } from "@/components/ui/input";
 import {
   BarChart3,
   Calendar,
-  ChevronDown,
-  Download,
   FileSpreadsheet,
   Filter,
   Loader,
   Search,
   Users,
-  BookOpen,
   AlertCircle,
   Check,
   X,
   FileText,
+  File,
 } from "lucide-react";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 type LectureSession = {
   _id: string;
@@ -159,6 +151,42 @@ const AttendanceL = () => {
     toast.success("Report downloaded successfully");
   };
 
+  const exportAsPDF = () => {
+    if (!report.length) return;
+    const selectedSessionData = sessions.find((s) => s._id === selectedSession);
+    const doc = new jsPDF();
+    doc.setFontSize(20);
+    doc.text(
+      `Attendance Report for ${selectedSessionData?.courseCode}`,
+      20,
+      20
+    );
+    doc.setFontSize(12);
+    doc.text(`Course Title: ${selectedSessionData?.courseTitle}`, 20, 30);
+    doc.text(
+      `Date: ${
+        selectedSessionData?.date
+          ? new Date(selectedSessionData.date).toLocaleDateString()
+          : "N/A"
+      }`,
+      20,
+      40
+    );
+    autoTable(doc, {
+      head: [["Name", "Matric Number", "Course Code", "Level", "Status"]],
+      body: report.map((r) => [
+        r.name,
+        r.matricNumber,
+        r.courseCode,
+        r.level,
+        r.status,
+      ]),
+      startY: 50,
+    });
+    doc.save(`${selectedSessionData?.courseCode}-attendance-report.pdf`);
+    toast.success("Report downloaded successfully");
+  };
+
   const filteredReport = report.filter((record) => {
     const matchesSearch =
       record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -195,7 +223,7 @@ const AttendanceL = () => {
                 onValueChange={handleSessionChange}
                 disabled={loading}
               >
-                <SelectTrigger className="w-full bg-white">
+                <SelectTrigger className="w-full bg-white border-none">
                   <SelectValue placeholder="Select a lecture session" />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
@@ -427,11 +455,17 @@ const AttendanceL = () => {
 
         <Button
           onClick={exportToCSV}
-          variant="outline"
+          className="flex items-center gap-2 bg-lime-100 hover:bg-lime-400 border-none"
+        >
+          <FileSpreadsheet className="h-4 w-4" />
+          Export to CSV
+        </Button>
+        <Button
+          onClick={exportAsPDF}
           className="flex items-center gap-2 bg-green-100 hover:bg-green-400 border-none"
         >
-          <Download className="h-4 w-4" />
-          Export to CSV
+          <File className="h-4 w-4" />
+          Export as PDF
         </Button>
       </div>
 

@@ -225,7 +225,7 @@ const AttendanceS = () => {
                 <div className="text-center py-12">
                   <Loader className="mx-auto h-8 w-8 animate-spin text-blue-500" />
                   <p className="mt-2 text-gray-500">
-                    Fetching your attendance records...
+                    Retreving attendance records...
                   </p>
                 </div>
               )}
@@ -234,7 +234,7 @@ const AttendanceS = () => {
                 <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                   <Calendar className="h-16 w-16 mb-4 opacity-20" />
                   <div>
-                    <p className="font-medium">No attendance records loaded</p>
+                    <p className="font-medium ">No attendance records loaded</p>
                     <p className="text-sm text-gray-400 mt-1">
                       Click "Get Records" to fetch your attendance history
                     </p>
@@ -245,7 +245,7 @@ const AttendanceS = () => {
               {!loading && filteredRecords?.length === 0 && (
                 <div className="flex flex-col items-center py-12 text-gray-500">
                   <FileQuestion className="h-12 w-12 mb-3 text-gray-300" />
-                  <p className="font-medium">No matching records found</p>
+                  <p className="font-medium ">No matching records found</p>
                   <p className="text-sm text-gray-400 mt-1">
                     Try adjusting your search or view settings
                   </p>
@@ -282,23 +282,23 @@ const AttendanceS = () => {
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <Card className="bg-white overflow-x-auto sm:mx-0 border rounded-md">
+                      <Card className="bg-white overflow-x-auto overflow-y-auto sm:mx-0 border rounded-md">
                         <Table className="min-w-full ">
                           <TableHeader>
                             <TableRow>
-                              <TableHead className="font-medium">
+                              <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Course
                               </TableHead>
-                              <TableHead className="font-medium">
+                              <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Code
                               </TableHead>
-                              <TableHead className="font-medium">
+                              <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Level
                               </TableHead>
-                              <TableHead className="font-medium">
+                              <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Status
                               </TableHead>
-                              <TableHead className="font-medium">
+                              <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Date
                               </TableHead>
                             </TableRow>
@@ -310,7 +310,7 @@ const AttendanceS = () => {
                                 className="hover:bg-gray-50"
                               >
                                 <TableCell
-                                  className="max-w-[200px] truncate font-medium"
+                                  className="max-w-[200px] truncate font-medium "
                                   title={record.courseTitle}
                                 >
                                   {record.courseTitle}
@@ -321,7 +321,7 @@ const AttendanceS = () => {
                                 <TableCell>{record.level}</TableCell>
                                 <TableCell>
                                   <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    className={`px-2 py-1 rounded-full text-xs font-medium  ${
                                       record.status === "present"
                                         ? "bg-green-100 text-green-700"
                                         : "bg-red-100 text-red-600"
@@ -400,13 +400,13 @@ const AttendanceS = () => {
                         style={{ width: `${attendancePercentage}%` }}
                       ></div>
                     </div>
-                    <p className="text-right text-sm mt-1 text-blue-600 font-medium">
+                    <p className="text-right text-sm mt-1 text-blue-600 font-medium ">
                       {attendancePercentage}% Attendance
                     </p>
                   </div>
 
                   <div className="pt-2 border-t border-blue-100">
-                    <p className="text-sm text-gray-600 font-medium">
+                    <p className="text-sm text-gray-600 font-medium ">
                       Course Breakdown:
                     </p>
                     <ul className="mt-2 space-y-1">
@@ -421,7 +421,7 @@ const AttendanceS = () => {
                             <span className="truncate" title={course}>
                               {course}
                             </span>
-                            <span className="font-medium text-blue-700">
+                            <span className="font-medium  text-blue-700">
                               {count} classes
                             </span>
                           </li>
@@ -458,7 +458,7 @@ const AttendanceS = () => {
                 {mostRecentClass && (
                   <div className="space-y-3">
                     <div className="p-3 bg-white rounded-lg border border-amber-100">
-                      <p className="font-medium text-amber-800">
+                      <p className="font-medium  text-amber-800">
                         {mostRecentClass.courseTitle}
                       </p>
                       <div className="flex justify-between mt-1">
@@ -482,6 +482,8 @@ const AttendanceS = () => {
           )}
         </div>
       </div>
+
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Stats Cards */}
         <Card className="bg-white shadow-sm">
@@ -543,7 +545,7 @@ const AttendanceS = () => {
             {mostRecentClass ? (
               <>
                 <p
-                  className="text-lg font-medium text-amber-600 truncate"
+                  className="text-lg font-medium  text-amber-600 truncate"
                   title={mostRecentClass.courseTitle}
                 >
                   {mostRecentClass.courseCode}
