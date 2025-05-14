@@ -72,7 +72,7 @@ const Home: React.FC = () => {
 
       {/* Card Summary Grid */}
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="lg:col-span-2 lg:row-span-1 max-w-full rounded-xl bg-white shadow-md">
+        <div className="lg:col-span-2 lg:row-span-1 max-w-full rounded-xl bg-white shadow-sm">
           <div className="md:flex h-full">
             {/* Image Section */}
             <div className="md:w-1/2">
@@ -84,20 +84,21 @@ const Home: React.FC = () => {
             </div>
 
             {/* Text Content */}
-            <div className="p-2 md:p-4 flex flex-col justify-center">
+            <div className="p-4 flex flex-col justify-center">
               <div className="text-sm font-semibold tracking-wide text-indigo-500 uppercase mb-1">
-                Company Retreats
+                Your Digital Attendance Management System Solution!
               </div>
               <a
                 href="#"
                 className="block text-xl leading-tight font-bold text-gray-900 hover:underline"
               >
-                Incredible accommodation for your team
+                Manage Your Attendance with Ease
               </a>
               <p className="mt-2 text-gray-600">
-                Looking to take your team away on a retreat to enjoy awesome
-                food and take in some sunshine? We have a list of places to do
-                just that.
+                A fully digital attendance management system that allows you to
+                manage your attendance with ease. No more paper trails or manual
+                tracking. With our system, you can easily track attendance,
+                generate reports, and manage your team all in one place.
               </p>
             </div>
           </div>
