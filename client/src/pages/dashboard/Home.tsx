@@ -17,6 +17,7 @@ import img1 from "@/assets/images/card/qrb.png";
 import img2 from "@/assets/images/card/qrw.png";
 
 import { useAuth } from "@/context/AuthContext";
+import { Link } from "react-router-dom";
 
 type CardItem = {
   id: number;
@@ -84,16 +85,16 @@ const Home: React.FC = () => {
             </div>
 
             {/* Text Content */}
-            <div className="p-4 flex flex-col justify-center">
+            <div className="p-4 flex flex-col justify-center space-y-2">
               <div className="text-sm font-semibold tracking-wide text-indigo-500 uppercase mb-1">
                 Your Digital Attendance Management System Solution!
               </div>
-              <a
-                href="#"
+              <Link
+                to={"/dashboard/home"}
                 className="block text-xl leading-tight font-bold text-gray-900 hover:underline"
               >
                 Manage Your Attendance with Ease
-              </a>
+              </Link>
               <p className="mt-2 text-gray-600">
                 A fully digital attendance management system that allows you to
                 manage your attendance with ease. No more paper trails or manual
