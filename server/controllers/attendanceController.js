@@ -258,10 +258,38 @@ const recentlyMarkedAttendance = asyncHandler(async (req, res) => {
   }
 });
 
+const attendanceTrend = asyncHandler(async (req, res) => {
+  try {
+    if (!req.user || req.user.role !== "lecturer") {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized. Lecturer access only" });
+    }
+
+    // Fetch all sessions by this lecturer
+    const sessions = await LectureSession.find({ lecturer: req.user._id });
+
+    const trendData = sessions.map((session) => ({
+      courseCode: session.courseCode,
+      sessionDate: session.sessionStart.toISOString().split("T")[0], // e.g., '2025-05-13'
+      attendanceCount: session.attendanceRecords.length,
+    }));
+
+    // Optional: sort by course and date
+    trendData.sort((a, b) => new Date(a.sessionDate) - new Date(b.sessionDate));
+
+    res.status(200).json(trendData);
+  } catch (error) {
+    console.error("Error generating attendance trend:", error);
+    res.status(500).json({ error: "Error generating attendance trend" });
+  }
+});
+
 module.exports = {
   generateAttendanceQRCode,
   markAttendance,
   getAttendanceReport,
   getLectureSessions,
   recentlyMarkedAttendance,
+  attendanceTrend,
 };

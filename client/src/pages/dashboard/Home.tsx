@@ -10,7 +10,7 @@ import * as Icons from "lucide-react";
 import rawCardData from "@/components/json/card.json";
 import { Status } from "@/components/lctui/Status";
 import { Activity } from "@/components/lctui/Activity";
-import { Chart } from "@/components/general/Chart";
+import Chart from "@/components/general/Chart";
 import img1 from "@/assets/images/card/qrb.png";
 import img2 from "@/assets/images/card/qrw.png";
 
@@ -42,7 +42,6 @@ const Icon = ({ name }: { name: keyof typeof Icons }) => {
 
 const Home: React.FC = () => {
   const [today, setToday] = useState(() => new Date().toLocaleString());
-  const [flipImage, setFlipImage] = useState(img1);
   const [isFlipped, setIsFlipped] = useState(false);
 
   React.useEffect(() => {

@@ -5,6 +5,7 @@ const {
   getAttendanceReport,
   recentlyMarkedAttendance,
   getLectureSessions,
+  attendanceTrend,
 } = require("../controllers/attendanceController");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 const { validateSessionId } = require("../middlewares/validationMiddleware");
@@ -20,5 +21,6 @@ router.get(
   getAttendanceReport
 );
 router.get("/record", authMiddleware, recentlyMarkedAttendance);
+router.get("/trend", authMiddleware, attendanceTrend);
 
 module.exports = router;
