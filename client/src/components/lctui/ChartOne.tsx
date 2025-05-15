@@ -154,7 +154,7 @@ const ChartOne = () => {
 
   return (
     <div>
-      <Card className="bg-white rounded-xl shadow-md">
+      <Card className="bg-white">
         <CardHeader className="pb-2">
           <div className="flex justify-between items-center flex-wrap space-y-2">
             <CardTitle className="text-lg font-semibold">
