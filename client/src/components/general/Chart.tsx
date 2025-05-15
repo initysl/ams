@@ -156,11 +156,11 @@ const Chart = () => {
     <div>
       <Card className="bg-white rounded-xl shadow-md">
         <CardHeader className="pb-2">
-          <div className="flex justify-between items-center flex-wrap">
+          <div className="flex justify-between items-center flex-wrap space-y-2">
             <CardTitle className="text-lg font-semibold">
               Attendance Trend
             </CardTitle>
-            <div className="flex space-x-2">
+            <div className="flex space-x-3">
               <select
                 value={selectedCourse}
                 onChange={handleCourseChange}
@@ -186,7 +186,7 @@ const Chart = () => {
           </div>
 
           {/* Quick Stats */}
-          <div className="flex mt-2 gap-4 text-sm flex-wrap">
+          <div className="flex mt-2 gap-4  text-sm flex-wrap">
             <div className="bg-blue-50 p-2 rounded-md">
               <span className="font-medium">Average: </span>
               <span className="text-blue-700">
@@ -217,7 +217,7 @@ const Chart = () => {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart
                 data={filteredData}
-                margin={{ top: 10, right: 30, left: 0, bottom: 5 }}
+                margin={{ top: 10, right: 30, left: -25, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                 <XAxis dataKey="name" stroke="#8884d8" fontSize={12} />
