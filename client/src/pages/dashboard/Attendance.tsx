@@ -6,15 +6,15 @@ const Attendance = () => {
   const { user } = useAuth();
 
   return (
-    <div>
+    <>
       {user?.role === "lecturer" ? (
         <AttendanceL />
       ) : user?.role === "student" ? (
         <AttendanceS />
       ) : (
-        <div>Invalid role</div>
+        <div className="text-2xl">404</div>
       )}
-    </div>
+    </>
   );
 };
 
