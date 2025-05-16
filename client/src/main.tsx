@@ -6,12 +6,15 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
 import { AuthProvider } from "./context/AuthContext.tsx";
+import { AttendanceProvider } from "./context/AttendanceContex.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <App />
+        <AttendanceProvider>
+          <App />
+        </AttendanceProvider>
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>

@@ -3,11 +3,12 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardTitle } from "../ui/card";
 import { useAuth } from "@/context/AuthContext";
 import { FileText } from "lucide-react";
+import { useAttendance } from "@/context/AttendanceContex";
 
-const Status = ({ totalStudents = 0 }) => {
+const Status = () => {
   const { user } = useAuth();
+  const { totalStudents } = useAttendance();
 
-  // Create appropriate message based on role
   const statusMessage =
     user?.role === "lecturer"
       ? `${totalStudents} students recorded in attendance database.`

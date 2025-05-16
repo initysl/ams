@@ -28,10 +28,11 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { useAttendance } from "@/context/AttendanceContex";
 
 interface AttendanceProps {
-  record: number;
-  onUpdateRecord?: (count: number) => void; // Add callback prop
+  attendanceCount: number;
+  onUpdateRecord?: (count: number) => void;
 }
 
 type LectureSession = {
@@ -59,14 +60,12 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
   const [report, setReport] = useState<AttendanceRecord[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const { updateTotalStudents } = useAttendance();
 
   // Statistics
   const totalStudents = report.length;
   const presentCount = report.filter(
     (r) => r.status.toLowerCase() === "present"
-  ).length;
-  const absentCount = report.filter(
-    (r) => r.status.toLowerCase() === "absent"
   ).length;
   const attendanceRate =
     totalStudents > 0 ? Math.round((presentCount / totalStudents) * 100) : 0;
@@ -82,12 +81,14 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     fetchLectureSessions();
   }, []);
 
-  // Update the parent component whenever totalStudents changes
   useEffect(() => {
+    updateTotalStudents(totalStudents);
+
+    // Also update via props if provided (for backward compatibility)
     if (onUpdateRecord) {
       onUpdateRecord(totalStudents);
     }
-  }, [totalStudents, onUpdateRecord]);
+  }, [totalStudents, onUpdateRecord, updateTotalStudents]);
 
   const fetchLectureSessions = async () => {
     setLoading(true);
@@ -160,7 +161,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast.success("Report downloaded successfully");
+    toast.success("Report processing......");
   };
 
   const exportAsPDF = () => {
@@ -196,7 +197,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
       startY: 50,
     });
     doc.save(`${selectedSessionData?.courseCode}-attendance-report.pdf`);
-    toast.success("Report downloaded successfully");
+    toast.success("Report processing......");
   };
 
   const filteredReport = report.filter((record) => {
@@ -525,12 +526,6 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
             <Card className="bg-white">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm text-gray-500">Absent</p>
-                    <p className="text-2xl font-bold text-red-600">
-                      {absentCount}
-                    </p>
-                  </div>
                   <div className="p-3 bg-red-100 rounded-lg">
                     <X className="h-5 w-5 text-red-600" />
                   </div>

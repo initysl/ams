@@ -1,0 +1,50 @@
+// ParentComponent.jsx
+import { useState } from "react";
+import AttendanceL from "./AttendanceL"; // Import your existing component
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users } from "lucide-react";
+
+const ParentComponent = () => {
+  // State to store the total students count
+  const [totalStudents, setTotalStudents] = useState(0);
+
+  // Handler function to update the count when attendance data changes
+  const handleUpdateRecord = (count) => {
+    setTotalStudents(count);
+  };
+  useEffect(() => {
+    fetchLectureSessions();
+  }, []);
+  return (
+    <div className="container mx-auto space-y-6">
+      {/* Display Card for Total Students */}
+      <Card className="bg-blue-50 shadow-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-blue-700">
+            <Users className="h-5 w-5" />
+            Total Students Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-sm text-gray-500">Total Students</p>
+              <p className="text-3xl font-bold text-gray-800">{totalStudents}</p>
+            </div>
+            <div className="p-4 bg-blue-100 rounded-lg">
+              <Users className="h-6 w-6 text-blue-600" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Pass the attendance count and update handler to the AttendanceL component */}
+      <AttendanceL
+        attendanceCount={totalStudents}
+        onUpdateRecord={handleUpdateRecord}
+      />
+    </div>
+  );
+};
+
+export default ParentComponent;
