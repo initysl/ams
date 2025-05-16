@@ -11,7 +11,7 @@ import {
   TooltipProps,
   Legend,
 } from "recharts";
-import { Calendar, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import api from "@/lib/axios";
 
 interface AttendanceRecord {

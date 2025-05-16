@@ -29,6 +29,11 @@ import {
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
+interface AttendanceProps {
+  record: number;
+  onUpdateRecord?: (count: number) => void; // Add callback prop
+}
+
 type LectureSession = {
   _id: string;
   courseCode: string;
@@ -46,7 +51,7 @@ type AttendanceRecord = {
   date: string | number;
 };
 
-const AttendanceL = () => {
+const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
   const [loading, setLoading] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
   const [sessions, setSessions] = useState<LectureSession[]>([]);
@@ -76,6 +81,13 @@ const AttendanceL = () => {
   useEffect(() => {
     fetchLectureSessions();
   }, []);
+
+  // Update the parent component whenever totalStudents changes
+  useEffect(() => {
+    if (onUpdateRecord) {
+      onUpdateRecord(totalStudents);
+    }
+  }, [totalStudents, onUpdateRecord]);
 
   const fetchLectureSessions = async () => {
     setLoading(true);
