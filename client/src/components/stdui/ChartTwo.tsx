@@ -82,12 +82,10 @@ const ChartTwo: React.FC = () => {
       const recordDate = new Date(record.date);
 
       if (timeFilter === "week") {
-        // Get data from past 7 days
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(now.getDate() - 7);
         return recordDate >= oneWeekAgo;
       } else {
-        // Get data from past 30 days
         const oneMonthAgo = new Date();
         oneMonthAgo.setDate(now.getDate() - 30);
         return recordDate >= oneMonthAgo;
@@ -101,8 +99,6 @@ const ChartTwo: React.FC = () => {
         day: "numeric",
       });
     };
-
-    // Group by day and count attendance by course
     const groupedByDay: Record<string, ChartDataPoint> = {};
     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -116,7 +112,7 @@ const ChartTwo: React.FC = () => {
         groupedByDay[dayKey] = {
           day: daysOfWeek[recordDate.getDay()],
           date: formattedDate,
-          courseCode: courseCode, // Use the course code from the record
+          courseCode: courseCode,
           present: 0,
           total: 0,
         };
@@ -144,10 +140,8 @@ const ChartTwo: React.FC = () => {
     return chartData;
   };
 
-  // Get chart data
   const chartData = prepareChartData();
 
-  // Custom tooltip for the chart - Now includes course code
   const CustomTooltip: React.FC<CustomTooltipProps> = ({
     active,
     payload,
@@ -177,7 +171,6 @@ const ChartTwo: React.FC = () => {
         <CardHeader className="pb-2">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
             <CardTitle className="text-lg font-semibold flex items-center">
-              <Calendar className="mr-2 h-5 w-5" />
               Attendance Trend
             </CardTitle>
 
@@ -228,7 +221,7 @@ const ChartTwo: React.FC = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={chartData}
-                  margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                  margin={{ top: 5, right: 19, left: 1, bottom: 5 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis
@@ -244,10 +237,21 @@ const ChartTwo: React.FC = () => {
                     width={30}
                   />
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend />
+                  <Legend
+                    verticalAlign="top"
+                    align="right"
+                    iconType="circle"
+                    iconSize={8}
+                    wrapperStyle={{ paddingTop: 10 }}
+                    formatter={(value, entry) => (
+                      <span className="text-sm" style={{ color: entry.color }}>
+                        {value}
+                      </span>
+                    )}
+                  />
                   <Bar
                     dataKey="present"
-                    name="Present"
+                    name="present"
                     fill="#10B981"
                     radius={[10, 4, 0, 0]}
                     barSize={15}
