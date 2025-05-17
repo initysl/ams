@@ -98,7 +98,7 @@ const ResetPass: React.FC = () => {
                 <Input
                   type={showPassword ? "text" : "password"}
                   id="password"
-                  autoComplete="on"
+                  autoComplete="new-password"
                   {...register("newPassword")}
                   placeholder="Enter new password"
                   className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
@@ -120,7 +120,7 @@ const ResetPass: React.FC = () => {
                 <Input
                   type={showConfirmPassword ? "text" : "password"}
                   id="confirmPassword"
-                  autoComplete="off"
+                  autoComplete="new-password"
                   {...register("confirmPassword")}
                   placeholder="Confirm new password"
                   className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"

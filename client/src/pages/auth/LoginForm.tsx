@@ -39,7 +39,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
         <Input
           id="email"
           type="email"
-          autoComplete="on"
+          autoComplete="email"
           {...register("email")}
           placeholder="Email address"
           className="w-full p-2 bg-gray-100 rounded-sm focus:ring-2 focus:ring-slate-400 focus:outline-none"
@@ -52,7 +52,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
         <Input
           id="password"
           type={showPassword ? "text" : "password"}
-          autoComplete="on"
+          autoComplete="current-password"
           {...register("password")}
           placeholder="Password"
           className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"

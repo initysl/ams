@@ -59,7 +59,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         <div>
           <Input
             id="name"
-            autoComplete="on"
+            autoComplete="name"
             {...register("name")}
             placeholder="Full Name"
             className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
@@ -72,7 +72,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <Input
             id="email"
             type="email"
-            autoComplete="on"
+            autoComplete="email"
             {...register("email")}
             placeholder="Email"
             className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
@@ -84,7 +84,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         <div>
           <Input
             id="department"
-            autoComplete="on"
+            autoComplete="organization"
             {...register("department")}
             placeholder="Department"
             className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
@@ -113,7 +113,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <Input
             id="password"
             type={showPassword ? "text" : "password"}
-            autoComplete="on"
+            autoComplete="new-password"
             {...register("password")}
             placeholder="Password"
             className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
@@ -135,7 +135,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <Input
             id="confirmPassword"
             type={showConfirmPassword ? "text" : "password"}
-            autoComplete="off"
+            autoComplete="new-password"
             {...register("confirmPassword")}
             placeholder="Confirm Password"
             className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
