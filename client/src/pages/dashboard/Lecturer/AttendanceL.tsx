@@ -25,6 +25,7 @@ import {
   X,
   FileText,
   File,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -53,8 +54,8 @@ type AttendanceRecord = {
 };
 
 const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
-  const [loading, setLoading] = useState(false);
-  const [reportLoading, setReportLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [reportLoading, setReportLoading] = useState<boolean>(false);
   const [sessions, setSessions] = useState<LectureSession[]>([]);
   const [selectedSession, setSelectedSession] = useState<string>("");
   const [report, setReport] = useState<AttendanceRecord[]>([]);
