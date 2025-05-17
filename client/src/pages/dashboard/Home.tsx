@@ -120,9 +120,9 @@ const Home: React.FC = () => {
         </div>
 
         {/* Dynamic Cards */}
-        {cardData.cards.map((text) => (
+        {cardData.cards.map((text, index) => (
           <Card
-            key={text.id}
+            key={index}
             className={`bg-white shadow-md hover:shadow-xl transition rounded-xl p-4 flex flex-col justify-between ${
               cardColors[text.id % cardColors.length]
             }`}

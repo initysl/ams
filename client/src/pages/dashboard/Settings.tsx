@@ -44,9 +44,15 @@ const Settings = () => {
               crossOrigin="use-credentials"
             />
             <div className="mt-4 text-center">
-              <ul className="space-y-2">
+              <ul className="space-y-1">
                 <li className="font-semibold">{user?.name}</li>
-                <li className="font-semibold">{user?.matricNumber}</li>
+                {user?.role === "lecturer" ? (
+                  <li>{user.role}</li>
+                ) : user?.role === "student" ? (
+                  <li>{user.matricNumber}</li>
+                ) : (
+                  <li>{user?.role}</li>
+                )}
                 <li>{user?.email}</li>
               </ul>
             </div>

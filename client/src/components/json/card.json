@@ -2,16 +2,17 @@
   "cards": [
     {
       "id": 1,
-      "title": "Attendance Management Made Easy",
-      "value": "Seamlessly track attendance real-time using time-based QR Code",
-      "description": "Generate QR Code to monitor attendance records in real-time.",
-      "icon": "QrCode"
+      "title": "Smart Attendance Starts Here",
+      "value": "Instant check-ins. Real-time tracking. Zero stress.",
+      "description": "Generate dynamic QR codes in seconds, students check in effortlessly engage and mark attendance in seconds.",
+      "icon": "CheckCircle"
     },
+
     {
       "id": 2,
-      "title": "Detailed Reports",
-      "value": "Comprehensive attendance data",
-      "description": "View, manage and generate detailed attendance reports for analysis and decision-making.",
+      "title": "Insightful Attendance Reports",
+      "value": "Track trends, measure engagement, make smarter decisions.",
+      "description": "Access detailed, easy-to-read reports that help you monitor attendance patterns, evaluate class participation, and make informed academic decisions—all in one place.",
       "icon": "FileBarChart"
     },
 
