@@ -31,7 +31,7 @@ import { motion } from "framer-motion";
 import { useAttendance } from "@/context/AttendanceContex";
 
 interface AttendanceProps {
-  attendanceCount: number;
+  attendanceCount?: number;
   onUpdateRecord?: (count: number) => void;
 }
 
@@ -77,10 +77,38 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     return acc;
   }, {} as Record<string, number>);
 
+  // Load cached sessions and reports from sessionStorage on component mount
   useEffect(() => {
-    fetchLectureSessions();
+    // Load cached lecture sessions
+    const cachedSessions = sessionStorage.getItem("lectureSessions");
+    if (cachedSessions) {
+      setSessions(JSON.parse(cachedSessions));
+    }
+
+    // Load cached selected session
+    const cachedSelectedSession = sessionStorage.getItem("selectedSession");
+    if (cachedSelectedSession) {
+      setSelectedSession(cachedSelectedSession);
+    }
+
+    // Load cached report based on the selected session
+    if (cachedSelectedSession) {
+      const cachedReportKey = `report_${cachedSelectedSession}`;
+      const cachedReport = sessionStorage.getItem(cachedReportKey);
+      if (cachedReport) {
+        setReport(JSON.parse(cachedReport));
+      }
+    }
   }, []);
 
+  // Fetch lecture sessions if not cached
+  useEffect(() => {
+    if (sessions.length === 0) {
+      fetchLectureSessions();
+    }
+  }, [sessions.length]);
+
+  // Update total students count whenever report changes
   useEffect(() => {
     updateTotalStudents(totalStudents);
 
@@ -97,6 +125,8 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
         withCredentials: true,
       });
       setSessions(response.data);
+      // Cache lecture sessions
+      sessionStorage.setItem("lectureSessions", JSON.stringify(response.data));
     } catch (error: any) {
       toast.error(
         error?.response?.data?.error || "Failed to fetch lecture sessions"
@@ -112,12 +142,29 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
       return;
     }
 
+    // Check if we have cached report for this session
+    const cachedReportKey = `report_${sessionId}`;
+    const cachedReport = sessionStorage.getItem(cachedReportKey);
+
+    if (cachedReport) {
+      setReport(JSON.parse(cachedReport));
+      toast.success("Loaded cached attendance report");
+      return;
+    }
+
     setReportLoading(true);
     try {
       const response = await api.get(`attendance/report/${sessionId}`, {
         withCredentials: true,
       });
       setReport(response.data.report);
+
+      // Cache the report for this session
+      sessionStorage.setItem(
+        cachedReportKey,
+        JSON.stringify(response.data.report)
+      );
+
       toast.success("Attendance report generated successfully");
     } catch (error: any) {
       toast.error(error?.response?.data?.error || "Failed to generate report");
@@ -129,7 +176,44 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
 
   const handleSessionChange = (value: string) => {
     setSelectedSession(value);
+    sessionStorage.setItem("selectedSession", value);
+
+    // Check if we already have a cached report for this session
+    const cachedReportKey = `report_${value}`;
+    const cachedReport = sessionStorage.getItem(cachedReportKey);
+
+    if (cachedReport) {
+      setReport(JSON.parse(cachedReport));
+    } else {
+      setReport([]);
+    }
+  };
+
+  const clearCache = () => {
+    // Clear specific cache items related to attendance
+    const keysToRemove = [];
+
+    // Find all report keys
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      if (key && key.startsWith("report_")) {
+        keysToRemove.push(key);
+      }
+    }
+
+    // Remove specific keys
+    keysToRemove.forEach((key) => sessionStorage.removeItem(key));
+    sessionStorage.removeItem("lectureSessions");
+    sessionStorage.removeItem("selectedSession");
+
+    // Reset state
     setReport([]);
+    setSessions([]);
+    setSelectedSession("");
+
+    // Fetch sessions again
+    fetchLectureSessions();
+    toast.success("Cache cleared successfully");
   };
 
   const exportAsCSV = () => {
@@ -260,7 +344,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="md:col-span-1">
+            <div className="md:col-span-1 space-y-2">
               <Button
                 onClick={() => generateReport(selectedSession)}
                 disabled={!selectedSession || reportLoading}
@@ -274,6 +358,13 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
                 ) : (
                   <>Generate Report</>
                 )}
+              </Button>
+              <Button
+                onClick={clearCache}
+                variant="outline"
+                className="w-full bg-red-600 hover:bg-red-700 text-white"
+              >
+                Clear Cache
               </Button>
             </div>
           </div>
@@ -526,6 +617,12 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
             <Card className="bg-white">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm text-gray-500">Absent</p>
+                    <p className="text-2xl font-bold text-red-600">
+                      {totalStudents - presentCount}
+                    </p>
+                  </div>
                   <div className="p-3 bg-red-100 rounded-lg">
                     <X className="h-5 w-5 text-red-600" />
                   </div>
@@ -586,6 +683,10 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
           {filteredReport.length > 0 && (
             <div className="text-sm text-gray-500 mt-4 text-center">
               Showing {filteredReport.length} of {report.length} records
+              {selectedSession &&
+                sessionStorage.getItem(`report_${selectedSession}`) && (
+                  <span className="ml-1 text-blue-500">(Cached)</span>
+                )}
             </div>
           )}
         </motion.div>
