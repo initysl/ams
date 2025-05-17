@@ -309,7 +309,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="md:col-span-3">
+            <div className="md:col-span-2">
               <Select
                 value={selectedSession}
                 onValueChange={handleSessionChange}
@@ -339,7 +339,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="md:col-span-1 space-y-2">
+            <div className="flex flex-col md:flex-row space-y-2 space-x-2 ">
               <Button
                 onClick={() => generateReport(selectedSession)}
                 disabled={!selectedSession || reportLoading}
