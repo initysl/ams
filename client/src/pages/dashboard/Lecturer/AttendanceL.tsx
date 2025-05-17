@@ -77,20 +77,17 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     return acc;
   }, {} as Record<string, number>);
 
-  // Load cached sessions and reports from sessionStorage on component mount
+  // Load cached sessions
   useEffect(() => {
-    // Load cached lecture sessions
     const cachedSessions = sessionStorage.getItem("lectureSessions");
     if (cachedSessions) {
       setSessions(JSON.parse(cachedSessions));
     }
-
     // Load cached selected session
     const cachedSelectedSession = sessionStorage.getItem("selectedSession");
     if (cachedSelectedSession) {
       setSelectedSession(cachedSelectedSession);
     }
-
     // Load cached report based on the selected session
     if (cachedSelectedSession) {
       const cachedReportKey = `report_${cachedSelectedSession}`;
@@ -107,11 +104,9 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
       fetchLectureSessions();
     }
   }, [sessions.length]);
-
   // Update total students count whenever report changes
   useEffect(() => {
     updateTotalStudents(totalStudents);
-
     // update via props
     if (onUpdateRecord) {
       onUpdateRecord(totalStudents);
@@ -364,7 +359,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
                 variant="outline"
                 className="w-full bg-red-600 hover:bg-red-700 text-white"
               >
-                Clear Cache
+                Clear
               </Button>
             </div>
           </div>
