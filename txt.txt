@@ -3,7 +3,7 @@ Ensure to remove all console.log and toast session expired
 Use normal rafce in normal components
 
 
-Add Gender;Sex: Ensure autocomplete as well
+Add Gender;Sex: Ensure autocomplete as well..
 After email update, verify the new email address... Working....... Done
 Add a password pattern, user can't use symbols or special characters for pass ...Done
 Add profile picture... Done
