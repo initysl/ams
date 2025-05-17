@@ -10,12 +10,10 @@ const AttendanceContext = createContext<AttendanceContextType | undefined>(
   undefined
 );
 
-// Define props interface for the provider
 interface AttendanceProviderProps {
   children: ReactNode;
 }
 
-// Provider component to wrap around your component tree
 export const AttendanceProvider = ({ children }: AttendanceProviderProps) => {
   const [totalStudents, setTotalStudents] = useState<number>(0);
 

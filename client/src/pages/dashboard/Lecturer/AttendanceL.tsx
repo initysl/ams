@@ -84,7 +84,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
   useEffect(() => {
     updateTotalStudents(totalStudents);
 
-    // Also update via props if provided (for backward compatibility)
+    // update via props
     if (onUpdateRecord) {
       onUpdateRecord(totalStudents);
     }
@@ -132,7 +132,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     setReport([]);
   };
 
-  const exportToCSV = () => {
+  const exportAsCSV = () => {
     if (!report.length) return;
 
     const selectedSessionData = sessions.find((s) => s._id === selectedSession);
@@ -467,11 +467,11 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
         </div>
 
         <Button
-          onClick={exportToCSV}
+          onClick={exportAsCSV}
           className="flex items-center gap-2 bg-lime-100 hover:bg-lime-400 border-none"
         >
           <FileSpreadsheet className="h-4 w-4" />
-          Export to CSV
+          Export as CSV
         </Button>
         <Button
           onClick={exportAsPDF}
