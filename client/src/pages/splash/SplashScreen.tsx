@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { Check, Users, Bell, Calendar, ArrowRightCircle } from "lucide-react";
+import { Check, Users, Calendar, ArrowRightCircle, QrCode } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import logo from "@/assets/images/at.png";
 
 const SplashScreen = () => {
   const [currentScreen, setCurrentScreen] = useState(0);
@@ -8,24 +10,23 @@ const SplashScreen = () => {
 
   const screens = [
     {
-      title: "Your Attendance,\nPerfectly Managed",
+      title: "Dive into the world of automated attendance management.",
       description:
         "Track attendance with ease and manage your records in one centralized platform.",
       icon: <Calendar className="text-white" size={28} />,
       bgColor: "bg-green-500",
     },
     {
-      title: "Monitor Teams\nIn Real-Time",
+      title: "Track attendance in real-time, effortlessly",
       description:
-        "Keep track of your team's attendance and get insights on participation patterns.",
+        "Keep track of students' attendance and get insights on participation patterns.",
       icon: <Users className="text-white" size={28} />,
       bgColor: "bg-blue-500",
     },
     {
-      title: "Stay Updated\nWith Notifications",
-      description:
-        "Get instant alerts about attendance updates and important events.",
-      icon: <Bell className="text-white" size={28} />,
+      title: "Say hello to accuracy and efficiency!",
+      description: "Your smart attendance solution starts here!",
+      icon: <QrCode className="text-white" size={28} />,
       bgColor: "bg-green-500",
     },
   ];
@@ -67,10 +68,10 @@ const SplashScreen = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-svh bg-white">
       {/* Header */}
       <header className="p-4 sm:p-6 flex items-center justify-center">
-        <h1 className="text-lg sm:text-xl font-semibold text-green-600">
+        <h1 className="text-3xl sm:text-4xl font-semibold text-green-600">
           AttendEase
         </h1>
       </header>
@@ -88,18 +89,19 @@ const SplashScreen = () => {
               {currentScreen === 0 && (
                 <div className="relative">
                   <div className="absolute -left-12 sm:-left-16 top-8">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-green-100 flex items-center justify-center">
-                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-green-300"></div>
+                    <div
+                      className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full ${screens[currentScreen].bgColor} flex items-center justify-center animate-pulse`}
+                    >
+                      {screens[currentScreen].icon}
                     </div>
                   </div>
 
-                  <div className="h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-neutral-100 flex items-center justify-center">
-                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-neutral-200 flex items-center justify-center">
-                      <div
-                        className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full ${screens[currentScreen].bgColor} flex items-center justify-center animate-pulse`}
-                      >
-                        {screens[currentScreen].icon}
-                      </div>
+                  <div className="h-52 w-52  rounded-full bg-neutral-100 flex items-center justify-center">
+                    <div className="w-52 h-52  rounded-full bg-neutral-200 flex items-center justify-center">
+                      <img
+                        src={logo}
+                        alt="App logo; A boy with attendance sheets"
+                      />
                     </div>
                   </div>
 
@@ -181,8 +183,8 @@ const SplashScreen = () => {
                     </div>
 
                     <div className="w-full bg-neutral-100 rounded-xl p-3 flex items-center transform transition-all hover:scale-105 duration-300">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-amber-500 flex items-center justify-center mr-3">
-                        <Bell size={18} className="text-white" />
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-amber-600 flex items-center justify-center mr-3">
+                        <QrCode size={18} className="text-white" />
                       </div>
                       <div className="flex-1">
                         <div className="h-2 sm:h-3 w-3/4 bg-neutral-300 rounded mb-1 sm:mb-2"></div>
@@ -228,13 +230,13 @@ const SplashScreen = () => {
 
         {/* Button */}
         <div className="mb-6 sm:mb-8">
-          <button
+          <Button
             onClick={handleNext}
             className={`w-full py-3 rounded-full flex items-center justify-center ${screens[currentScreen].bgColor} text-white transform transition-all duration-300 hover:brightness-110 hover:shadow-lg active:scale-95`}
           >
             {currentScreen < 2 ? "Next Screen" : "Get Started"}
             <ArrowRightCircle size={16} className="ml-2 animate-pulse" />
-          </button>
+          </Button>
         </div>
       </div>
     </div>
