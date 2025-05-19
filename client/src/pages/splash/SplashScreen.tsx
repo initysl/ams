@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Check, Users, Calendar, ArrowRightCircle, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/images/at.png";
+import { useNavigate } from "react-router-dom";
 
 const SplashScreen = () => {
   const [currentScreen, setCurrentScreen] = useState(0);
@@ -31,6 +32,8 @@ const SplashScreen = () => {
     },
   ];
 
+  const navigate = useNavigate();
+
   const handleNext = () => {
     if (isAnimating) return;
 
@@ -42,15 +45,12 @@ const SplashScreen = () => {
         setTimeout(() => setIsAnimating(false), 50);
       }, 300);
     } else {
-      // Navigate to auth in actual implementation
-      alert("Navigate to auth");
-      // In your real app, you'd use: navigate("/auth");
+      navigate("/auth");
     }
   };
 
   const goToScreen = (index: any) => {
     if (isAnimating || index === currentScreen) return;
-
     setDirection(index > currentScreen ? "next" : "prev");
     setIsAnimating(true);
     setTimeout(() => {
@@ -154,11 +154,10 @@ const SplashScreen = () => {
                   <div className="flex flex-col items-start w-full max-w-xs mx-auto gap-3 sm:gap-4">
                     <div className="w-full bg-neutral-100 rounded-xl p-3 flex items-center transform transition-all hover:scale-105 duration-300">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-green-500 flex items-center justify-center mr-3">
-                        <Calendar size={18} className="text-white" />
+                        <QrCode size={18} className="text-white" />
                       </div>
                       <div className="flex-1">
-                        <div className="h-2 sm:h-3 w-3/4 bg-neutral-300 rounded mb-1 sm:mb-2"></div>
-                        <div className="h-1.5 sm:h-2 w-1/2 bg-neutral-200 rounded"></div>
+                        <span>Generate dynamic QR Code</span>
                       </div>
                       <div
                         className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${screens[currentScreen].bgColor} flex items-center justify-center ml-2 animate-pulse`}
@@ -172,8 +171,7 @@ const SplashScreen = () => {
                         <Users size={18} className="text-white" />
                       </div>
                       <div className="flex-1">
-                        <div className="h-2 sm:h-3 w-3/4 bg-neutral-300 rounded mb-1 sm:mb-2"></div>
-                        <div className="h-1.5 sm:h-2 w-1/2 bg-neutral-200 rounded"></div>
+                        <span>View attendance record</span>
                       </div>
                       <div
                         className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${screens[currentScreen].bgColor} flex items-center justify-center ml-2`}
@@ -184,11 +182,10 @@ const SplashScreen = () => {
 
                     <div className="w-full bg-neutral-100 rounded-xl p-3 flex items-center transform transition-all hover:scale-105 duration-300">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-amber-600 flex items-center justify-center mr-3">
-                        <QrCode size={18} className="text-white" />
+                        <Calendar size={18} className="text-white" />
                       </div>
                       <div className="flex-1">
-                        <div className="h-2 sm:h-3 w-3/4 bg-neutral-300 rounded mb-1 sm:mb-2"></div>
-                        <div className="h-1.5 sm:h-2 w-1/2 bg-neutral-200 rounded"></div>
+                        <span>Real-time attendance trend</span>
                       </div>
                       <div
                         className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${screens[currentScreen].bgColor} flex items-center justify-center ml-2`}
