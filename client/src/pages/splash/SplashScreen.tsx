@@ -59,7 +59,7 @@ const SplashScreen = () => {
     }, 300);
   };
 
-  // Define animation classes
+  // Animation classes
   const getContentAnimationClass = () => {
     if (!isAnimating) return "opacity-100 translate-x-0";
     return direction === "next"
