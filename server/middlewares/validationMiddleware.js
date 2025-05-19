@@ -3,44 +3,51 @@ const { check } = require("express-validator");
 // Registration Validation
 const validateRegistration = [
   check("name")
-    .customSanitizer((value) => value.trim()) // preserve internal spaces
+    .exists()
+    .customSanitizer((value) => (value ? value.trim() : ""))
     .isLength({ min: 5 })
     .withMessage("Name must be at least 5 characters long"),
 
-  check("email").trim().isEmail().withMessage("Invalid email address"),
+  check("email").exists().trim().isEmail().withMessage("Invalid email address"),
 
   check("matricNumber")
-    .customSanitizer((value) => value.trim().replace(/\s+/g, ""))
+    .optional()
+    .customSanitizer((value) => (value ? value.trim().replace(/\s+/g, "") : ""))
     .matches(/^[A-Za-z0-9/]+$/)
     .isLength({ min: 10 })
-    .optional(),
+    .withMessage("Matric number must be at least 10 characters long"),
 
   check("department")
-    .customSanitizer((value) => value.trim()) // preserve internal spaces
+    .exists()
+    .customSanitizer((value) => (value ? value.trim() : ""))
     .isLength({ min: 3 })
     .withMessage("Department must be at least 3 characters long"),
 
   check("password")
-    .customSanitizer((value) => value.trim().replace(/\s+/g, ""))
+    .exists()
+    .customSanitizer((value) => (value ? value.trim().replace(/\s+/g, "") : ""))
     .matches(/^[A-Za-z0-9/]+$/)
     .withMessage("Password can only contain letters and numbers")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
 
-  check("confirmPassword").custom((value, { req }) => {
-    if (value !== req.body.password) {
-      throw new Error("Passwords do not match");
-    }
-    return true;
-  }),
+  check("confirmPassword")
+    .exists()
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error("Passwords do not match");
+      }
+      return true;
+    }),
 ];
 
 // Login Validation
 const validateLogin = [
-  check("email").isEmail().withMessage("Invalid email address"),
+  check("email").exists().isEmail().withMessage("Invalid email address"),
 
   check("password")
-    .customSanitizer((value) => value.replace(/\s+/g, ""))
+    .exists()
+    .customSanitizer((value) => (value ? value.replace(/\s+/g, "") : ""))
     .matches(/^[A-Za-z0-9/]+$/)
     .withMessage("Password can only contain letters and numbers")
     .isLength({ min: 6 })
@@ -50,7 +57,8 @@ const validateLogin = [
 // Session ID Validation
 const validateSessionId = [
   check("sessionId")
-    .customSanitizer((value) => value.replace(/\s+/g, ""))
+    .exists()
+    .customSanitizer((value) => (value ? value.replace(/\s+/g, "") : ""))
     .isMongoId()
     .withMessage("Invalid session ID"),
 ];
@@ -59,7 +67,7 @@ const validateSessionId = [
 const validateProfileUpdate = [
   check("name")
     .optional()
-    .customSanitizer((value) => value.trim()) // preserve internal spaces
+    .customSanitizer((value) => (value ? value.trim() : ""))
     .isLength({ min: 5 })
     .withMessage("Name must be at least 5 characters long"),
 
@@ -71,20 +79,20 @@ const validateProfileUpdate = [
 
   check("matricNumber")
     .optional()
-    .customSanitizer((value) => value.trim().replace(/\s+/g, ""))
+    .customSanitizer((value) => (value ? value.trim().replace(/\s+/g, "") : ""))
     .matches(/^[A-Za-z0-9/]+$/)
     .isLength({ min: 10 })
     .withMessage("Matric number must be at least 10 characters long"),
 
   check("department")
     .optional()
-    .customSanitizer((value) => value.trim()) // preserve internal spaces
+    .customSanitizer((value) => (value ? value.trim() : ""))
     .isLength({ min: 3 })
     .withMessage("Department must be at least 3 characters long"),
 
   check("password")
     .optional()
-    .customSanitizer((value) => value.replace(/\s+/g, ""))
+    .customSanitizer((value) => (value ? value.replace(/\s+/g, "") : ""))
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
 ];

@@ -146,7 +146,7 @@ const AuthForm: React.FC = () => {
           <Button
             type="submit"
             form={isSignIn ? "login-form" : "register-form"}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg"
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg cursor-pointer "
             disabled={loginMutation.isPending || registerMutation.isPending}
           >
             {loginMutation.isPending || registerMutation.isPending ? (

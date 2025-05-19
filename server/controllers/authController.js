@@ -21,7 +21,7 @@ const register = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: errors.array() });
   }
 
-  const { name, email, matricNumber, department, password } = req.body;
+  const { name, gender, email, matricNumber, department, password } = req.body;
 
   const existingUser = await User.findOne({
     $or: [{ email }, { matricNumber }],
@@ -40,6 +40,7 @@ const register = asyncHandler(async (req, res) => {
 
   const newUser = new User({
     name,
+    gender,
     email,
     matricNumber,
     department,
@@ -127,6 +128,7 @@ const login = asyncHandler(async (req, res) => {
     user: {
       matricNumber: user.matricNumber,
       email: user.email,
+      gender: user.gender,
       profilePic: user.profilePicture,
       role: user.role,
     },

@@ -5,10 +5,18 @@ import { z } from "zod";
 import { EyeIcon, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Profilebox from "@/components/ui/Profilebox";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 
 const registerSchema = z
   .object({
     name: z.string().min(5, "Name is required"),
+
     email: z.string().email("Invalid email"),
     department: z.string().min(3, "Department is required"),
     matricNumber: z
@@ -48,9 +56,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   } = useForm<RegisterFields>({
     resolver: zodResolver(registerSchema),
   });
-
+  true;
   return (
-    <form id="register-form" onSubmit={handleSubmit(onSubmit)}>
+    <form id="register-form" onSubmit={handleSubmit(onSubmit)} autoFocus={true}>
       <div className="mb-4 w-fit ">
         <Profilebox profilePic={previewURL} onImageChange={onImageChange} />
       </div>
@@ -68,6 +76,17 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
           )}
         </div>
+        {/* <div>
+          <Select autoComplete="sex">
+            <SelectTrigger className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none">
+              <SelectValue placeholder="Gender" />
+            </SelectTrigger>
+            <SelectContent className="bg-gray-100 border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none">
+              <SelectItem value="male">Male</SelectItem>
+              <SelectItem value="female">Female</SelectItem>
+            </SelectContent>
+          </Select>
+        </div> */}
         <div>
           <Input
             id="email"
@@ -81,6 +100,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
           )}
         </div>
+
         <div>
           <Input
             id="department"
