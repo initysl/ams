@@ -1,31 +1,106 @@
-// QRCodeAttendanceGenerator.jsx
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import api from "@/lib/axios";
+import { Card, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState } from "react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-// Define form schema with Zod
-const formSchema = z.object({
-  courseTitle: z.string().min(1, "Course title is required"),
-  courseCode: z.string().min(1, "Course code is required"),
-  level: z.string().min(1, "Level is required"),
-  duration: z.string().min(1, "Duration is required"),
-});
+const qrSchema = {
+  courseTitle: z.string().min(5, "Course title is required"),
+  courseCode: z.string().min(5, "Course code is required"),
+  courseLevel: z.enum(["100", "200", "300", "400", "500"], {
+    required_error: "Course level is required",
+  }),
+  duration: z
+    .number()
+    .min(1, "Duration must be at least 1 minute")
+    .max(60, "Duration must be at most 60 minutes"),
+};
 
-const GenerateQRPage = () => {
+type GenerateQR = {
+  courseTitle: string;
+  courseCode: string;
+  courseLevel: string;
+  duration: number;
+};
+
+const GenerateQR = () => {
   return (
-    <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-      <h1 className="text-xl font-bold text-center mb-6">
-        Generate QR Code for Attendance
-      </h1>
-
-      <p className="text-center text-sm text-gray-500 mt-4">
-        Simply generate the QR CODE for the lecture
-      </p>
+    <div>
+      <Card className="max-w-4xl mx-auto bg-white p-5">
+        <CardDescription>
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+            <div className="space-y-2 mb-2">
+              <Label htmlFor="courseTitle">Course Title</Label>
+              <Input
+                id="courseTitle"
+                type="text"
+                placeholder="Enter course title"
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
+              <div className="space-y-2 mb-2">
+                <Label htmlFor="courseCode">Course Code</Label>
+                <Input
+                  id="courseCode"
+                  type="text"
+                  placeholder="Enter course code"
+                />
+              </div>
+              <div className="grid grid-cols-2 md:flex gap-4 place-items-center">
+                <div className="space-y-2 mb-2">
+                  <Label htmlFor="courseLevel">Course Level</Label>
+                  <Select defaultValue="400">
+                    <SelectTrigger className="w-[150px] md:w-[180px] bg-gray-100 border border-gray-300 rounded-md">
+                      <SelectValue placeholder="Choose level" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-gray-300 rounded-md">
+                      <SelectGroup>
+                        <SelectItem value="100" className="hover:bg-gray-200">
+                          100
+                        </SelectItem>
+                        <SelectItem value="200" className="hover:bg-gray-200">
+                          200
+                        </SelectItem>
+                        <SelectItem value="300" className="hover:bg-gray-200">
+                          300
+                        </SelectItem>
+                        <SelectItem value="400" className="hover:bg-gray-200">
+                          400
+                        </SelectItem>
+                        <SelectItem value="500" className="hover:bg-gray-200">
+                          500
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2 mb-2">
+                  <Label htmlFor="duration">Duration(minutes)</Label>
+                  <Input
+                    id="duration"
+                    type="number"
+                    min={1}
+                    max={60}
+                    placeholder="20"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardDescription>
+      </Card>
     </div>
   );
 };
 
-export default GenerateQRPage;
+export default GenerateQR;

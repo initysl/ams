@@ -25,7 +25,6 @@ import {
   X,
   FileText,
   File,
-  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -296,9 +295,9 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
 
   return (
     <div className="container mx-auto space-y-6 pb-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      {/* <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="font-semibold text-xl md:text-2xl">Attendance Report</h2>
-      </div>
+      </div> */}
 
       {/* Session Selection */}
       <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-100 shadow-sm ">
