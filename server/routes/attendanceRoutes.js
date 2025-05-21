@@ -1,6 +1,8 @@
 const express = require("express");
 const {
   generateAttendanceQRCode,
+  stopLectureSession,
+  deleteLectureSession,
   markAttendance,
   getAttendanceReport,
   recentlyMarkedAttendance,
@@ -12,6 +14,8 @@ const { validateSessionId } = require("../middlewares/validationMiddleware");
 const router = express.Router();
 
 router.post("/generate", authMiddleware, generateAttendanceQRCode);
+router.post("/stop/:sessionId", authMiddleware, stopLectureSession);
+router.delete("/session/:sessionId", authMiddleware, deleteLectureSession);
 router.post("/mark", authMiddleware, markAttendance);
 router.get("/lecture", authMiddleware, getLectureSessions);
 router.get(

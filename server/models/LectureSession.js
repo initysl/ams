@@ -16,9 +16,13 @@ const attendanceRecordSchema = new mongoose.Schema(
 // Main Schema for a Lecture Session with Grouped Attendance
 const lectureSessionSchema = new mongoose.Schema(
   {
+    courseTitle: { type: String, required: true },
     courseCode: { type: String, required: true },
-    courseTitle: { type: String },
-    level: { type: String },
+    level: {
+      type: String,
+      required: true,
+      enum: ["100", "200", "300", "400", "500"],
+    },
     sessionStart: { type: Date, required: true },
     sessionEnd: { type: Date, required: true },
     attendanceRecords: [attendanceRecordSchema], // Array of students who marked attendance
@@ -26,6 +30,10 @@ const lectureSessionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+    active: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }

@@ -20,10 +20,10 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
         .json({ error: "Only lecturers can generate QR codes" });
     }
 
-    const { courseCode, courseTitle, level, duration } = req.body;
+    const { courseTitle, courseCode, level, duration } = req.body;
     if (!courseCode || !courseTitle || !level || !duration) {
       return res.status(400).json({
-        error: "courseCode, courseTitle, level, and duration are required",
+        error: "courseTitle, courseCode, level, and duration are required",
       });
     }
 
@@ -31,12 +31,13 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
     const sessionEnd = addMinutes(sessionStart, duration);
 
     const lectureSession = new LectureSession({
-      courseCode,
       courseTitle,
+      courseCode,
       level,
       sessionStart,
       sessionEnd,
       lecturer: req.user._id,
+      active: true, // Add active flag to track if session is active
     });
 
     await lectureSession.save();
@@ -68,6 +69,101 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
   } catch (error) {
     console.error("Error generating QR code:", error);
     res.status(500).json({ error: "Error generating QR code" });
+  }
+});
+
+// Add new endpoint to stop a session but keep it in the database
+const stopLectureSession = asyncHandler(async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "Unauthorized. Please log in" });
+    }
+
+    if (req.user.role !== "lecturer") {
+      return res
+        .status(401)
+        .json({ error: "Only lecturers can manage sessions" });
+    }
+
+    const { sessionId } = req.params;
+    if (!sessionId) {
+      return res.status(400).json({ error: "Session ID is required" });
+    }
+
+    // Find the session
+    const lectureSession = await LectureSession.findById(sessionId);
+
+    if (!lectureSession) {
+      return res.status(404).json({ error: "Lecture session not found" });
+    }
+
+    // Check if the user is the owner of this session
+    if (lectureSession.lecturer.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ error: "You can only manage your own sessions" });
+    }
+
+    // Update the session to be inactive and ended now
+    lectureSession.active = false;
+    lectureSession.sessionEnd = new Date(); // End the session now rather than at original end time
+    await lectureSession.save();
+
+    res.status(200).json({
+      message: "Session stopped successfully",
+      sessionId: lectureSession._id,
+    });
+  } catch (error) {
+    console.error("Error stopping lecture session:", error);
+    res.status(500).json({ error: "Error stopping lecture session" });
+  }
+});
+
+// Add endpoint to delete a session
+const deleteLectureSession = asyncHandler(async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "Unauthorized. Please log in" });
+    }
+
+    if (req.user.role !== "lecturer") {
+      return res
+        .status(401)
+        .json({ error: "Only lecturers can delete sessions" });
+    }
+
+    const { sessionId } = req.params;
+    if (!sessionId) {
+      return res.status(400).json({ error: "Session ID is required" });
+    }
+
+    // Find the session
+    const lectureSession = await LectureSession.findById(sessionId);
+
+    if (!lectureSession) {
+      return res.status(404).json({ error: "Lecture session not found" });
+    }
+
+    // Check if the user is the owner of this session
+    if (lectureSession.lecturer.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ error: "You can only delete your own sessions" });
+    }
+
+    // Delete the session and all related attendance records
+    // First, delete attendance records
+    await Attendance.deleteMany({ lectureSession: sessionId });
+
+    // Then delete the session itself
+    await LectureSession.findByIdAndDelete(sessionId);
+
+    res.status(200).json({
+      message: "Session and related attendance records deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting lecture session:", error);
+    res.status(500).json({ error: "Error deleting lecture session" });
   }
 });
 
@@ -287,6 +383,8 @@ const attendanceTrend = asyncHandler(async (req, res) => {
 
 module.exports = {
   generateAttendanceQRCode,
+  stopLectureSession,
+  deleteLectureSession,
   markAttendance,
   getAttendanceReport,
   getLectureSessions,
