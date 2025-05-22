@@ -153,7 +153,7 @@ const deleteLectureSession = asyncHandler(async (req, res) => {
 
     // Delete the session and all related attendance records
     // First, delete attendance records
-    await Attendance.deleteMany({ lectureSession: sessionId });
+    await LectureSession.deleteMany({ lectureSession: sessionId });
 
     // Then delete the session itself
     await LectureSession.findByIdAndDelete(sessionId);

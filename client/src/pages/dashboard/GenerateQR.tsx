@@ -307,42 +307,42 @@ const GenerateQR = () => {
     }
   };
 
-  // Server polling to check if the session is still active (in case it was stopped from another device)
-  useEffect(() => {
-    // Only poll if we have an active session
-    if (!qrGenerated || !sessionId) return;
+  // // Server polling to check if the session is still active (in case it was stopped from another device)
+  // useEffect(() => {
+  //   // Only poll if we have an active session
+  //   if (!qrGenerated || !sessionId) return;
 
-    const checkSessionStatus = async () => {
-      try {
-        const response = await api.get(
-          `attendance/session/${sessionId}/status`,
-          {
-            withCredentials: true,
-          }
-        );
+  //   const checkSessionStatus = async () => {
+  //     try {
+  //       const response = await api.get(
+  //         `attendance/session/${sessionId}/status`,
+  //         {
+  //           withCredentials: true,
+  //         }
+  //       );
 
-        // If session is no longer active but we think it is
-        if (!response.data.active && qrGenerated) {
-          setQrGenerated(false);
-          localStorage.removeItem(STORAGE_KEY);
-          toast.info("This QR session has been stopped from another device");
-        }
-      } catch (error: any) {
-        // If we get a 404, the session doesn't exist anymore
-        if (error?.response && error.response?.status === 404) {
-          setQrGenerated(false);
-          localStorage.removeItem(STORAGE_KEY);
-          toast.info("This QR session is no longer available");
-        }
-      }
-    };
+  //       // If session is no longer active but we think it is
+  //       if (!response.data.active && qrGenerated) {
+  //         setQrGenerated(false);
+  //         localStorage.removeItem(STORAGE_KEY);
+  //         toast.info("This QR session has been stopped from another device");
+  //       }
+  //     } catch (error: any) {
+  //       // If we get a 404, the session doesn't exist anymore
+  //       if (error?.response && error.response?.status === 404) {
+  //         setQrGenerated(false);
+  //         localStorage.removeItem(STORAGE_KEY);
+  //         toast.info("This QR session is no longer available");
+  //       }
+  //     }
+  //   };
 
-    // Check immediately and then every 30 seconds
-    checkSessionStatus();
-    const interval = setInterval(checkSessionStatus, 30000);
+  //   // Check immediately and then every 30 seconds
+  //   checkSessionStatus();
+  //   const interval = setInterval(checkSessionStatus, 30000);
 
-    return () => clearInterval(interval);
-  }, [qrGenerated, sessionId]);
+  //   return () => clearInterval(interval);
+  // }, [qrGenerated, sessionId]);
 
   const QRPlaceholder = ({ generated = false }) => (
     <div className="flex flex-col items-center justify-center min-h-52 border border-gray-200 mb-6 p-4 rounded-lg">
@@ -375,7 +375,7 @@ const GenerateQR = () => {
   // Show success state after QR is generated
   if (qrGenerated) {
     return (
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <div className="max-w-4xl mx-auto md:p-4 space-y-6">
         <Card className="bg-white border-2 border-teal-100">
           <CardHeader className="border-b border-gray-100 bg-gray-50">
             <CardTitle className="text-xl text-gray-800">
