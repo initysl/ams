@@ -117,7 +117,7 @@ const GenerateQR = () => {
       if (difference <= 0) {
         // QR code has expired
         setQrGenerated(false);
-        toast.info("QR code has expired");
+        toast.info("QR code expired");
         localStorage.removeItem(STORAGE_KEY);
         return { minutes: 0, seconds: 0 };
       }
@@ -358,8 +358,11 @@ const GenerateQR = () => {
         <div className="mt-2 flex items-center gap-1 bg-amber-100 text-amber-800 px-3 py-1 rounded-full">
           <Clock size={16} />
           <span className="font-medium">
-            {String(timeRemaining.minutes).padStart(2, "0")}:
-            {String(timeRemaining.seconds).padStart(2, "0")} remaining
+            {timeRemaining.minutes === 0 && timeRemaining.seconds === 0
+              ? "QR Code expired"
+              : `${String(timeRemaining.minutes).padStart(2, "0")}:${String(
+                  timeRemaining.seconds
+                ).padStart(2, "0")} remaining`}
           </span>
         </div>
       )}
