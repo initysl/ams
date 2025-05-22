@@ -72,7 +72,7 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
   }
 });
 
-// Add new endpoint to stop a session but keep it in the database
+// Stop Lecture Session
 const stopLectureSession = asyncHandler(async (req, res) => {
   try {
     if (!req.user) {
@@ -90,21 +90,16 @@ const stopLectureSession = asyncHandler(async (req, res) => {
       return res.status(400).json({ error: "Session ID is required" });
     }
 
-    // Find the session
     const lectureSession = await LectureSession.findById(sessionId);
 
     if (!lectureSession) {
       return res.status(404).json({ error: "Lecture session not found" });
     }
-
-    // Check if the user is the owner of this session
     if (lectureSession.lecturer.toString() !== req.user._id.toString()) {
       return res
         .status(403)
         .json({ error: "You can only manage your own sessions" });
     }
-
-    // Update the session to be inactive and ended now
     lectureSession.active = false;
     lectureSession.sessionEnd = new Date(); // End the session now rather than at original end time
     await lectureSession.save();
@@ -119,13 +114,12 @@ const stopLectureSession = asyncHandler(async (req, res) => {
   }
 });
 
-// Add endpoint to delete a session
+// Delete Lecture Session
 const deleteLectureSession = asyncHandler(async (req, res) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: "Unauthorized. Please log in" });
     }
-
     if (req.user.role !== "lecturer") {
       return res
         .status(401)
@@ -137,14 +131,11 @@ const deleteLectureSession = asyncHandler(async (req, res) => {
       return res.status(400).json({ error: "Session ID is required" });
     }
 
-    // Find the session
     const lectureSession = await LectureSession.findById(sessionId);
 
     if (!lectureSession) {
       return res.status(404).json({ error: "Lecture session not found" });
     }
-
-    // Check if the user is the owner of this session
     if (lectureSession.lecturer.toString() !== req.user._id.toString()) {
       return res
         .status(403)
