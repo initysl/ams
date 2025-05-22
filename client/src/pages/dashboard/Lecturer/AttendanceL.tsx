@@ -678,10 +678,6 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
           {filteredReport.length > 0 && (
             <div className="text-sm text-gray-500 mt-4 text-center">
               Showing {filteredReport.length} of {report.length} records
-              {selectedSession &&
-                sessionStorage.getItem(`report_${selectedSession}`) && (
-                  <span className="ml-1 text-blue-500">(Cached)</span>
-                )}
             </div>
           )}
         </motion.div>

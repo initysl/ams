@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 // Import SVG as a string
 import qrplaceholder from "../../../assets/images/qr-placeholder.svg";
-import { AlertCircle, Clock, Check, X } from "lucide-react";
+import { AlertCircle, Clock, X } from "lucide-react";
 
 const qrSchema = z.object({
   courseTitle: z.string().min(5, "Course title is required"),
