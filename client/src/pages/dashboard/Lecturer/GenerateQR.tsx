@@ -369,7 +369,6 @@ const GenerateQR = () => {
     </div>
   );
 
-  // Show success state after QR is generated
   if (qrGenerated) {
     return (
       <div className="max-w-4xl mx-auto md:p-4 space-y-6">
@@ -584,27 +583,21 @@ const GenerateQR = () => {
         </Card>
 
         <Card className="bg-white">
-          <CardContent className="pt-6">
+          <CardContent className="pt-4">
             <QRPlaceholder />
             <div className="flex gap-4">
               <Button
                 type="submit"
                 disabled={isGenerating}
-                className="flex-1 bg-teal-600 hover:bg-teal-700 text-white h-12 rounded-md font-medium transition-colors flex items-center justify-center gap-2"
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white  rounded-md font-medium transition-colors flex items-center justify-center gap-2"
               >
-                {isGenerating ? (
-                  "Generating..."
-                ) : (
-                  <>
-                    <Check size={18} /> Generate QR Code
-                  </>
-                )}
+                {isGenerating ? "Generating..." : <>Generate QR Code</>}
               </Button>
               <Button
                 type="button"
                 onClick={() => reset()}
                 variant="outline"
-                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 h-12 rounded-md font-medium transition-colors"
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md font-medium transition-colors"
               >
                 Reset
               </Button>
