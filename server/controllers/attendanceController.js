@@ -172,7 +172,7 @@ const markAttendance = asyncHandler(async (req, res) => {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
       if (err.name === "TokenExpiredError") {
-        return res.status(400).json({ error: "QRrrrrrrrrr Code has expired" });
+        return res.status(400).json({ error: "QR Code expired" });
       }
       return res.status(400).json({ error: "Invalid token" });
     }

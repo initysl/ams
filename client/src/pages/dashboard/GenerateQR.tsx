@@ -376,7 +376,7 @@ const GenerateQR = () => {
               Active QR Code Session
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6">
+          <CardContent className="">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <QRPlaceholder generated={true} />
