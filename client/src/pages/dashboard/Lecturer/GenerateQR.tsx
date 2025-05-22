@@ -17,7 +17,7 @@ import api from "@/lib/axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 // Import SVG as a string
-import qrplaceholder from "../../assets/images/qr-placeholder.svg";
+import qrplaceholder from "../../../assets/images/qr-placeholder.svg";
 import { AlertCircle, Clock, Check, X } from "lucide-react";
 
 const qrSchema = z.object({
