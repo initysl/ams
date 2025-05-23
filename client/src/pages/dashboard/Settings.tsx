@@ -130,7 +130,7 @@ const Settings = () => {
       {/* Mobile full-screen dialog */}
       {isMobile && (
         <Dialog open={showMobileDialog} onOpenChange={setShowMobileDialog}>
-          <DialogContent className="w-full overflow-y-auto bg-white">
+          <DialogContent className="w-full overflow-y-auto bg-white border-none">
             <Outlet />
           </DialogContent>
         </Dialog>

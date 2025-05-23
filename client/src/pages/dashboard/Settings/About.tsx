@@ -6,7 +6,8 @@ const About = () => {
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-medium">Application Information</h3>
-          <p className="text-gray-600">
+          {/* Fix alignment here */}
+          <p className="text-gray-600 text-pretty">
             This application is designed to manage attendance tracking using QR
             codes in tetiary institution(s). It provides an easy way for
             lecturers to generate dynamic QR codes for classes and for students

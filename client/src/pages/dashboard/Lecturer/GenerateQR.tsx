@@ -115,7 +115,6 @@ const GenerateQR = () => {
       const difference = expiryDate.getTime() - now.getTime();
 
       if (difference <= 0) {
-        // QR code has expired
         setQrGenerated(false);
         toast.info("QR code expired");
         localStorage.removeItem(STORAGE_KEY);
@@ -253,10 +252,10 @@ const GenerateQR = () => {
   const handlePrint = () => {
     const printWindow = window.open("", "_blank");
     if (printWindow) {
-      printWindow.document.write(`
+      printWindow.document.writeln(`
         <html>
           <head>
-            <title>QR Code - ${courseDetails?.courseCode}</title>
+            <title className="text-cente ">QR Code - ${courseDetails?.courseCode}</title>
             <style>
               body {
                 display: flex;
@@ -291,7 +290,7 @@ const GenerateQR = () => {
               <p>Level: ${courseDetails?.level}</p>
               <p>Duration: ${courseDetails?.duration} minutes</p>
             </div>
-            <img src="${qrCodeUrl}" alt="QR Code" />
+            <img src="${qrCodeUrl}" alt="${courseDetails?.courseCode} QR Code" />
           </body>
         </html>
       `);
