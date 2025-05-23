@@ -18,7 +18,14 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 // Import SVG as a string
 import qrplaceholder from "../../../assets/images/qr-placeholder.svg";
-import { AlertCircle, Clock, X } from "lucide-react";
+import {
+  AlertCircle,
+  Clock,
+  ListRestart,
+  Printer,
+  Save,
+  X,
+} from "lucide-react";
 
 const qrSchema = z.object({
   courseTitle: z.string().min(5, "Course title is required"),
@@ -386,13 +393,13 @@ const GenerateQR = () => {
                     onClick={handleDownload}
                     className="bg-blue-600 hover:bg-blue-700 text-white h-10 rounded-md font-medium transition-colors"
                   >
-                    Download QR
+                    Download QR Code <Save size={16} />
                   </Button>
                   <Button
                     onClick={handlePrint}
                     className="bg-green-600 hover:bg-green-700 text-white h-10 rounded-md font-medium transition-colors"
                   >
-                    Print QR
+                    Print QR <Printer size={16} />
                   </Button>
                 </div>
               </div>
@@ -598,7 +605,7 @@ const GenerateQR = () => {
                 variant="outline"
                 className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md font-medium transition-colors"
               >
-                Reset
+                Reset <ListRestart size={16} />
               </Button>
             </div>
           </CardContent>
