@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Camera, QrCode } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AnimatePresence, motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 
 interface MarkPopoverProps {
   triggerText?: string;

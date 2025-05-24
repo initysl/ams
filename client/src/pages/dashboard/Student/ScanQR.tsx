@@ -7,11 +7,13 @@ import {
   AlertCircle,
   RotateCcw,
   ScanQrCode,
+  ListCheck,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import MarkPopover from "./MarkPopover";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
+import { Link } from "react-router-dom";
 
 const ScanQR = () => {
   const [isScanning, setIsScanning] = useState(false);
@@ -30,12 +32,16 @@ const ScanQR = () => {
           </div>
         </Card>
 
-        <div className="flex flex-col items-center justify-center mt-16 ">
+        <div className="flex flex-col items-center justify-center mt-16 gap-3">
           <Popover>
             <PopoverTrigger asChild>
               <MarkPopover triggerText="Scan QR" />
             </PopoverTrigger>
           </Popover>
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg cursor-pointer">
+            <Link to="/dashboard/attendance"> View attendance</Link>
+            <ListCheck />
+          </Button>
         </div>
       </div>
     </div>
