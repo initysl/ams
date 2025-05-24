@@ -1,5 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
+import {
+  Html5Qrcode,
+  Html5QrcodeSupportedFormats,
+  Html5QrcodeScannerState,
+} from "html5-qrcode";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
@@ -15,6 +19,7 @@ const QRScanner: React.FC = () => {
   const [scanResult, setScanResult] = useState<string | null>(null);
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const markAttendanceMutation = useMutation<AttendanceResponse, Error, string>(
     {
@@ -74,6 +79,31 @@ const QRScanner: React.FC = () => {
     }
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!html5QrCodeRef.current) {
+      html5QrCodeRef.current = new Html5Qrcode("reader", {
+        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+        verbose: false,
+      });
+    }
+
+    try {
+      const decodedText = await html5QrCodeRef.current.scanFile(file, true);
+      setScanResult(decodedText);
+      toast.success("QR code successfully read from image");
+      markAttendanceMutation.mutate(decodedText);
+    } catch (err) {
+      console.error("Image QR scan failed:", err);
+      toast.error("Failed to scan QR code from image.");
+    } finally {
+      // Reset the file input so user can upload the same file again if needed
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   useEffect(() => {
     return () => {
       if (html5QrCodeRef.current) {
@@ -88,21 +118,35 @@ const QRScanner: React.FC = () => {
       <div
         id="reader"
         ref={scannerRef}
-        className="w-80 h-80 border rounded-lg"
+        className="w-80 h-80 border rounded-lg bg-white shadow-sm"
       />
 
-      {!isScanning ? (
-        <Button
-          className="bg-green-600 hover:bg-green-700"
-          onClick={startScanner}
-        >
-          Start Scanning
+      <div className="flex flex-col gap-2 items-center">
+        {!isScanning ? (
+          <Button
+            className="bg-green-600 hover:bg-green-700"
+            onClick={startScanner}
+          >
+            Start Scanning
+          </Button>
+        ) : (
+          <Button className="bg-red-600 hover:bg-red-700" onClick={stopScanner}>
+            Stop Scanning
+          </Button>
+        )}
+
+        <input
+          type="file"
+          accept="image/png"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={handleFileUpload}
+        />
+
+        <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+          Upload QR Image
         </Button>
-      ) : (
-        <Button className="bg-red-600 hover:bg-red-700" onClick={stopScanner}>
-          Stop Scanning
-        </Button>
-      )}
+      </div>
 
       {scanResult && (
         <p className="text-green-700 font-medium text-center">
