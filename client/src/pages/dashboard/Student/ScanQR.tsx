@@ -38,10 +38,12 @@ const ScanQR = () => {
               <MarkPopover triggerText="Scan QR" />
             </PopoverTrigger>
           </Popover>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg cursor-pointer">
-            <Link to="/dashboard/attendance"> View attendance</Link>
-            <ListCheck />
-          </Button>
+          <Link to="/dashboard/attendance" className="w-full max-w-sm">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold p-5 w-full flex items-center justify-center gap-2">
+              View attendance
+              <ListCheck />
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
