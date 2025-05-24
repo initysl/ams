@@ -7,7 +7,7 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
-import { QrCode } from "lucide-react";
+import { Camera, QrCode } from "lucide-react";
 
 interface MarkPopoverProps {
   triggerText?: string;
@@ -21,7 +21,7 @@ const MarkPopover: React.FC<MarkPopoverProps> = ({
       <Popover>
         <PopoverTrigger asChild>
           <Button className="bg-teal-600 hover:bg-teal-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg cursor-pointer">
-            {triggerText}
+            {triggerText} <Camera />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-80 bg-white border-amber-50">

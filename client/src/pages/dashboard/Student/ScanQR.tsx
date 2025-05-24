@@ -33,7 +33,7 @@ const ScanQR = () => {
         <div className="flex flex-col items-center justify-center mt-16 ">
           <Popover>
             <PopoverTrigger asChild>
-              <MarkPopover triggerText="SCAN QR CODE" />
+              <MarkPopover triggerText="Scan QR" />
             </PopoverTrigger>
           </Popover>
         </div>
