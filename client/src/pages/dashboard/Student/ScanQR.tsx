@@ -1,52 +1,113 @@
-import React, { useState, useRef, useEffect } from "react";
-import {
-  Camera,
-  Upload,
-  X,
-  CheckCircle,
-  AlertCircle,
-  RotateCcw,
-  ScanQrCode,
-  ListCheck,
-} from "lucide-react";
-import { Card } from "@/components/ui/card";
+import React, { useEffect, useRef, useState } from "react";
+import { Html5Qrcode } from "html5-qrcode";
 import { Button } from "@/components/ui/button";
-import MarkPopover from "./MarkPopover";
-import { Popover, PopoverTrigger } from "@/components/ui/popover";
-import { Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import api from "@/lib/axios";
+import { toast } from "sonner";
 
-const ScanQR = () => {
+// Type for the attendance API response
+type AttendanceResponse = {
+  message: string;
+};
+
+const QRScanner: React.FC = () => {
   const [isScanning, setIsScanning] = useState(false);
-  const [scanResult, setScanResult] = useState(null);
-  const [error, setError] = useState(null);
+  const [scanResult, setScanResult] = useState<string | null>(null);
+  const scannerRef = useRef<HTMLDivElement | null>(null);
+  const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
+
+  const markAttendanceMutation = useMutation<AttendanceResponse, Error, string>(
+    {
+      mutationFn: async (token: string) => {
+        const response = await api.post<AttendanceResponse>("attendance/mark", {
+          token,
+        });
+        return response.data;
+      },
+      onSuccess: (data) => {
+        toast.success("✅ " + data.message);
+      },
+      onError: (error: any) => {
+        toast.error(
+          "❌ " + (error?.response?.data?.error || "Failed to mark attendance")
+        );
+      },
+    }
+  );
+
+  const startScanner = async () => {
+    if (!html5QrCodeRef.current) {
+      html5QrCodeRef.current = new Html5Qrcode("reader");
+    }
+
+    try {
+      await html5QrCodeRef.current.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: 250,
+        },
+        (decodedText: string) => {
+          html5QrCodeRef.current?.stop();
+          setIsScanning(false);
+          setScanResult(decodedText);
+          markAttendanceMutation.mutate(decodedText);
+        },
+        (errorMessage: string) => {
+          console.warn("QR Scan Error:", errorMessage);
+        }
+      );
+      setIsScanning(true);
+    } catch (err) {
+      console.error("Error starting scanner:", err);
+      toast.error("Failed to start QR scanner.");
+    }
+  };
+
+  const stopScanner = async () => {
+    if (html5QrCodeRef.current) {
+      await html5QrCodeRef.current.stop();
+      setIsScanning(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (html5QrCodeRef.current) {
+        html5QrCodeRef.current.stop().catch(() => {});
+        html5QrCodeRef.current.clear();
+      }
+    };
+  }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center ">
-      <p className="text-center text-pretty">
-        Scan QR Code by using your camera or uploading to mark attendance
-      </p>
-      <div className="mt-20 ">
-        <Card className="flex flex-col items-center justify-center p-5 ">
-          <div className="flex items-center justify-center w-64 h-64 border-2 border-dashed rounded-lg">
-            {isScanning ? <Camera size={80} /> : <ScanQrCode size={80} />}
-          </div>
-        </Card>
+    <div className="flex flex-col items-center gap-4">
+      <div
+        id="reader"
+        ref={scannerRef}
+        className="w-80 h-80 border rounded-lg"
+      />
 
-        <div className="flex flex-col items-center justify-center mt-16 gap-3">
-          <Popover>
-            <PopoverTrigger asChild>
-              <MarkPopover triggerText="Scan QR" />
-            </PopoverTrigger>
-          </Popover>
-          <Link to="/dashboard/attendance" className="w-full max-w-sm">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold p-5 w-full flex items-center justify-center gap-2">
-              View attendance
-              <ListCheck />
-            </Button>
-          </Link>
-        </div>
-      </div>
+      {!isScanning ? (
+        <Button
+          className="bg-green-600 hover:bg-green-700"
+          onClick={startScanner}
+        >
+          Start Scanning
+        </Button>
+      ) : (
+        <Button className="bg-red-600 hover:bg-red-700" onClick={stopScanner}>
+          Stop Scanning
+        </Button>
+      )}
+
+      {scanResult && (
+        <p className="text-green-700 font-medium text-center">
+          ✅ Scanned Token: {scanResult}
+        </p>
+      )}
     </div>
   );
 };
-export default ScanQR;
+
+export default QRScanner;

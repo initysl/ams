@@ -2,6 +2,7 @@ Ensure to remove all console.log and toast session expired
 # NODE_ENV = production
 Use normal rafce in normal components
 
+useMutation for api POST, PUT, DELETE... good for caching
 Recheck protected routes
 Add Gender;Sex: Ensure autocomplete as well..
 After email update, verify the new email address... Working....... Done
