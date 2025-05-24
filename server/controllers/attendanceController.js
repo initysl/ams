@@ -161,7 +161,7 @@ const deleteLectureSession = asyncHandler(async (req, res) => {
 // Mark Attendance
 const markAttendance = asyncHandler(async (req, res) => {
   try {
-    const { token } = req.body;
+    const { token, confirmAttendance } = req.body;
 
     if (!token) {
       return res.status(400).json({ error: "QR Code token is required" });
@@ -192,12 +192,12 @@ const markAttendance = asyncHandler(async (req, res) => {
       return res.status(401).json({ error: "Unauthorized user" });
     }
 
-    const { name, matricNumber } = student;
-
     const lectureSession = await LectureSession.findById(sessionId);
     if (!lectureSession) {
       return res.status(404).json({ error: "Session not found" });
     }
+
+    const { name, matricNumber } = student;
 
     const alreadyMarked = lectureSession.attendanceRecords.some(
       (record) => record.matricNumber === matricNumber
@@ -207,6 +207,35 @@ const markAttendance = asyncHandler(async (req, res) => {
       return res.status(400).json({ error: "Attendance already marked" });
     }
 
+    const now = new Date();
+    const expiry = parseISO(expiryTime);
+    const durationInMinutes = Math.max(
+      0,
+      Math.floor((expiry - now) / (1000 * 60))
+    );
+
+    // If confirmAttendance is not provided, return course data for confirmation
+    if (!confirmAttendance) {
+      return res.status(200).json({
+        success: true,
+        requiresConfirmation: true,
+        courseData: {
+          courseCode: courseCode.trim().toUpperCase(),
+          courseTitle: courseTitle.trim(),
+          level: level.trim(),
+          duration: `${durationInMinutes} minutes remaining`,
+          sessionTime:
+            lectureSession.startTime ||
+            new Date().toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            }),
+        },
+      });
+    }
+
+    // If confirmAttendance is true, mark the attendance
     const record = {
       student: student._id,
       name: name.trim(),
@@ -221,7 +250,15 @@ const markAttendance = asyncHandler(async (req, res) => {
     lectureSession.attendanceRecords.push(record);
     await lectureSession.save();
 
-    res.status(200).json({ message: "Attendance marked successfully" });
+    res.status(200).json({
+      success: true,
+      message: "Attendance marked successfully",
+      courseData: {
+        courseCode: courseCode.trim().toUpperCase(),
+        courseTitle: courseTitle.trim(),
+        level: level.trim(),
+      },
+    });
   } catch (error) {
     console.error("Error marking attendance:", error);
     res.status(500).json({ error: "Error marking attendance" });
