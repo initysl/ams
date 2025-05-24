@@ -4,8 +4,7 @@
       "id": 1,
       "title": "Smart Attendance Starts Here",
       "value": "Instant check-ins. Real-time tracking. Zero stress.",
-      "description": "Generate dynamic QR codes in seconds, students check in effortlessly engage and mark attendance in seconds.",
-      "icon": "CheckCircle"
+      "description": "Generate dynamic QR codes in seconds, students check in effortlessly engage and mark attendance in seconds."
     },
 
     {
@@ -20,15 +19,13 @@
       "id": 3,
       "title": "User-Friendly Interface",
       "value": "Easy to Use",
-      "description": "Simplified interface for seamless attendance management.",
-      "icon": "LayoutDashboard"
+      "description": "Simplified interface for seamless attendance management."
     },
     {
       "id": 4,
       "title": "Help & Support",
       "value": "Get help and support for any issues encountered",
-      "description": "Send us feedbacks on ways to improve.",
-      "icon": "HelpCircle"
+      "description": "Send us feedbacks on ways to improve."
     }
   ]
 }

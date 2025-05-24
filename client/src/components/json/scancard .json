@@ -1,0 +1,34 @@
+{
+  "scan": [
+    {
+      "id": 1,
+      "title": "Scan QR Code ",
+      "value": "Fast and Convinent",
+      "description": "Seamlessly scan qr code to mark attendance.",
+      "icon": "CheckCircle"
+    },
+
+    {
+      "id": 2,
+      "title": "Mark Attendance By Camera",
+      "value": "Easy and fast",
+      "description": "Grant swift access for camera to mark attendance.",
+      "icon": "FileBarChart"
+    },
+
+    {
+      "id": 3,
+      "title": "Mark Attendance By Upload",
+      "value": "Easy to Use",
+      "description": "Upload QR Code from device to mark attendance.",
+      "icon": "LayoutDashboard"
+    },
+    {
+      "id": 4,
+      "title": "View Attendance Record",
+      "value": "Sharp, smooth and swift",
+      "description": "View your attendance record with just a click",
+      "icon": "HelpCircle"
+    }
+  ]
+}

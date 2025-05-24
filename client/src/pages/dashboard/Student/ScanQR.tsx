@@ -7,6 +7,14 @@ import { toast } from "sonner";
 import { ListCheck, Loader2, Clipboard, Upload, Scan } from "lucide-react";
 import { Link } from "react-router-dom";
 import MarkPopover from "./MarkPopover";
+import cardData from "@/components/json/scancard .json";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 type CourseData = {
   courseCode: string;
@@ -22,6 +30,13 @@ type AttendanceResponse = {
   requiresConfirmation?: boolean;
   courseData?: CourseData;
 };
+
+const cardColors = [
+  "bg-teal-200",
+  "bg-yellow-100",
+  "bg-orange-200",
+  "bg-purple-100",
+];
 
 const QRScanner: React.FC = () => {
   const [isScanning, setIsScanning] = useState(false);
@@ -194,7 +209,7 @@ const QRScanner: React.FC = () => {
   }, []);
 
   return (
-    <div className="container flex flex-col items-center justify-center gap-6 max-w-md mx-auto">
+    <div className="container flex flex-col items-center justify-center gap-6  ">
       <div
         id="reader"
         ref={scannerRef}
@@ -255,7 +270,9 @@ const QRScanner: React.FC = () => {
 
       {scanResult && !showConfirmation && (
         <div className="bg-green-50 border border-green-400 text-green-800 px-4 py-3 rounded w-full max-w-sm flex items-center justify-between gap-2">
-          <p className="text-sm truncate">{scanResult}</p>
+          <p className="text-sm truncate line-through opacity-30">
+            {scanResult}
+          </p>
           <Button
             variant="ghost"
             size="sm"
@@ -281,6 +298,29 @@ const QRScanner: React.FC = () => {
           />
         </div>
       )}
+
+      {cardData.scan.map((text, index) => (
+        <Card
+          key={index}
+          className={`w-full bg-white shadow-md hover:shadow-xl transition rounded-xl p-4 flex flex-col justify-between ${
+            cardColors[text.id % cardColors.length]
+          }`}
+        >
+          <CardHeader className="p-0 mb-2">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-base font-semibold">
+                {text.title}
+              </CardTitle>
+            </div>
+            <CardDescription className="text-sm text-muted-foreground mt-1">
+              {text.description}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <p className="text-sm text-gray-700 font-medium">{text.value}</p>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };

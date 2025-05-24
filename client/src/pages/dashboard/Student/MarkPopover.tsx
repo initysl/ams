@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  PopoverTrigger,
-  Popover,
-  PopoverContent,
-} from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
-import { Camera, QrCode, X } from "lucide-react";
+import { QrCode, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AnimatePresence, motion } from "framer-motion";
 
