@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Html5Qrcode } from "html5-qrcode";
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
@@ -25,11 +25,11 @@ const QRScanner: React.FC = () => {
         return response.data;
       },
       onSuccess: (data) => {
-        toast.success("✅ " + data.message);
+        toast.success(data.message);
       },
       onError: (error: any) => {
         toast.error(
-          "❌ " + (error?.response?.data?.error || "Failed to mark attendance")
+          error?.response?.data?.error || "Failed to mark attendance"
         );
       },
     }
@@ -37,7 +37,10 @@ const QRScanner: React.FC = () => {
 
   const startScanner = async () => {
     if (!html5QrCodeRef.current) {
-      html5QrCodeRef.current = new Html5Qrcode("reader");
+      html5QrCodeRef.current = new Html5Qrcode("reader", {
+        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+        verbose: false,
+      });
     }
 
     try {
