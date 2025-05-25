@@ -32,8 +32,8 @@ type AttendanceResponse = {
 };
 
 const cardColors = [
-  "bg-teal-200",
-  "bg-yellow-100",
+  "bg-teal-700",
+  "bg-blue-300",
   "bg-orange-200",
   "bg-purple-100",
 ];
@@ -209,118 +209,129 @@ const QRScanner: React.FC = () => {
   }, []);
 
   return (
-    <div className="container flex flex-col items-center justify-center gap-6  ">
-      <div
-        id="reader"
-        ref={scannerRef}
-        className="w-80 h-80 border rounded-lg bg-white shadow-inner flex items-center justify-center relative top-10"
-      >
-        {isLoading && (
-          <Loader2 className="animate-spin text-gray-500 w-8 h-8" />
-        )}
-      </div>
+    <div className="container mx-auto px-4 py-6">
+      <div className="grid grid-cols-1 gap-6">
+        {/* Scanner Section */}
+        <div className="flex justify-center">
+          <div
+            id="reader"
+            ref={scannerRef}
+            className="w-full max-w-[320px] h-[320px] border rounded-lg bg-white shadow-inner flex items-center justify-center relative"
+          >
+            {isLoading && (
+              <Loader2 className="animate-spin text-gray-500 w-8 h-8" />
+            )}
+          </div>
+        </div>
 
-      <div className="flex items-center justify-center w-full max-w-sm gap-3 mt-20">
-        {!isScanning ? (
+        {/* Controls Section */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto">
           <Button
-            variant={"outline"}
-            onClick={startScanner}
+            variant={isScanning ? "destructive" : "outline"}
+            onClick={isScanning ? stopScanner : startScanner}
+            disabled={isLoading}
+            className={
+              isScanning
+                ? ""
+                : "border-teal-600 text-teal-600 hover:bg-teal-700 hover:text-white"
+            }
+          >
+            {isScanning ? (
+              "Stop Scanning"
+            ) : (
+              <>
+                <Scan />
+                {isLoading && <Loader2 className="animate-spin w-4 h-4 ml-2" />}
+              </>
+            )}
+          </Button>
+
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <Button
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
             disabled={isLoading}
             className="border-teal-600 text-teal-600 hover:bg-teal-700 hover:text-white"
           >
-            <Scan />
-            {isLoading ? (
-              <Loader2 className="animate-spin w-4 h-4 mr-2" />
-            ) : null}
+            <Upload />
           </Button>
-        ) : (
-          <Button
-            onClick={stopScanner}
-            disabled={isLoading}
-            className="bg-red-600 hover:bg-red-700 text-white flex-1"
-          >
-            Stop Scanning
-          </Button>
+
+          <div className="col-span-2">
+            <Link to="/dashboard/attendance" className="block">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full">
+                View attendance
+                <ListCheck className="ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Scan Result Section */}
+        {scanResult && !showConfirmation && (
+          <div className="bg-green-50 border border-green-400 text-green-800 px-4 py-3 rounded max-w-2xl mx-auto flex items-center justify-between gap-2">
+            <p className="text-sm truncate line-through opacity-30">
+              {scanResult}
+            </p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                navigator.clipboard.writeText(scanResult);
+                toast.success("Token copied!");
+              }}
+            >
+              <Clipboard className="w-4 h-4" />
+            </Button>
+          </div>
         )}
 
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          onChange={handleFileUpload}
-          className="hidden"
-        />
-        <Button
-          variant={"outline"}
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isLoading}
-          className="border-teal-600 text-teal-600 hover:bg-teal-700 hover:text-white"
-        >
-          <Upload />
-        </Button>
-        <div>
-          <Link to="/dashboard/attendance" className="w-full max-w-sm">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full flex items-center justify-center gap-2">
-              View attendance
-              <ListCheck />
-            </Button>
-          </Link>
+        {/* Confirmation Popover */}
+        {showConfirmation && courseData && (
+          <div className="max-w-2xl mx-auto">
+            <MarkPopover
+              courseData={courseData}
+              isOpen={showConfirmation}
+              onConfirm={handleConfirmAttendance}
+              onCancel={handleCancelConfirmation}
+              isLoading={confirmAttendanceMutation.isPending}
+            />
+          </div>
+        )}
+
+        {/* Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ">
+          {cardData.scan.map((text, index) => (
+            <Card
+              key={index}
+              className={` bg-white shadow-md hover:shadow-xl transition rounded-xl p-4 flex flex-col justify-between ${
+                cardColors[text.id % cardColors.length]
+              }`}
+            >
+              <CardHeader className="p-0 mb-2">
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-base font-semibold">
+                    {text.title}
+                  </CardTitle>
+                </div>
+                <CardDescription className="text-sm text-muted-foreground mt-1">
+                  {text.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <p className="text-sm text-gray-700 font-medium">
+                  {text.value}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
-
-      {scanResult && !showConfirmation && (
-        <div className="bg-green-50 border border-green-400 text-green-800 px-4 py-3 rounded w-full max-w-sm flex items-center justify-between gap-2">
-          <p className="text-sm truncate line-through opacity-30">
-            {scanResult}
-          </p>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              navigator.clipboard.writeText(scanResult);
-              toast.success("Token copied!");
-            }}
-          >
-            <Clipboard className="w-4 h-4" />
-          </Button>
-        </div>
-      )}
-
-      {/* Render MarkPopover when confirmation is needed */}
-      {showConfirmation && courseData && (
-        <div className="w-full max-w-sm">
-          <MarkPopover
-            courseData={courseData}
-            isOpen={showConfirmation}
-            onConfirm={handleConfirmAttendance}
-            onCancel={handleCancelConfirmation}
-            isLoading={confirmAttendanceMutation.isPending}
-          />
-        </div>
-      )}
-
-      {cardData.scan.map((text, index) => (
-        <Card
-          key={index}
-          className={`w-full bg-white shadow-md hover:shadow-xl transition rounded-xl p-4 flex flex-col justify-between ${
-            cardColors[text.id % cardColors.length]
-          }`}
-        >
-          <CardHeader className="p-0 mb-2">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-base font-semibold">
-                {text.title}
-              </CardTitle>
-            </div>
-            <CardDescription className="text-sm text-muted-foreground mt-1">
-              {text.description}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <p className="text-sm text-gray-700 font-medium">{text.value}</p>
-          </CardContent>
-        </Card>
-      ))}
     </div>
   );
 };
