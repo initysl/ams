@@ -4,7 +4,15 @@ import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { toast } from "sonner";
-import { ListCheck, Loader2, Clipboard, Upload, Scan } from "lucide-react";
+import {
+  ListCheck,
+  Loader2,
+  Clipboard,
+  Upload,
+  Scan,
+  Camera,
+  ScanQrCode,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import MarkPopover from "./MarkPopover";
 import cardData from "@/components/json/scancard .json";
@@ -209,17 +217,28 @@ const QRScanner: React.FC = () => {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="container mx-auto  py-6">
       <div className="grid grid-cols-1 gap-6">
         {/* Scanner Section */}
         <div className="flex justify-center">
           <div
             id="reader"
             ref={scannerRef}
+            aria-label="QR code scanner"
             className="w-full max-w-[320px] h-[320px] border rounded-lg bg-white shadow-inner flex items-center justify-center relative"
           >
+            <ScanQrCode
+              size={80}
+              className={`absolute text-gray-400 transition-opacity ${
+                isLoading ? "opacity-30" : "opacity-100"
+              }`}
+              aria-label="QR code scanner icon"
+            />
             {isLoading && (
-              <Loader2 className="animate-spin text-gray-500 w-8 h-8" />
+              <Loader2
+                className="animate-spin text-gray-500 w-8 h-8"
+                aria-label="Loading..."
+              />
             )}
           </div>
         </div>
@@ -232,7 +251,7 @@ const QRScanner: React.FC = () => {
             disabled={isLoading}
             className={
               isScanning
-                ? ""
+                ? "border-teal-600 text-teal-600 hover:bg-teal-700 hover:text-white"
                 : "border-teal-600 text-teal-600 hover:bg-teal-700 hover:text-white"
             }
           >
