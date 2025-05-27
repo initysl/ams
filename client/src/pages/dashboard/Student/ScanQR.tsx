@@ -6,7 +6,7 @@ import api from "@/lib/axios";
 import { toast } from "sonner";
 import {
   ListCheck,
-  Loader2,
+  Loader,
   Clipboard,
   Upload,
   Scan,
@@ -40,7 +40,7 @@ type AttendanceResponse = {
 };
 
 const cardColors = [
-  "bg-teal-700",
+  "bg-slate-100",
   "bg-blue-300",
   "bg-orange-200",
   "bg-purple-100",
@@ -235,7 +235,7 @@ const QRScanner: React.FC = () => {
               aria-label="QR code scanner icon"
             />
             {isLoading && (
-              <Loader2
+              <Loader
                 className="animate-spin text-gray-500 w-8 h-8"
                 aria-label="Loading..."
               />
@@ -260,7 +260,7 @@ const QRScanner: React.FC = () => {
             ) : (
               <>
                 <Scan />
-                {isLoading && <Loader2 className="animate-spin w-4 h-4 ml-2" />}
+                {isLoading && <Loader className="animate-spin w-4 h-4 ml-2" />}
               </>
             )}
           </Button>

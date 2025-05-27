@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -6,16 +6,16 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import * as Icons from "lucide-react";
+import { FileBarChart as Icons } from "lucide-react";
 import rawCardData from "@/components/json/card.json";
 import Status from "@/components/lctui/Status";
 import { Activity } from "@/components/lctui/Activity";
 import Chart from "@/components/general/Chart";
 import img1 from "@/assets/images/card/qrb.png";
 import img2 from "@/assets/images/card/qrw.png";
-
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 type CardItem = {
   id: number;
@@ -34,9 +34,9 @@ const cardColors = [
 ];
 
 const Icon = ({ name }: { name: keyof typeof Icons }) => {
-  const LucideIcon = Icons[name];
+  const LucideIcon = Icons[name] as React.ElementType;
   return LucideIcon ? (
-    <LucideIcon className="h-10 w-10 text-primary bg-white shadow p-2 rounded-2xl" />
+    <LucideIcon className="h-10 w-10 text-primary bg-white text-indigo-500 shadow p-2 rounded-2xl" />
   ) : null;
 };
 
@@ -44,7 +44,7 @@ const Home: React.FC = () => {
   const [today, setToday] = useState(() => new Date().toLocaleString());
   const [isFlipped, setIsFlipped] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setToday(
         new Date().toLocaleString("en-US", {
@@ -121,43 +121,65 @@ const Home: React.FC = () => {
 
         {/* Dynamic Cards */}
         {cardData.cards.map((text, index) => (
-          <Card
-            key={index}
-            className={`bg-white shadow-md hover:shadow-xl transition rounded-xl p-4 flex flex-col justify-between ${
-              cardColors[text.id % cardColors.length]
-            }`}
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{
+              type: "spring",
+              stiffness: 120,
+              damping: 20,
+              duration: 0.5,
+              delay: index * 0.1,
+            }}
+            viewport={{ once: false, amount: 0.3 }}
+            key={text.id}
           >
-            <CardHeader className="p-0 mb-2">
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-base font-semibold">
-                  {text.title}
-                </CardTitle>
-                <Icon name={text.icon} className="text-indigo-500" />
-              </div>
-              <CardDescription className="text-sm text-muted-foreground mt-1">
-                {text.description}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <p className="text-sm text-gray-700 font-medium">{text.value}</p>
-            </CardContent>
-          </Card>
+            <Card
+              key={index}
+              className={`bg-white shadow-md hover:shadow-xl transition-transform transform hover:scale-105 rounded-xl p-4 flex flex-col justify-between ${
+                cardColors[text.id % cardColors.length]
+              }`}
+            >
+              <CardHeader className="p-0 mb-2">
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-base font-semibold">
+                    {text.title}
+                  </CardTitle>
+                  <Icon name={text.icon} />
+                </div>
+                <CardDescription className="text-sm text-muted-foreground mt-1">
+                  {text.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <p className="text-sm text-gray-700 font-medium">
+                  {text.value}
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
       </div>
+      <motion.div
+        className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+        initial={{ opacity: 0, y: 50, scale: 0.95 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{
+          type: "spring",
+          stiffness: 120,
+          damping: 20,
+          duration: 0.5,
+        }}
+        viewport={{ once: false, amount: 0.3 }}
+      >
+        {/* Visual Stats Chart */}
+        <Chart />
+        {/* Extra Info Cards */}
 
-      {/* Visual Stats Chart */}
-      <Chart />
-      {/* Extra Info Cards */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <Status />
-        <Card className="p-5 bg-yellow-100">
-          <CardTitle className="mb-1">Upcoming Events</CardTitle>
-          <p className="text-sm text-gray-800">
-            "Tech Seminar" scheduled for April 25.
-          </p>
-        </Card>
-      </div>
-      <Activity />
+
+        <Activity />
+      </motion.div>
     </div>
   );
 };
