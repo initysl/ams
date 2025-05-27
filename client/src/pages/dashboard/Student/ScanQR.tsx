@@ -23,6 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { motion } from "framer-motion";
 
 type CourseData = {
   courseCode: string;
@@ -57,6 +58,7 @@ const QRScanner: React.FC = () => {
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null); // Added scrollRef
 
   // Initial scan mutation to get course data
   const scanQRMutation = useMutation<AttendanceResponse, Error, string>({
@@ -217,7 +219,7 @@ const QRScanner: React.FC = () => {
   }, []);
 
   return (
-    <div className="container mx-auto  py-6">
+    <div className="container mx-auto py-6" ref={scrollRef}>
       <div className="grid grid-cols-1 gap-6">
         {/* Scanner Section */}
         <div className="flex justify-center">
@@ -324,32 +326,52 @@ const QRScanner: React.FC = () => {
         )}
 
         {/* Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ">
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          initial="hidden"
+          animate="visible"
+          viewport={{ root: scrollRef, amount: 0.2 }}
+          variants={{
+            hidden: { opacity: 0, y: 20 },
+            visible: {
+              opacity: 1,
+              y: 0,
+              transition: { duration: 0.5, staggerChildren: 0.1 },
+            },
+          }}
+        >
           {cardData.scan.map((text, index) => (
-            <Card
+            <motion.div
               key={index}
-              className={` bg-white shadow-md hover:shadow-xl transition rounded-xl p-4 flex flex-col justify-between ${
-                cardColors[text.id % cardColors.length]
-              }`}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0 },
+              }}
             >
-              <CardHeader className="p-0 mb-2">
-                <div className="flex justify-between items-center">
-                  <CardTitle className="text-base font-semibold">
-                    {text.title}
-                  </CardTitle>
-                </div>
-                <CardDescription className="text-sm text-muted-foreground mt-1">
-                  {text.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <p className="text-sm text-gray-700 font-medium">
-                  {text.value}
-                </p>
-              </CardContent>
-            </Card>
+              <Card
+                className={` bg-white shadow-md hover:shadow-xl transition rounded-xl p-4 flex flex-col justify-between ${
+                  cardColors[text.id % cardColors.length]
+                }`}
+              >
+                <CardHeader className="p-0 mb-2">
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-base font-semibold">
+                      {text.title}
+                    </CardTitle>
+                  </div>
+                  <CardDescription className="text-sm text-muted-foreground mt-1">
+                    {text.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <p className="text-sm text-gray-700 font-medium">
+                    {text.value}
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

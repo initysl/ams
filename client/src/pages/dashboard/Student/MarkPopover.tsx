@@ -70,6 +70,7 @@ const MarkPopover: React.FC<MarkPopoverProps> = ({
           transition={{ duration: 0.3 }}
           className="w-96 bg-white border border-gray-200 rounded-lg shadow-lg relative"
           role="dialog"
+          exit={{ opacity: 0 }} // scale: 0.95
           aria-labelledby="popover-title"
           aria-describedby="popover-description"
         >
