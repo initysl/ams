@@ -134,7 +134,7 @@ const AttendanceS = () => {
   return (
     <div className="container mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="font-semibold text-xl md:text-2xl">Attendance Record</h2>
+        {/* <h2 className="font-semibold text-xl md:text-2xl">Attendance Record</h2> */}
 
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <div className="relative w-full sm:w-64">
@@ -233,9 +233,9 @@ const AttendanceS = () => {
               {!loading && !records && (
                 <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                   <Calendar className="h-16 w-16 mb-4 opacity-20" />
-                  <div>
+                  <div className="text-center space-y-2">
                     <p className="font-medium ">No attendance records loaded</p>
-                    <p className="text-sm text-gray-400 mt-1">
+                    <p className="text-sm text-gray-400 ">
                       Click "Get Records" to fetch your attendance history
                     </p>
                   </div>
@@ -437,10 +437,14 @@ const AttendanceS = () => {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                    <p>No attendance records available.</p>
-                    <p className="text-sm mt-1">
-                      Click "Get Records" to fetch your data.
-                    </p>
+                    <div className="text-center space-y-2">
+                      <p>No attendance records available.</p>
+                      <p className="text-sm ">
+                        {/* Click "Get Records" to fetch your data. */}
+                        Senior man, load your record naa, abi you never attend
+                        any class nii 👀.
+                      </p>
+                    </div>
                   </div>
                 )}
               </CardContent>
