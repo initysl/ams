@@ -3,7 +3,7 @@ import api from "@/lib/axios";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
-import { Loader } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 type FeedbackFormInputs = {
   category: string;
@@ -112,7 +112,7 @@ const Feedback = () => {
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
         >
           {isPending ? (
-            <Loader className="h-5 w-5 animate-spin" />
+            <Loader2 className="h-5 w-5 animate-spin" />
           ) : (
             "Submit Feedback"
           )}

@@ -17,7 +17,7 @@ import {
   Calendar,
   FileSpreadsheet,
   Filter,
-  Loader,
+  Loader2,
   Search,
   Users,
   AlertCircle,
@@ -321,7 +321,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
                 <SelectContent className="bg-white">
                   {sessions.length === 0 && loading && (
                     <div className="flex items-center justify-center py-2 text-gray-500">
-                      <Loader className="h-4 w-4 animate-spin mr-2" />
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
                       Loading sessions...
                     </div>
                   )}
@@ -347,7 +347,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
               >
                 {reportLoading ? (
                   <>
-                    <Loader className="animate-spin w-4 h-4 mr-2" />
+                    <Loader2 className="animate-spin w-4 h-4 mr-2" />
                     Loading...
                   </>
                 ) : (

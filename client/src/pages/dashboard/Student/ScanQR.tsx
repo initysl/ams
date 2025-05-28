@@ -6,7 +6,7 @@ import api from "@/lib/axios";
 import { toast } from "sonner";
 import {
   ListCheck,
-  Loader,
+  Loader2,
   Clipboard,
   Upload,
   Scan,
@@ -240,7 +240,7 @@ const QRScanner: React.FC = () => {
                     aria-label="QR code scanner icon"
                   />
                 ) : (
-                  <Loader
+                  <Loader2
                     className="animate-spin text-gray-500 w-8 h-8"
                     aria-label="Loading..."
                   />
@@ -267,7 +267,7 @@ const QRScanner: React.FC = () => {
             ) : (
               <>
                 <Scan />
-                {isLoading && <Loader className="animate-spin w-4 h-4 ml-2" />}
+                {isLoading && <Loader2 className="animate-spin w-4 h-4 ml-2" />}
               </>
             )}
           </Button>
@@ -332,7 +332,7 @@ const QRScanner: React.FC = () => {
 
         {/* Cards Grid */}
         <motion.div
-          className="grid grid-cols-2  lg:grid-cols-3 gap-5"
+          className="grid grid-cols-2 lg:grid-cols-3 gap-5 auto-rows-fr"
           initial="hidden"
           animate="visible"
           viewport={{ root: scrollRef, amount: 0.2 }}
@@ -352,9 +352,10 @@ const QRScanner: React.FC = () => {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0 },
               }}
+              className="h-full"
             >
               <Card
-                className={` bg-white shadow-md hover:shadow-xl transition rounded-xl p-4 flex flex-col justify-between ${
+                className={`h-full bg-white shadow-md hover:shadow-xl transition rounded-xl p-4 flex flex-col ${
                   cardColors[text.id % cardColors.length]
                 }`}
               >

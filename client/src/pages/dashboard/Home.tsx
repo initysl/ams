@@ -99,7 +99,7 @@ const Home: React.FC = () => {
             </div>
 
             {/* Text Content */}
-            <div className="p-4 md:py-8 flex flex-col justify-center space-y-2">
+            <div className="p-4 md:py-8 flex flex-col justify-center space-y-4">
               <div className="text-sm font-semibold tracking-wide text-indigo-500 uppercase mb-1">
                 Your Digital Attendance Management System Solution!
               </div>
@@ -109,11 +109,11 @@ const Home: React.FC = () => {
               >
                 Manage Your Attendance with Ease
               </Link>
-              <p className="mt-2 text-gray-600">
+              <p className="mt-2 text-gray-600 tracking-wide">
                 A fully digital attendance management system that allows you to
                 manage your attendance with ease. No more paper trails or manual
-                tracking. With our system, you can easily track attendance,
-                generate reports, and manage your attendance all in one place.
+                tracking. Easily track attendance, generate reports, and manage
+                your attendance all in one place.
               </p>
             </div>
           </div>
@@ -178,7 +178,7 @@ const Home: React.FC = () => {
 
         <Status />
 
-        <Activity />
+        {/* <Activity /> */}
       </motion.div>
     </div>
   );

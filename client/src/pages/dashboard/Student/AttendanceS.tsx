@@ -12,7 +12,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/axios";
 import {
-  Loader,
+  Loader2,
   FileQuestion,
   BookOpenCheck,
   Calendar,
@@ -170,7 +170,7 @@ const AttendanceS = () => {
                     disabled={loading}
                   >
                     {loading ? (
-                      <Loader className="animate-spin w-4 h-4 mr-2" />
+                      <Loader2 className="animate-spin w-4 h-4 mr-2" />
                     ) : null}
                     {loading ? "Loading..." : "Get Records"}
                   </Button>
@@ -223,7 +223,7 @@ const AttendanceS = () => {
             <CardContent className="p-4">
               {loading && (
                 <div className="text-center py-12">
-                  <Loader className="mx-auto h-8 w-8 animate-spin text-blue-500" />
+                  <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-500" />
                   <p className="mt-2 text-gray-500">
                     Retreving attendance records...
                   </p>
