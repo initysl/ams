@@ -228,10 +228,10 @@ const QRScanner: React.FC = () => {
               id="reader"
               ref={scannerRef}
               aria-label="QR code scanner"
-              className="w-full h-full border rounded-lg bg-white shadow-inner"
+              className="w-full h-full flex justify-center border rounded-lg bg-white shadow-inner"
             />
 
-            {/* Overlay for icons when scanner is not active */}
+            {/* Overlay for icons when scanner is not active and not loading */}
             {!isScanning && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 {!isLoading ? (
