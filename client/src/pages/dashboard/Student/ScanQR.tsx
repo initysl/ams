@@ -223,24 +223,30 @@ const QRScanner: React.FC = () => {
       <div className="grid grid-cols-1 gap-6">
         {/* Scanner Section */}
         <div className="flex justify-center">
-          <div
-            id="reader"
-            ref={scannerRef}
-            aria-label="QR code scanner"
-            className="w-full max-w-[320px] h-[320px] border rounded-lg bg-white shadow-inner flex items-center justify-center relative"
-          >
-            <ScanQrCode
-              size={80}
-              className={`absolute text-gray-400 transition-opacity ${
-                isLoading ? "opacity-30" : "opacity-100"
-              }`}
-              aria-label="QR code scanner icon"
+          <div className="relative w-full max-w-[320px] h-[320px]">
+            <div
+              id="reader"
+              ref={scannerRef}
+              aria-label="QR code scanner"
+              className="w-full h-full border rounded-lg bg-white shadow-inner"
             />
-            {isLoading && (
-              <Loader
-                className="animate-spin text-gray-500 w-8 h-8"
-                aria-label="Loading..."
-              />
+
+            {/* Overlay for icons when scanner is not active */}
+            {!isScanning && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                {!isLoading ? (
+                  <ScanQrCode
+                    size={80}
+                    className="text-gray-400"
+                    aria-label="QR code scanner icon"
+                  />
+                ) : (
+                  <Loader
+                    className="animate-spin text-gray-500 w-8 h-8"
+                    aria-label="Loading..."
+                  />
+                )}
+              </div>
             )}
           </div>
         </div>
