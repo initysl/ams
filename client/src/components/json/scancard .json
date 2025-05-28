@@ -12,7 +12,7 @@
       "id": 2,
       "title": "Mark Attendance By Camera",
       "value": "Easy and fast",
-      "description": "Grant swift access for camera to mark attendance.",
+      "description": "Swift camera access to mark attendance.",
       "icon": "FileBarChart"
     },
 
@@ -26,7 +26,7 @@
     {
       "id": 4,
       "title": "View Attendance Record",
-      "value": "Sharp, smooth and swift",
+      "value": "Smooth and swift",
       "description": "View your attendance record with just a click",
       "icon": "HelpCircle"
     }
