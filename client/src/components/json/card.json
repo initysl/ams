@@ -2,30 +2,31 @@
   "cards": [
     {
       "id": 1,
-      "title": "Smart Attendance Starts Here",
-      "value": "Instant check-ins. Real-time tracking. Zero stress.",
-      "description": "Generate dynamic QR codes in seconds, students check in effortlessly engage and mark attendance in seconds."
+      "title": "Smart Attendance Management System",
+      "value": "Instant Digital Check-ins",
+      "description": "Generate dynamic QR codes instantly for students to mark attendance effortlessly.",
+      "icon": "QrCode"
     },
-
     {
       "id": 2,
-      "title": "Insightful Attendance Reports",
-      "value": "Track trends, measure engagement, make smarter decisions.",
-      "description": "Access detailed, easy-to-read reports that help you monitor attendance patterns, evaluate class participation, and make informed academic decisions—all in one place.",
+      "title": "Insightful Attendance Report Analytics",
+      "value": "Trends And Data Analytics",
+      "description": "Access detailed attendance reports that help monitor student patterns effectively.",
       "icon": "FileBarChart"
     },
-
     {
       "id": 3,
-      "title": "User-Friendly Interface",
-      "value": "Easy to Use",
-      "description": "Simplified interface for seamless attendance management."
+      "title": "User-Friendly Interface Design Experience",
+      "value": "Simple And Easy Navigation",
+      "description": "Simplified dashboard interface designed for seamless attendance management daily operations.",
+      "icon": "Users"
     },
     {
       "id": 4,
-      "title": "Help & Support",
-      "value": "Get help and support for any issues encountered",
-      "description": "Send us feedbacks on ways to improve."
+      "title": "Help And Support Center",
+      "value": "Customer Service And Feedback",
+      "description": "Get comprehensive help support and send feedback for continuous improvement.",
+      "icon": "HelpCircle"
     }
   ]
 }

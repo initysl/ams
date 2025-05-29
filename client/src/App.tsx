@@ -23,7 +23,7 @@ import Profile from "./pages/dashboard/Settings/Profile";
 
 function App() {
   return (
-    <div className="bg-gradient-to-b from-white to-green-100">
+    <div className="bg-gradient-to-b from-slate-100 to-green-100">
       <Router>
         <Routes>
           {/* Public routes */}
