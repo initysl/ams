@@ -70,7 +70,7 @@ const Home: React.FC = () => {
       </div>
 
       {/* Card Summary Grid */}
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 ">
         <div className="lg:col-span-2 lg:row-span-1 max-w-full rounded-xl bg-white shadow-sm">
           <div className="md:flex h-full">
             {/* Image Section */}
@@ -129,7 +129,7 @@ const Home: React.FC = () => {
               delay: index * 0.1,
             }}
             whileHover={{
-              scale: 1.02,
+              scale: 1,
               y: -5,
               transition: { duration: 0.2 },
             }}
@@ -163,7 +163,7 @@ const Home: React.FC = () => {
         ))}
       </div>
       <motion.div
-        className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+        className="grid gap-4 grid-cols-1  "
         initial={{ opacity: 0, y: 50, scale: 0.95 }}
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
         transition={{
@@ -172,15 +172,11 @@ const Home: React.FC = () => {
           damping: 20,
           duration: 0.5,
         }}
-        viewport={{ once: false, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.3 }}
       >
         {/* Visual Stats Chart */}
         <Chart />
-        {/* Extra Info Cards */}
-
         <Status />
-
-        {/* <Activity /> */}
       </motion.div>
     </div>
   );
