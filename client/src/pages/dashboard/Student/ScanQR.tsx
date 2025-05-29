@@ -6,10 +6,11 @@ import api from "@/lib/axios";
 import { toast } from "sonner";
 import {
   ListCheck,
-  Loader2,
+  Loader,
   Clipboard,
   Upload,
   Scan,
+  Camera,
   ScanQrCode,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -227,7 +228,7 @@ const QRScanner: React.FC = () => {
               id="reader"
               ref={scannerRef}
               aria-label="QR code scanner"
-              className="w-full h-full flex justify-center border rounded-lg bg-white shadow-inner"
+              className="w-full h-full border rounded-lg bg-white shadow-inner"
             />
 
             {/* Overlay for icons when scanner is not active and not loading */}
@@ -240,7 +241,7 @@ const QRScanner: React.FC = () => {
                     aria-label="QR code scanner icon"
                   />
                 ) : (
-                  <Loader2
+                  <Loader
                     className="animate-spin text-gray-500 w-8 h-8"
                     aria-label="Loading..."
                   />
@@ -267,7 +268,7 @@ const QRScanner: React.FC = () => {
             ) : (
               <>
                 <Scan />
-                {isLoading && <Loader2 className="animate-spin w-4 h-4 ml-2" />}
+                {isLoading && <Loader className="animate-spin w-4 h-4 ml-2" />}
               </>
             )}
           </Button>
@@ -332,7 +333,7 @@ const QRScanner: React.FC = () => {
 
         {/* Cards Grid */}
         <motion.div
-          className="grid grid-cols-2 lg:grid-cols-3 gap-5 auto-rows-fr"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
           initial="hidden"
           animate="visible"
           viewport={{ root: scrollRef, amount: 0.2 }}
@@ -352,10 +353,9 @@ const QRScanner: React.FC = () => {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0 },
               }}
-              className="h-full"
             >
               <Card
-                className={`h-full bg-white shadow-md hover:shadow-xl transition rounded-xl p-4 flex flex-col ${
+                className={` bg-white shadow-md hover:shadow-xl transition rounded-xl p-4 flex flex-col justify-between ${
                   cardColors[text.id % cardColors.length]
                 }`}
               >

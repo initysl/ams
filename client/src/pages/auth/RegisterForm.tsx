@@ -5,18 +5,10 @@ import { z } from "zod";
 import { EyeIcon, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Profilebox from "@/components/ui/Profilebox";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
 
 const registerSchema = z
   .object({
     name: z.string().min(5, "Name is required"),
-
     email: z.string().email("Invalid email"),
     department: z.string().min(3, "Department is required"),
     matricNumber: z
@@ -56,9 +48,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   } = useForm<RegisterFields>({
     resolver: zodResolver(registerSchema),
   });
-  true;
+
   return (
-    <form id="register-form" onSubmit={handleSubmit(onSubmit)} autoFocus={true}>
+    <form
+      id="register-form"
+      onSubmit={handleSubmit(onSubmit)}
+      autoComplete="on"
+    >
       <div className="mb-4 w-fit ">
         <Profilebox profilePic={previewURL} onImageChange={onImageChange} />
       </div>
@@ -76,17 +72,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
           )}
         </div>
-        {/* <div>
-          <Select autoComplete="sex">
-            <SelectTrigger className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none">
-              <SelectValue placeholder="Gender" />
-            </SelectTrigger>
-            <SelectContent className="bg-gray-100 border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none">
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
-            </SelectContent>
-          </Select>
-        </div> */}
+
         <div>
           <Input
             id="email"
@@ -104,7 +90,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         <div>
           <Input
             id="department"
-            autoComplete="organization"
+            autoComplete="organization-title"
             {...register("department")}
             placeholder="Department"
             className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
@@ -115,12 +101,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             </p>
           )}
         </div>
+
         <div>
           <Input
             id="matricNumber"
-            autoComplete="on"
+            autoComplete="off"
             {...register("matricNumber")}
-            placeholder="Matric No for students. e.g 2021/36000 "
+            placeholder="Matric No for students. e.g 2021/36000"
             className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
           />
           {errors.matricNumber && (
@@ -129,6 +116,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             </p>
           )}
         </div>
+
         <div className="relative">
           <Input
             id="password"
@@ -142,6 +130,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-2 top-2 text-gray-500"
+            tabIndex={-1}
           >
             {showPassword ? <EyeOff /> : <EyeIcon />}
           </button>
@@ -151,6 +140,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             </p>
           )}
         </div>
+
         <div className="relative">
           <Input
             id="confirmPassword"
@@ -164,6 +154,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             className="absolute right-2 top-2 text-gray-500"
+            tabIndex={-1}
           >
             {showConfirmPassword ? <EyeOff /> : <EyeIcon />}
           </button>

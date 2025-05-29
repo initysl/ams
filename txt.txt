@@ -4,8 +4,12 @@ Use normal rafce in normal components
 useMutation for api POST, PUT, DELETE... good for caching
 Recheck protected routes
 Add animation to the viewports | cards
-
+Redefine the toasts `error`
+Error in register form[Email and matricNumber autocomplete]
 Add Gender;Sex: Ensure autocomplete as well..
+
+
+
 After email update, verify the new email address... Working....... Done
 Add a password pattern, user can't use symbols or special characters for pass ...Done
 Add profile picture... Done
