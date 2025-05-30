@@ -18,14 +18,21 @@ h1,
 h2,
 h3,
 h4,
-h5 {
+h5,
+.card-header {
   font-family: "Space Grotesk", sans-serif;
   font-style: normal;
 }
 
 p,
 span,
-Link {
+Link,
+Button {
   font-family: "Ancizar Sans", sans-serif;
   font-style: normal;
+}
+
+Button,
+button {
+  cursor: pointer;
 }

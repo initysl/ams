@@ -260,10 +260,10 @@ const Home: React.FC = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-base font-bold text-gray-800 mb-2">
-                      <h2>{card.title}</h2>
+                      {card.title}
                     </CardTitle>
-                    <CardDescription className="text-gray-600 text-sm">
-                      <h2>{card.description}</h2>
+                    <CardDescription className="card-des text-gray-600 text-sm">
+                      {card.description}
                     </CardDescription>
                   </div>
                 </div>

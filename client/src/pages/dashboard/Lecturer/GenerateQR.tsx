@@ -22,6 +22,7 @@ import {
   AlertCircle,
   Clock,
   ListRestart,
+  Loader2,
   Printer,
   Save,
   X,
@@ -377,10 +378,10 @@ const GenerateQR = () => {
 
   if (qrGenerated) {
     return (
-      <div className="max-w-4xl mx-auto md:p-4 space-y-6">
-        <Card className="bg-white border-2 border-teal-100">
-          <CardHeader className="border-b border-gray-100 bg-gray-50">
-            <CardTitle className="text-xl text-gray-800">
+      <div className=" space-y-6">
+        <Card className="bg-white">
+          <CardHeader className="card-header border-b border-gray-100 bg-gray-50">
+            <CardTitle className=" text-xl text-gray-800">
               Active QR Code Session
             </CardTitle>
           </CardHeader>
@@ -493,7 +494,7 @@ const GenerateQR = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
       <form onSubmit={handleSubmit(handleGenerateQR)} className="space-y-6">
         <Card className="bg-white">
           <CardContent>
@@ -597,7 +598,13 @@ const GenerateQR = () => {
                 disabled={isGenerating}
                 className="flex-1 bg-blue-500 hover:bg-blue-600 text-white  rounded-md font-medium transition-colors flex items-center justify-center gap-2"
               >
-                {isGenerating ? "Generating..." : <>Generate QR Code</>}
+                {isGenerating ? (
+                  <>
+                    Generating... <Loader2 className="h-4 w-4" />
+                  </>
+                ) : (
+                  <>Generate QR Code</>
+                )}
               </Button>
               <Button
                 type="button"
