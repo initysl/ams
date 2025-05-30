@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import {
   QrCode,
+  ScanQrCode,
   FileBarChart,
   Users,
   HelpCircle,
@@ -19,6 +20,7 @@ import {
   Target,
   Smile,
   CheckCircle,
+  Settings2,
 } from "lucide-react";
 import rawCardData from "@/components/json/card.json";
 import Status from "@/components/lctui/Status";
@@ -28,6 +30,8 @@ import img2 from "@/assets/images/card/qrw.png";
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import Achievement from "@/components/general/Achievement";
+import Activity from "@/components/general/Activity";
 
 type CardItem = {
   id: number;
@@ -40,6 +44,7 @@ type CardItem = {
 // ✅ Create a proper icon mapping object
 const iconMap = {
   QrCode,
+  ScanQrCode,
   FileBarChart,
   Users,
   HelpCircle,
@@ -61,58 +66,6 @@ const cardColors = [
   "bg-gradient-to-br from-purple-50 to-pink-100",
   "bg-gradient-to-br from-green-50 to-emerald-100",
   "bg-gradient-to-br from-teal-50 to-cyan-100",
-];
-
-// Mock data for new components
-const recentActivities = [
-  {
-    id: 1,
-    action: "Attended Lecture",
-    subject: "Computer Science",
-    time: "2 hours ago",
-    icon: CheckCircle,
-    color: "text-green-500",
-  },
-  {
-    id: 2,
-    action: "Missed Class",
-    subject: "Mathematics",
-    time: "1 day ago",
-    icon: AlertCircle,
-    color: "text-red-500",
-  },
-  {
-    id: 3,
-    action: "Perfect Week",
-    subject: "All Classes",
-    time: "1 week ago",
-    icon: Trophy,
-    color: "text-yellow-500",
-  },
-];
-
-const achievements = [
-  {
-    id: 1,
-    title: "Perfect Attendance",
-    description: "100% attendance this month",
-    icon: Trophy,
-    color: "bg-yellow-100 text-yellow-600",
-  },
-  {
-    id: 2,
-    title: "Early Bird",
-    description: "Never missed morning classes",
-    icon: Star,
-    color: "bg-blue-100 text-blue-600",
-  },
-  {
-    id: 3,
-    title: "Consistent Learner",
-    description: "15 days streak",
-    icon: Target,
-    color: "bg-green-100 text-green-600",
-  },
 ];
 
 // ✅ Fixed Icon component
@@ -154,7 +107,7 @@ const Home: React.FC = () => {
             <h1 className="text-xl lg:text-4xl font-bold mb-1">
               Welcome Back, {user?.matricNumber || user?.name}
             </h1>
-            <p className="text-lg">{today}</p>
+            <p className="text-sm md:text-lg">{today}</p>
           </div>
           <motion.div
             className="hidden md:block"
@@ -203,7 +156,7 @@ const Home: React.FC = () => {
 
             <div className="p-8 flex flex-col justify-center space-y-6">
               <div className="inline-block bg-indigo-100 text-indigo-600 text-sm font-semibold px-4 py-2 rounded-full w-fit">
-                Digital Solution
+                <h2>Digital Solution</h2>
               </div>
               <Link
                 to={"/dashboard/home"}
@@ -221,30 +174,11 @@ const Home: React.FC = () => {
         </div>
 
         {/* Quick Actions Panel */}
-        <motion.div
-          className="bg-white rounded-3xl shadow-xl p-6"
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 }}
-        >
+        <div className="bg-white rounded-3xl shadow-xl p-6">
           <h3 className="text-xl font-bold mb-6 text-gray-800">
             Quick Actions
           </h3>
           <div className="space-y-4">
-            <motion.button
-              className="w-full flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl hover:from-blue-100 hover:to-indigo-100 transition-all"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="bg-blue-500 p-3 rounded-full">
-                <Calendar className="h-5 w-5 text-white" />
-              </div>
-              <div className="text-left">
-                <p className="font-semibold text-gray-800">View Schedule</p>
-                <p className="text-sm text-gray-600">Today's classes</p>
-              </div>
-            </motion.button>
-
             <motion.button
               className="w-full flex items-center space-x-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl hover:from-green-100 hover:to-emerald-100 transition-all"
               whileHover={{ scale: 1.02 }}
@@ -278,8 +212,24 @@ const Home: React.FC = () => {
                 </Link>
               </div>
             </motion.button>
+
+            <motion.button
+              className="w-full flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl hover:from-blue-100 hover:to-indigo-100 transition-all"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="bg-blue-500 p-3 rounded-full">
+                <Settings2 className="h-5 w-5 text-white" />
+              </div>
+              <div className="text-left">
+                <Link to={"/dashboard/settings"}>
+                  <p className="font-semibold text-gray-800">Settings</p>
+                  <p className="text-sm text-gray-600">Quick Settings</p>
+                </Link>
+              </div>
+            </motion.button>
           </div>
-        </motion.div>
+        </div>
       </motion.div>
 
       {/* Enhanced Stats Cards */}
@@ -304,22 +254,22 @@ const Home: React.FC = () => {
             <Card
               className={`${
                 cardColors[index % cardColors.length]
-              } border-0 shadow-lg hover:shadow-2xl transition-all duration-300 rounded-2xl overflow-hidden h-full`}
+              } border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden h-full`}
             >
               <CardHeader className="p-6 pb-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-lg font-bold text-gray-800 mb-2">
-                      {card.title}
+                    <CardTitle className="text-base font-bold text-gray-800 mb-2">
+                      <h2>{card.title}</h2>
                     </CardTitle>
                     <CardDescription className="text-gray-600 text-sm">
-                      {card.description}
+                      <h2>{card.description}</h2>
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="px-6 pb-6">
-                <p className="text-xl font-bold text-gray-800 mb-2">
+              <CardContent className="flex justify-between items-center px-6 pb-6">
+                <p className="text-sm font-bold text-gray-800 mb-2">
                   {card.value}
                 </p>
                 <div className="flex items-center text-sm text-green-600">
@@ -351,79 +301,10 @@ const Home: React.FC = () => {
         </div>
         <div className="bg-white rounded-3xl shadow-xl p-6 space-y-5">
           <Status />
-          {/* Recent Activity Feed */}
-          <motion.div
-            className="bg-white rounded-3xl "
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-800">
-                Recent Activity
-              </h3>
-              <Bell className="h-5 w-5 text-gray-400" />
-            </div>
-            <div className="space-y-4">
-              {recentActivities.map((activity) => (
-                <div
-                  key={activity.id}
-                  className="flex items-center space-x-4 p-4 rounded-xl bg-gray-50"
-                >
-                  <div
-                    className={`p-2 rounded-full bg-white shadow-sm ${activity.color}`}
-                  >
-                    <activity.icon className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-gray-800">
-                      {activity.action}
-                    </p>
-                    <p className="text-sm text-gray-600">{activity.subject}</p>
-                    <p className="text-xs text-gray-400">{activity.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+          <Activity />
         </div>
       </motion.div>
-
-      <div className="grid gap-6 grid-cols-1 ">
-        {/* Achievements */}
-        <motion.div
-          className="bg-white rounded-3xl shadow-xl p-6"
-          initial={{ opacity: 0, x: 30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-        >
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-800">Achievements</h3>
-            <Trophy className="h-5 w-5 text-yellow-500" />
-          </div>
-          <div className="space-y-4">
-            {achievements.map((achievement) => (
-              <motion.div
-                key={achievement.id}
-                className="flex items-center space-x-4 p-4 rounded-xl bg-gray-50"
-                whileHover={{ scale: 1.02 }}
-              >
-                <div className={`p-3 rounded-full ${achievement.color}`}>
-                  <achievement.icon className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-800">
-                    {achievement.title}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {achievement.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
+      <Achievement />
     </div>
   );
 };

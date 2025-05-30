@@ -362,11 +362,11 @@ const QRScanner: React.FC = () => {
                 <CardHeader className="p-0 mb-2">
                   <div className="flex justify-between items-center">
                     <CardTitle className="text-base font-semibold">
-                      {text.title}
+                      <h2>{text.title}</h2>
                     </CardTitle>
                   </div>
                   <CardDescription className="text-sm text-muted-foreground mt-1">
-                    {text.description}
+                    <h2>{text.description}</h2>
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">

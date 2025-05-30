@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Ancizar+Sans:ital,wght@0,100..1000;1,100..1000&family=Space+Grotesk:wght@300..700&display=swap");
 @import "tailwindcss";
 /* globals.css or your main CSS file */
 .perspective {
@@ -11,4 +12,20 @@
 }
 .backface-hidden {
   backface-visibility: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: "Space Grotesk", sans-serif;
+  font-style: normal;
+}
+
+p,
+span,
+Link {
+  font-family: "Ancizar Sans", sans-serif;
+  font-style: normal;
 }

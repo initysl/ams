@@ -20,7 +20,9 @@ const Status = () => {
         <CardContent className="pt-6">
           <div className="flex justify-between items-start">
             <div>
-              <CardTitle className="mb-5">Today's Attendance Status</CardTitle>
+              <CardTitle className="mb-5">
+                <h2>Attendance Status</h2>
+              </CardTitle>
               <div className="">
                 <p className="text-sm text-gray-700 mb-2">{statusMessage}</p>
                 <Link to="/dashboard/attendance">
