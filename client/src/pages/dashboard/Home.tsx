@@ -152,7 +152,7 @@ const Home: React.FC = () => {
         <Card className="bg-white p-4 flex flex-row items-center justify-between">
           <div>
             <h1 className="text-xl lg:text-4xl font-bold mb-1">
-              Welcome Back {user?.matricNumber}
+              Welcome Back, {user?.matricNumber || user?.name}
             </h1>
             <p className="text-lg">{today}</p>
           </div>
