@@ -10,7 +10,7 @@ import {
   QrCode,
   FileBarChart,
   Users,
-  HelpCircle, // ✅ Remove the "as Icons" alias
+  HelpCircle,
   Bell,
   Calendar,
   Trophy,
@@ -144,36 +144,17 @@ const Home: React.FC = () => {
     <div className="space-y-8  min-h-screen">
       {/* Enhanced Top Section with Greeting and Quick Stats */}
       <motion.div
-        className="relative overflow-hidden bg-white rounded-3xl p-4"
+        className="relative overflow-hidden "
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        {/* <div className="absolute inset-0 bg-black opacity-10"></div> */}
-        <div className="relative z-10 flex justify-between items-center">
+        <Card className="bg-white p-4 flex flex-row items-center justify-between">
           <div>
-            <motion.h1
-              className="text-xl lg:text-4xl font-bold mb-1"
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              Welcome Back, {user?.matricNumber} 👋
-            </motion.h1>
-            <motion.p
-              className="text-lg opacity-90 mb-4"
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              {today}
-            </motion.p>
-            <motion.div
-              className="flex items-center space-x-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            ></motion.div>
+            <h1 className="text-xl lg:text-4xl font-bold mb-1">
+              Welcome Back {user?.matricNumber}
+            </h1>
+            <p className="text-lg">{today}</p>
           </div>
           <motion.div
             className="hidden md:block"
@@ -185,7 +166,7 @@ const Home: React.FC = () => {
               <Smile className="h-16 w-16" />
             </div>
           </motion.div>
-        </div>
+        </Card>
       </motion.div>
 
       {/* Hero Card with Flip Animation */}
