@@ -168,7 +168,7 @@ const ChartTwo: React.FC = () => {
   return (
     <div>
       <Card className="bg-white rounded-xl">
-        <CardHeader className="pb-2">
+        <CardHeader className="card-header pb-2">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
             <CardTitle className="text-lg font-semibold flex items-center mb-2">
               Attendance Trend

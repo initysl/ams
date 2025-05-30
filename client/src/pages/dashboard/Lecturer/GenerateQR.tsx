@@ -600,7 +600,7 @@ const GenerateQR = () => {
               >
                 {isGenerating ? (
                   <>
-                    Generating... <Loader2 className="h-4 w-4" />
+                    Generating... <Loader2 className="h-4 w-4 animate-spin" />
                   </>
                 ) : (
                   <>Generate QR Code</>
