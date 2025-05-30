@@ -7,21 +7,18 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import {
-  FileBarChart as Icons,
+  QrCode,
+  FileBarChart,
+  Users,
+  HelpCircle, // ✅ Remove the "as Icons" alias
   Bell,
   Calendar,
-  Clock,
   Trophy,
-  TrendingUp,
-  Users,
-  CheckCircle,
   AlertCircle,
   Star,
-  BookOpen,
   Target,
-  Activity,
-  FileBarChart,
   Smile,
+  CheckCircle,
 } from "lucide-react";
 import rawCardData from "@/components/json/card.json";
 import Status from "@/components/lctui/Status";
@@ -37,7 +34,23 @@ type CardItem = {
   title: string;
   value: string;
   description: string;
-  icon: keyof typeof Icons;
+  icon: keyof typeof iconMap;
+};
+
+// ✅ Create a proper icon mapping object
+const iconMap = {
+  QrCode,
+  FileBarChart,
+  Users,
+  HelpCircle,
+  Bell,
+  Calendar,
+  Trophy,
+  AlertCircle,
+  Star,
+  Target,
+  Smile,
+  CheckCircle,
 };
 
 const cardData: { cards: CardItem[] } = rawCardData as { cards: CardItem[] };
@@ -102,8 +115,9 @@ const achievements = [
   },
 ];
 
-const Icon = ({ name }: { name: keyof typeof Icons }) => {
-  const LucideIcon = Icons[name] as React.ElementType;
+// ✅ Fixed Icon component
+const Icon = ({ name }: { name: keyof typeof iconMap }) => {
+  const LucideIcon = iconMap[name];
   return LucideIcon ? (
     <LucideIcon className="h-10 w-10 text-primary bg-white text-indigo-500 shadow p-2 rounded-2xl" />
   ) : null;
@@ -206,7 +220,7 @@ const Home: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-8 md:py-12 flex flex-col justify-center space-y-6">
+            <div className="p-8 flex flex-col justify-center space-y-6">
               <div className="inline-block bg-indigo-100 text-indigo-600 text-sm font-semibold px-4 py-2 rounded-full w-fit">
                 Digital Solution
               </div>
@@ -321,9 +335,6 @@ const Home: React.FC = () => {
                       {card.description}
                     </CardDescription>
                   </div>
-                  <div className="bg-white/80 p-3 rounded-xl shadow-md">
-                    <Icon name={card.icon} />
-                  </div>
                 </div>
               </CardHeader>
               <CardContent className="px-6 pb-6">
@@ -331,8 +342,9 @@ const Home: React.FC = () => {
                   {card.value}
                 </p>
                 <div className="flex items-center text-sm text-green-600">
-                  <TrendingUp className="h-4 w-4 mr-1" />
-                  <span>+12% from last week</span>
+                  <div>
+                    <Icon name={card.icon} />
+                  </div>
                 </div>
               </CardContent>
             </Card>
