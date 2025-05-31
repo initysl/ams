@@ -432,7 +432,7 @@ const AttendanceS = () => {
                                   {course}
                                 </span>
                                 <span className="font-medium  text-blue-700">
-                                  {count} classes
+                                  {count} class(es)
                                 </span>
                               </li>
                             ))}
