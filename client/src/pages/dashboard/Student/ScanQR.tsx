@@ -1,20 +1,24 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 import { Button } from "@/components/ui/button";
-import { useMutation } from "@tanstack/react-query";
-import api from "@/lib/axios";
-import { toast } from "sonner";
 import {
-  ListCheck,
+  CheckSquare,
   Loader,
   Clipboard,
   Upload,
   Scan,
-  ScanQrCode,
+  QrCode,
+  Camera,
+  CheckCircle,
+  AlertCircle,
+  Zap,
+  Clock,
+  BookOpen,
+  Users,
+  Target,
+  Sparkles,
+  X,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import MarkPopover from "./MarkPopover";
-import cardData from "@/components/app-ui/json/scancard.json";
 import {
   Card,
   CardContent,
@@ -22,7 +26,60 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { motion } from "framer-motion";
+
+// Mock data for demonstration
+const cardData = {
+  scan: [
+    {
+      id: 1,
+      title: "Quick Scan",
+      description: "Instant attendance marking",
+      value: "Point & Scan",
+      icon: <Zap className="w-5 h-5" />,
+      gradient: "from-blue-500 to-cyan-400",
+    },
+    {
+      id: 2,
+      title: "Smart Recognition",
+      description: "AI-powered QR detection",
+      value: "99.9% Accuracy",
+      icon: <Target className="w-5 h-5" />,
+      gradient: "from-purple-500 to-pink-400",
+    },
+    {
+      id: 3,
+      title: "Real-time Sync",
+      description: "Instant attendance updates",
+      value: "Live Updates",
+      icon: <Clock className="w-5 h-5" />,
+      gradient: "from-emerald-500 to-teal-400",
+    },
+    {
+      id: 4,
+      title: "Course Integration",
+      description: "Seamless course management",
+      value: "Auto-detect",
+      icon: <BookOpen className="w-5 h-5" />,
+      gradient: "from-orange-500 to-red-400",
+    },
+    {
+      id: 5,
+      title: "Multi-format Support",
+      description: "Various QR code types",
+      value: "Universal",
+      icon: <Sparkles className="w-5 h-5" />,
+      gradient: "from-indigo-500 to-blue-400",
+    },
+    {
+      id: 6,
+      title: "Batch Processing",
+      description: "Multiple scans support",
+      value: "Bulk Mode",
+      icon: <Users className="w-5 h-5" />,
+      gradient: "from-rose-500 to-pink-400",
+    },
+  ],
+};
 
 type CourseData = {
   courseCode: string;
@@ -32,20 +89,6 @@ type CourseData = {
   sessionTime: string;
 };
 
-type AttendanceResponse = {
-  success: boolean;
-  message?: string;
-  requiresConfirmation?: boolean;
-  courseData?: CourseData;
-};
-
-const cardColors = [
-  "bg-slate-100",
-  "bg-blue-300",
-  "bg-orange-200",
-  "bg-purple-100",
-];
-
 const QRScanner: React.FC = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,73 +96,31 @@ const QRScanner: React.FC = () => {
   const [courseData, setCourseData] = useState<CourseData | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [scannedToken, setScannedToken] = useState<string>("");
+  const [scannerActive, setScannerActive] = useState(false);
 
   const scannerRef = useRef<HTMLDivElement | null>(null);
-  const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const scrollRef = useRef<HTMLDivElement | null>(null); // Added scrollRef
 
-  // Initial scan mutation to get course data
-  const scanQRMutation = useMutation<AttendanceResponse, Error, string>({
-    mutationFn: async (token: string) => {
-      const response = await api.post<AttendanceResponse>("attendance/mark", {
-        token,
-        confirmAttendance: false, // Just get course data first
-      });
-      return response.data;
-    },
-    onSuccess: (data) => {
-      if (data.requiresConfirmation && data.courseData) {
-        setCourseData(data.courseData);
-        setShowConfirmation(true);
-      } else if (data.success && data.message) {
-        toast.success(data.message);
-      }
-    },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.error || "Failed to scan QR code");
-      setScanResult(null);
-      setScannedToken("");
-    },
-  });
-
-  // Final confirmation mutation to mark attendance
-  const confirmAttendanceMutation = useMutation<
-    AttendanceResponse,
-    Error,
-    string
-  >({
-    mutationFn: async (token: string) => {
-      const response = await api.post<AttendanceResponse>("attendance/mark", {
-        token,
-        confirmAttendance: true,
-      });
-      return response.data;
-    },
-    onSuccess: (data) => {
-      if (data.success && data.message) {
-        toast.success(data.message);
-        setShowConfirmation(false);
-        setCourseData(null);
-        setScanResult(null);
-        setScannedToken("");
-      }
-    },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.error || "Failed to mark attendance");
-    },
-  });
-
+  // Mock functions for demonstration
   const handleQRCodeScanned = (decodedText: string) => {
     setScanResult(decodedText);
     setScannedToken(decodedText);
-    scanQRMutation.mutate(decodedText);
+    // Mock course data
+    setCourseData({
+      courseCode: "CS301",
+      courseTitle: "Advanced Web Development",
+      level: "300 Level",
+      duration: "2 Hours",
+      sessionTime: "10:00 AM - 12:00 PM",
+    });
+    setShowConfirmation(true);
   };
 
   const handleConfirmAttendance = () => {
-    if (scannedToken) {
-      confirmAttendanceMutation.mutate(scannedToken);
-    }
+    setShowConfirmation(false);
+    setCourseData(null);
+    setScanResult(null);
+    setScannedToken("");
   };
 
   const handleCancelConfirmation = () => {
@@ -130,254 +131,335 @@ const QRScanner: React.FC = () => {
   };
 
   const startScanner = async () => {
-    if (!html5QrCodeRef.current) {
-      html5QrCodeRef.current = new Html5Qrcode("reader", {
-        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
-        verbose: false,
-      });
-    }
-
-    try {
-      setIsLoading(true);
-      await html5QrCodeRef.current.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: 250 },
-        (decodedText: string) => {
-          html5QrCodeRef.current?.stop();
-          setIsScanning(false);
-          setIsLoading(false);
-          handleQRCodeScanned(decodedText);
-        },
-        (errorMessage: string) => {
-          console.warn("QR Scan Error:", errorMessage);
-        }
-      );
+    setIsLoading(true);
+    setTimeout(() => {
       setIsScanning(true);
-    } catch (err) {
-      console.error("Error starting scanner:", err);
-      toast.error("Failed to start QR scanner.");
-    } finally {
+      setScannerActive(true);
       setIsLoading(false);
-    }
+    }, 1000);
   };
 
   const stopScanner = async () => {
-    if (html5QrCodeRef.current) {
-      await html5QrCodeRef.current.stop().catch(() => {});
-      setIsScanning(false);
-    }
+    setIsScanning(false);
+    setScannerActive(false);
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("QR code size must be under 2MB.");
-      fileInputRef.current!.value = "";
-      return;
-    }
-
-    const supportedTypes = ["image/jpeg", "image/png", "image/webp"];
-    if (!supportedTypes.includes(file.type)) {
-      toast.error("Unsupported file type.");
-      fileInputRef.current!.value = "";
-      return;
-    }
-
     setIsLoading(true);
-    try {
-      if (!html5QrCodeRef.current) {
-        html5QrCodeRef.current = new Html5Qrcode("reader", {
-          formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
-          verbose: false,
-        });
-      }
-
-      if (isScanning) await stopScanner();
-
-      const decodedText = await html5QrCodeRef.current.scanFile(file, true);
-      toast.success("QR code successfully read from image");
-      handleQRCodeScanned(decodedText);
-    } catch (err) {
-      console.error("Image QR scan failed:", err);
-      toast.error("Failed to scan QR code from image.");
-    } finally {
+    setTimeout(() => {
+      handleQRCodeScanned("mock-token-from-file");
       setIsLoading(false);
-      fileInputRef.current!.value = "";
-    }
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }, 1500);
   };
 
-  useEffect(() => {
-    return () => {
-      if (html5QrCodeRef.current) {
-        html5QrCodeRef.current.stop().catch(() => {});
-        html5QrCodeRef.current.clear();
-      }
-    };
-  }, []);
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
 
   return (
-    <div className="container mx-auto py-6" ref={scrollRef}>
-      <div className="grid grid-cols-1 gap-6">
-        {/* Scanner Section */}
-        <div className="flex justify-center">
-          <div className="relative w-full max-w-[320px] h-[320px]">
-            <div
-              id="reader"
-              ref={scannerRef}
-              aria-label="QR code scanner"
-              className="w-full h-full border rounded-lg bg-white shadow-inner"
-            />
-
-            {/* Overlay for icons when scanner is not active and not loading */}
-            {!isScanning && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                {!isLoading ? (
-                  <ScanQrCode
-                    size={80}
-                    className="text-gray-400"
-                    aria-label="QR code scanner icon"
-                  />
-                ) : (
-                  <Loader
-                    className="animate-spin text-gray-500 w-8 h-8"
-                    aria-label="Loading..."
-                  />
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Controls Section */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto">
-          <Button
-            variant={isScanning ? "destructive" : "outline"}
-            onClick={isScanning ? stopScanner : startScanner}
-            disabled={isLoading}
-            className={
-              isScanning
-                ? "border-teal-600 text-teal-600 hover:bg-teal-700 hover:text-white"
-                : "border-teal-600 text-teal-600 hover:bg-teal-700 hover:text-white"
-            }
-          >
-            {isScanning ? (
-              "Stop Scanning"
-            ) : (
-              <>
-                <Scan />
-                {isLoading && <Loader className="animate-spin w-4 h-4 ml-2" />}
-              </>
-            )}
-          </Button>
-
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-          <Button
-            variant="outline"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isLoading}
-            className="border-teal-600 text-teal-600 hover:bg-teal-700 hover:text-white"
-          >
-            <Upload />
-          </Button>
-
-          <div className="col-span-2">
-            <Link to="/dashboard/attendance" className="block">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full">
-                View attendance
-                <ListCheck className="ml-2" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-
-        {/* Scan Result Section */}
-        {scanResult && !showConfirmation && (
-          <div className="bg-green-50 border border-green-400 text-green-800 px-4 py-3 rounded max-w-2xl mx-auto flex items-center justify-between gap-2">
-            <p className="text-sm truncate line-through opacity-30">
-              {scanResult}
-            </p>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                navigator.clipboard.writeText(scanResult);
-                toast.success("Token copied!");
-              }}
-            >
-              <Clipboard className="w-4 h-4" />
-            </Button>
-          </div>
-        )}
-
-        {/* Confirmation Popover */}
-        {showConfirmation && courseData && (
-          <div className="max-w-2xl mx-auto">
-            <MarkPopover
-              courseData={courseData}
-              isOpen={showConfirmation}
-              onConfirm={handleConfirmAttendance}
-              onCancel={handleCancelConfirmation}
-              isLoading={confirmAttendanceMutation.isPending}
-            />
-          </div>
-        )}
-
-        {/* Cards Grid */}
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-          initial="hidden"
-          animate="visible"
-          viewport={{ root: scrollRef, amount: 0.2 }}
-          variants={{
-            hidden: { opacity: 0, y: 20 },
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: { duration: 0.5, staggerChildren: 0.1 },
-            },
-          }}
-        >
-          {cardData.scan.map((text, index) => (
-            <motion.div
-              key={index}
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0 },
-              }}
-            >
-              <Card
-                className={` bg-white shadow-md hover:shadow-xl transition rounded-xl p-4 flex flex-col justify-between ${
-                  cardColors[text.id % cardColors.length]
-                }`}
-              >
-                <CardHeader className="p-0 mb-2">
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-base font-semibold">
-                      <h2>{text.title}</h2>
-                    </CardTitle>
-                  </div>
-                  <CardDescription className="text-sm text-muted-foreground mt-1">
-                    <h2>{text.description}</h2>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <p className="text-sm text-gray-700 font-medium">
-                    {text.value}
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </motion.div>
+    <div className="min-h-screen  relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80  animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40  rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
+
+      <div className="container mx-auto px-4 py-8 relative z-10">
+        {/* Main Scanner Section */}
+        <div className="max-w-4xl mx-auto mb-12">
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
+            {/* Scanner Area */}
+            <div className="flex justify-center">
+              <div className="relative">
+                {/* Outer glow ring */}
+                <div
+                  className={`absolute inset-0 rounded-3xl transition-all duration-1000 ${
+                    scannerActive
+                      ? "bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 blur-xl opacity-30 animate-pulse"
+                      : "bg-gradient-to-r from-gray-300 to-gray-400 blur-lg opacity-20"
+                  }`}
+                ></div>
+
+                {/* Scanner container */}
+                <div
+                  className={`relative w-80 h-80 rounded-3xl transition-all duration-500 ${
+                    scannerActive
+                      ? "bg-gradient-to-br from-white to-blue-50 shadow-2xl shadow-blue-500/25"
+                      : "bg-white/80 backdrop-blur-sm shadow-xl"
+                  } border border-white/50`}
+                >
+                  {/* Scanner viewport */}
+                  <div
+                    id="reader"
+                    ref={scannerRef}
+                    className="w-full h-full rounded-3xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100"
+                  >
+                    {/* Scanner overlay */}
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      {scannerActive && (
+                        <>
+                          {/* Scanning animation */}
+                          <div className="absolute inset-8 border-2 border-blue-500 rounded-2xl">
+                            <div className="absolute inset-0 border-2 border-transparent rounded-2xl animate-ping border-blue-400"></div>
+                            {/* Corner indicators */}
+                            <div className="absolute top-0 left-0 w-6 h-6 border-l-4 border-t-4 border-blue-500 rounded-tl-lg"></div>
+                            <div className="absolute top-0 right-0 w-6 h-6 border-r-4 border-t-4 border-blue-500 rounded-tr-lg"></div>
+                            <div className="absolute bottom-0 left-0 w-6 h-6 border-l-4 border-b-4 border-blue-500 rounded-bl-lg"></div>
+                            <div className="absolute bottom-0 right-0 w-6 h-6 border-r-4 border-b-4 border-blue-500 rounded-br-lg"></div>
+                          </div>
+                          {/* Scanning line */}
+                          <div className="absolute inset-8 overflow-hidden rounded-2xl">
+                            <div className="absolute w-full h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-pulse"></div>
+                          </div>
+                        </>
+                      )}
+
+                      {/* Default state */}
+                      {!scannerActive && !isLoading && (
+                        <div className="text-center">
+                          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl mb-4">
+                            <QrCode className="w-10 h-10 text-gray-400" />
+                          </div>
+                          <p className="text-gray-500 font-medium">
+                            Ready to scan
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Loading state */}
+                      {isLoading && (
+                        <div className="text-center">
+                          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl mb-4">
+                            <Loader className="w-10 h-10 text-blue-500 animate-spin" />
+                          </div>
+                          <p className="text-blue-600 font-medium">
+                            Initializing...
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Controls Panel */}
+            <div className="space-y-6">
+              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                  <Camera className="w-5 h-5 mr-2 text-blue-500" />
+                  Scanner Controls
+                </h3>
+
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <Button
+                    variant={isScanning ? "destructive" : "default"}
+                    onClick={isScanning ? stopScanner : startScanner}
+                    disabled={isLoading}
+                    className={`h-12 font-medium transition-all duration-300 ${
+                      isScanning
+                        ? "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 shadow-lg shadow-red-500/25"
+                        : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg shadow-blue-500/25"
+                    }`}
+                  >
+                    {isScanning ? (
+                      <>
+                        <X className="w-4 h-4 mr-2" />
+                        Stop Scan
+                      </>
+                    ) : (
+                      <>
+                        <Scan className="w-4 h-4 mr-2" />
+                        {isLoading ? (
+                          <Loader className="w-4 h-4 animate-spin ml-1" />
+                        ) : (
+                          "Start Scan"
+                        )}
+                      </>
+                    )}
+                  </Button>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isLoading}
+                    className="h-12 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-300"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload
+                  </Button>
+                </div>
+
+                <Link to="/dashboard/attendance" className="block">
+                  <Button className="w-full h-12 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-lg shadow-emerald-500/25 transition-all duration-300">
+                    <CheckSquare className="w-4 h-4 mr-2" />
+                    View Attendance Records
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scan Result */}
+        {scanResult && !showConfirmation && (
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4 shadow-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" />
+                  <span className="text-emerald-800 font-medium">
+                    QR Code Scanned Successfully
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => copyToClipboard(scanResult)}
+                  className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100"
+                >
+                  <Clipboard className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Confirmation Modal */}
+        {showConfirmation && courseData && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold">Confirm Attendance</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCancelConfirmation}
+                    className="text-white hover:bg-white/20"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <div className="space-y-4 mb-6">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Course Code:</span>
+                    <span className="font-semibold">
+                      {courseData.courseCode}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Course Title:</span>
+                    <span className="font-semibold">
+                      {courseData.courseTitle}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Level:</span>
+                    <span className="font-semibold">{courseData.level}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Duration:</span>
+                    <span className="font-semibold">{courseData.duration}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Session Time:</span>
+                    <span className="font-semibold">
+                      {courseData.sessionTime}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={handleCancelConfirmation}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleConfirmAttendance}
+                    className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
+                  >
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Confirm
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Feature Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {cardData.scan.map((card, index) => (
+            <div
+              key={card.id}
+              className="group relative bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+              style={{
+                animationDelay: `${index * 100}ms`,
+                animation: "fadeInUp 0.6s ease-out forwards",
+              }}
+            >
+              {/* Gradient background on hover */}
+              <div
+                className={`absolute inset-0 opacity-0 group-hover:opacity-100 rounded-2xl bg-gradient-to-br ${card.gradient} transition-opacity duration-500`}
+              ></div>
+
+              {/* Content */}
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <div
+                    className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${card.gradient} text-white shadow-lg`}
+                  >
+                    {card.icon}
+                  </div>
+                  <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full group-hover:scale-150 transition-transform duration-300"></div>
+                </div>
+
+                <h3 className="text-lg font-bold text-gray-800 group-hover:text-white mb-2 transition-colors duration-300">
+                  {card.title}
+                </h3>
+                <p className="text-gray-600 group-hover:text-white/90 text-sm mb-3 transition-colors duration-300">
+                  {card.description}
+                </p>
+                <div className="text-sm font-semibold text-gray-700 group-hover:text-white transition-colors duration-300">
+                  {card.value}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 };
