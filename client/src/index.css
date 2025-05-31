@@ -19,13 +19,15 @@ h2,
 h3,
 h4,
 h5,
-.card-header {
+.card-header,
+.table-header {
   font-family: "Space Grotesk", sans-serif;
 }
 
 p,
 span,
-Link {
+Link,
+.table-body {
   font-family: "Ancizar Sans", sans-serif;
 }
 

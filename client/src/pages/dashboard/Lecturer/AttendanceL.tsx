@@ -301,7 +301,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
 
       {/* Session Selection */}
       <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-100 shadow-sm ">
-        <CardHeader className="pb-4">
+        <CardHeader className="card-header pb-4">
           <CardTitle className="flex items-center gap-2 text-blue-700">
             <Calendar className="h-5 w-5" />
             Select Lecture Session
@@ -400,7 +400,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
         {/* Regular Table for Medium and Up Screens */}
         <div className="hidden md:block">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="table-header bg-gray-50">
               <tr>
                 <th
                   scope="col"
@@ -434,7 +434,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="table-body not-last:bg-white divide-y divide-gray-200">
               {filteredReport.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-8 text-center">
@@ -651,7 +651,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
           {/* Level Breakdown */}
           {levels.length > 0 && (
             <Card className="bg-white shadow-sm mb-6">
-              <CardHeader className="pb-2">
+              <CardHeader className="card-header pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
                   <FileText className="h-5 w-5 text-gray-500" />
                   Attendance by Level

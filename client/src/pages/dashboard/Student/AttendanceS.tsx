@@ -153,7 +153,7 @@ const AttendanceS = () => {
         {/* Fetch Controls & Table */}
         <div className="md:col-span-2">
           <Card className="bg-white shadow-sm">
-            <CardHeader className="pb-2">
+            <CardHeader className="card-header pb-2">
               <div className="flex flex-wrap justifybe items-center gap-2 w-full">
                 <div className="flex flex-wrap items-center gap-2">
                   <Input
@@ -281,8 +281,8 @@ const AttendanceS = () => {
                       transition={{ duration: 0.3 }}
                     >
                       <Card className="bg-white overflow-x-auto overflow-y-auto sm:mx-0 border rounded-md">
-                        <Table className="min-w-full ">
-                          <TableHeader>
+                        <Table className=" min-w-full ">
+                          <TableHeader className="table-header">
                             <TableRow>
                               <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Course
@@ -301,7 +301,7 @@ const AttendanceS = () => {
                               </TableHead>
                             </TableRow>
                           </TableHeader>
-                          <TableBody>
+                          <TableBody className="table-body">
                             {displayedRecords.map((record, index) => (
                               <TableRow
                                 key={index}
@@ -388,7 +388,7 @@ const AttendanceS = () => {
           >
             {/* Summary Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100">
+              <Card className="card-header bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-blue-700">
                     <BookOpenCheck className="h-5 w-5" />
@@ -462,7 +462,7 @@ const AttendanceS = () => {
 
               {records && records.length > 0 && (
                 <Card className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100">
-                  <CardHeader className="pb-2">
+                  <CardHeader className="card-header pb-2">
                     <CardTitle className="flex items-center gap-2 text-amber-700">
                       <Clock className="h-5 w-5" />
                       Recent Activity
@@ -516,7 +516,7 @@ const AttendanceS = () => {
                 }}
               >
                 <Card className="bg-white shadow-sm hover:shadow-lg transition-shadow duration-300">
-                  <CardHeader className="pb-2">
+                  <CardHeader className="card-header pb-2">
                     <CardTitle className="text-sm text-gray-500 flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-green-500" />
                       Classes Attended
@@ -549,7 +549,7 @@ const AttendanceS = () => {
                 }}
               >
                 <Card className="bg-white shadow-sm hover:shadow-lg transition-shadow duration-300">
-                  <CardHeader className="pb-2">
+                  <CardHeader className="card-header pb-2">
                     <CardTitle className="text-sm text-gray-500 flex items-center gap-2">
                       <BarChart3 className="h-4 w-4 text-blue-500" />
                       Attendance Rate
@@ -592,7 +592,7 @@ const AttendanceS = () => {
                 }}
               >
                 <Card className="bg-white shadow-sm hover:shadow-lg transition-shadow duration-300">
-                  <CardHeader className="pb-2">
+                  <CardHeader className="card-header pb-2">
                     <CardTitle className="text-sm text-gray-500 flex items-center gap-2">
                       <Award className="h-4 w-4 text-purple-500" />
                       Courses
@@ -623,7 +623,7 @@ const AttendanceS = () => {
                 }}
               >
                 <Card className="bg-white shadow-sm hover:shadow-lg transition-shadow duration-300 h-full">
-                  <CardHeader className="pb-2">
+                  <CardHeader className="card-header pb-2">
                     <CardTitle className="text-sm text-gray-500 flex items-center gap-2">
                       <Clock className="h-4 w-4 text-amber-500" />
                       Last Attended
