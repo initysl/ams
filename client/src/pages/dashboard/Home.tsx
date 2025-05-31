@@ -22,16 +22,16 @@ import {
   CheckCircle,
   Settings2,
 } from "lucide-react";
-import rawCardData from "@/components/json/card.json";
-import Status from "@/components/lctui/Status";
-import Chart from "@/components/general/Chart";
+import rawCardData from "@/components/app-ui/json/card.json";
+import Status from "@/components/app-ui/lct/Status";
+import Chart from "@/components/app-ui/general/Chart";
 import img1 from "@/assets/images/card/qrb.png";
 import img2 from "@/assets/images/card/qrw.png";
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import Achievement from "@/components/general/Achievement";
-import Activity from "@/components/general/Activity";
+import Activity from "@/components/app-ui/general/Activity";
+import Achievement from "@/components/app-ui/general/Achievement";
 
 type CardItem = {
   id: number;
@@ -301,10 +301,9 @@ const Home: React.FC = () => {
         </div>
         <div className="bg-white rounded-3xl shadow-xl p-6 space-y-5">
           <Status />
-          <Activity />
+          {user?.role === "lecturer" ? <Activity /> : <Achievement />}
         </div>
       </motion.div>
-      <Achievement />
     </div>
   );
 };

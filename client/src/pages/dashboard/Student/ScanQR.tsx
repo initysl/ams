@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import MarkPopover from "./MarkPopover";
-import cardData from "@/components/json/scancard .json";
+import cardData from "@/components/app-ui/json/scancard.json";
 import {
   Card,
   CardContent,

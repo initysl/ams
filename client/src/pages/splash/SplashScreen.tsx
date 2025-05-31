@@ -71,7 +71,7 @@ const SplashScreen = () => {
     <div className="flex flex-col h-svh bg-white">
       {/* Header */}
       <header className="p-4 sm:p-6 flex items-center justify-center">
-        <h1 className="text-3xl sm:text-4xl tracking-wide font-semibold text-green-600">
+        <h1 className="text-3xl sm:text-4xl tracking-wide font-bold text-green-600">
           AttendEase
         </h1>
       </header>

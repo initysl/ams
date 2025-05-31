@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Ancizar+Sans:ital,wght@0,100..1000;1,100..1000&family=Space+Grotesk:wght@300..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Ancizar+Sans:ital,wght@0,100..1000;1,100..1000&family=Lexend:wght@100..900&family=Space+Grotesk:wght@300..700&display=swap");
 @import "tailwindcss";
 /* globals.css or your main CSS file */
 .perspective {
@@ -21,18 +21,16 @@ h4,
 h5,
 .card-header {
   font-family: "Space Grotesk", sans-serif;
-  font-style: normal;
 }
 
 p,
 span,
-Link,
-Button {
+Link {
   font-family: "Ancizar Sans", sans-serif;
-  font-style: normal;
 }
 
 Button,
 button {
+  font-family: "Lexend", sans-serif;
   cursor: pointer;
 }

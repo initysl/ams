@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { Button } from "../ui/button";
-import { Card, CardContent, CardTitle } from "../ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
 import { FileText } from "lucide-react";
 import { useAttendance } from "@/context/AttendanceContex";
