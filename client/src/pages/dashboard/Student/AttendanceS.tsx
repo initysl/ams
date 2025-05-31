@@ -133,20 +133,18 @@ const AttendanceS = () => {
 
   return (
     <div className="container mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        {/* <h2 className="font-semibold text-xl md:text-2xl">Attendance Record</h2> */}
+      {/* <h2 className="font-semibold text-xl md:text-2xl">Attendance Record</h2> */}
 
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-            <Input
-              type="text"
-              placeholder="Search courses..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 w-full rounded-md"
-            />
-          </div>
+      <div className="flex gap-2 w-full ">
+        <div className="relative w-full ">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+          <Input
+            type="text"
+            placeholder="Search courses..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9 w-full rounded-md"
+          />
         </div>
       </div>
 
