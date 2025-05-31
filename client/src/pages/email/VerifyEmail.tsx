@@ -2,7 +2,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import api from "@/lib/axios";
-import AuthForm from "../auth/AuthForm";
+import { Loader } from "lucide-react";
 
 const VerifyEmail: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -38,6 +38,7 @@ const VerifyEmail: React.FC = () => {
     if (token) {
       verify();
     } else {
+      // Change the messages
       toast.error("No token provided in the URL.");
       setErrorMessage("Missing verification token.");
       setIsVerifying(false);
@@ -49,26 +50,7 @@ const VerifyEmail: React.FC = () => {
       {/* Spinner */}
       {isVerifying && (
         <>
-          <svg
-            className="animate-spin h-20 w-20 text-blue-500 mb-4"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-            ></path>
-          </svg>
+          <Loader className="h-16 w-16 animate-spin" />
           <p className="text-lg font-medium">Verifying your email...</p>
         </>
       )}
