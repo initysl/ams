@@ -232,24 +232,27 @@ const Home: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* Enhanced Stats Cards */}
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Enhanced Stats Cards - FIXED */}
+      <motion.div
+        className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.6 }}
+      >
         {cardData.cards.map((card, index) => (
           <motion.div
             key={card.id}
-            initial={{ opacity: 0, y: 30, scale: 0.95 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{
-              duration: 0.3,
-              ease: [0.25, 0.46, 0.45, 0.94],
-              delay: index * 0.1,
+              duration: 0.4,
+              delay: 0.7 + index * 0.1,
             }}
             whileHover={{
-              scale: 1,
+              scale: 1.02,
               y: -5,
-              transition: { duration: 0.1 },
+              transition: { duration: 0.2 },
             }}
-            viewport={{ once: true, amount: 0.3 }}
           >
             <Card
               className={`${
@@ -281,20 +284,14 @@ const Home: React.FC = () => {
             </Card>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/*  Charts and Status */}
       <motion.div
         className="grid gap-6 grid-cols-1 lg:grid-cols-2"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{
-          type: "spring",
-          stiffness: 120,
-          damping: 20,
-          duration: 0.5,
-        }}
-        viewport={{ once: true, amount: 0.3 }}
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.0, duration: 0.6 }}
       >
         <div className="bg-white rounded-3xl shadow-xl p-6 h-full">
           <Chart />

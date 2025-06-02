@@ -25,10 +25,13 @@ h5,
 }
 
 p,
-span,
-Link,
 .table-body {
   font-family: "Ancizar Sans", sans-serif;
+}
+
+span,
+.sidebar-group-content {
+  font-family: "Lexend", sans-serif;
 }
 
 Button,

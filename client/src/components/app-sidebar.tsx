@@ -47,10 +47,10 @@ export function AppSidebar() {
             AttendEase
           </SidebarGroupLabel>
           <Separator className="bg-stone-600 mb-5" />
-          <SidebarGroupContent>
+          <SidebarGroupContent className="sidebar-group-content">
             <SidebarMenu className="space-y-5">
               {/* Home */}
-              <SidebarMenuItem>
+              <SidebarMenuItem className="sidebar-menu-item">
                 <NavLink
                   to="/dashboard/home"
                   className={({ isActive }) =>
@@ -142,7 +142,7 @@ export function AppSidebar() {
               <SidebarFooter className="bg-stone-700 text-white rounded-xl mt-24">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <div className="flex items-center justify-between p-2 cursor-pointer w-full text-sm font-medium">
+                    <div className="navlink flex items-center justify-between p-2 cursor-pointer w-full text-sm font-medium">
                       {user.email}
                       <ChevronUp size={18} />
                     </div>
