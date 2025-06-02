@@ -24,7 +24,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { Separator } from "./ui/separator";
 import { useAuth } from "@/context/AuthContext";
 
@@ -151,15 +151,17 @@ export function AppSidebar() {
                     side="top"
                     className="w-[--radix-popper-anchor-width] bg-white border-none"
                   >
-                    <DropdownMenuItem className="hover:bg-green-600 hover:text-white transition-colors duration-200">
-                      <span>Profile</span>
+                    <DropdownMenuItem className="hover:bg-green-600 hover:text-white transition-colors duration-200 cursor-pointer">
+                      <Link to={"/dashboard/settings"}>
+                        <span>Profile</span>
+                      </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:bg-green-600 hover:text-white transition-colors duration-200">
+                    {/* <DropdownMenuItem className="hover:bg-green-600 hover:text-white transition-colors duration-200">
                       <span>Billing</span>
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                     <DropdownMenuItem
                       onClick={logout}
-                      className="hover:bg-green-600 hover:text-white transition-colors duration-200"
+                      className="hover:bg-green-600 hover:text-white transition-colors duration-200 cursor-pointer"
                     >
                       <span>Sign out</span>
                     </DropdownMenuItem>
