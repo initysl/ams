@@ -392,13 +392,13 @@ const GenerateQR = () => {
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   <Button
                     onClick={handleDownload}
-                    className="bg-blue-600 hover:bg-blue-700 text-white h-10 rounded-md font-medium transition-colors"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white h-10 rounded-md font-medium transition-colors"
                   >
-                    Download QR Code <Save size={16} />
+                    Download QR <Save size={16} />
                   </Button>
                   <Button
                     onClick={handlePrint}
-                    className="bg-green-600 hover:bg-green-700 text-white h-10 rounded-md font-medium transition-colors"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white h-10 rounded-md font-medium transition-colors"
                   >
                     Print QR <Printer size={16} />
                   </Button>

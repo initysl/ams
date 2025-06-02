@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import {
   CheckSquare,
   Loader,
-  Clipboard,
+  // Clipboard,
   Upload,
   Scan,
   QrCode,
@@ -235,17 +235,28 @@ const QRScanner: React.FC = () => {
       handleQRCodeScanned(decodedText);
     } catch (err) {
       console.error("Image QR scan failed:", err);
-      toast.error("Failed to scan QR code from image.");
+      // More specific error messages
+      if (err instanceof Error) {
+        if (err.message.includes("QR code not found")) {
+          toast.error("No QR code found in the image.");
+        } else if (err.message.includes("decoder failed")) {
+          toast.error(
+            "QR code found but couldn't be read. Try a clearer image."
+          );
+        } else {
+          toast.error("Failed to scan QR code from image.");
+        }
+      }
     } finally {
       setIsLoading(false);
       fileInputRef.current!.value = "";
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success("Token copied!");
-  };
+  // const copyToClipboard = (text: string) => {
+  //   navigator.clipboard.writeText(text);
+  //   toast.success("Token copied!");
+  // };
 
   useEffect(() => {
     return () => {
@@ -258,7 +269,7 @@ const QRScanner: React.FC = () => {
 
   return (
     <div className="min-h-svh relative overflow-hidden">
-      <div className="container mx-auto px-4 py-8 relative z-10">
+      <div className="container mx-auto py-8 relative z-10">
         {/* Main Scanner Section */}
         <motion.div
           className="max-w-4xl mx-auto mb-12"
@@ -279,7 +290,7 @@ const QRScanner: React.FC = () => {
                 <div
                   className={`absolute inset-0 rounded-3xl transition-all duration-1000 ${
                     scannerActive
-                      ? "bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 blur-xl opacity-30 animate-pulse"
+                      ? "bg-teal-500 animate-pulse"
                       : "bg-gradient-to-r from-gray-300 to-gray-400 blur-lg opacity-20"
                   }`}
                 ></div>
@@ -296,7 +307,7 @@ const QRScanner: React.FC = () => {
                   <div
                     id="reader"
                     ref={scannerRef}
-                    className="w-full h-full rounded-3xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100"
+                    className="w-full h-full flex justify-center rounded-3xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100"
                   >
                     {/* Scanner overlay */}
                     <div className="relative w-full h-full flex items-center justify-center">
@@ -439,7 +450,7 @@ const QRScanner: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Card className="max-w-2xl mx-auto mb-8">
+            <Card className="max-w-2xl mx-auto mb-8 bg-white">
               <CardContent className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4 shadow-lg">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
@@ -448,14 +459,6 @@ const QRScanner: React.FC = () => {
                       QR Code Scanned Successfully
                     </span>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => copyToClipboard(scanResult)}
-                    className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100"
-                  >
-                    <Clipboard className="w-4 h-4" />
-                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -511,7 +514,6 @@ const QRScanner: React.FC = () => {
                   >
                     {card.icon}
                   </div>
-                  <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full group-hover:scale-150 transition-transform duration-300"></div>
                 </div>
 
                 <h3 className="text-lg font-bold text-gray-800 group-hover:text-white mb-2 transition-colors duration-300">
