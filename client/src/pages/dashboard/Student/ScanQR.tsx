@@ -9,7 +9,6 @@ import {
   QrCode,
   Camera,
   CheckCircle,
-  AlertCircle,
   Zap,
   Clock,
   BookOpen,
@@ -17,6 +16,7 @@ import {
   Target,
   Sparkles,
   X,
+  ListCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -24,7 +24,6 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 
 // Mock data for demonstration
@@ -41,7 +40,7 @@ const cardData = {
     {
       id: 2,
       title: "Smart Recognition",
-      description: "AI-powered QR detection",
+      description: "Fast QR detection",
       value: "99.9% Accuracy",
       icon: <Target className="w-5 h-5" />,
       gradient: "from-purple-500 to-pink-400",
@@ -56,26 +55,10 @@ const cardData = {
     },
     {
       id: 4,
-      title: "Course Integration",
-      description: "Seamless course management",
-      value: "Auto-detect",
-      icon: <BookOpen className="w-5 h-5" />,
-      gradient: "from-orange-500 to-red-400",
-    },
-    {
-      id: 5,
-      title: "Multi-format Support",
-      description: "Various QR code types",
-      value: "Universal",
-      icon: <Sparkles className="w-5 h-5" />,
-      gradient: "from-indigo-500 to-blue-400",
-    },
-    {
-      id: 6,
-      title: "Batch Processing",
-      description: "Multiple scans support",
-      value: "Bulk Mode",
-      icon: <Users className="w-5 h-5" />,
+      title: "View Attendance Record",
+      description: "View your attendance record with just a click",
+      value: "Smooth and swift",
+      icon: <ListCheck className="w-5 h-5" />,
       gradient: "from-rose-500 to-pink-400",
     },
   ],
@@ -161,13 +144,13 @@ const QRScanner: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen  relative overflow-hidden">
+    <div className="min-h-svh relative overflow-hidden">
       {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80  animate-pulse"></div>
         <div className="absolute -bottom-40 -left-40  rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-      </div>
+      </div> */}
 
       <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Main Scanner Section */}
@@ -205,7 +188,7 @@ const QRScanner: React.FC = () => {
                         <>
                           {/* Scanning animation */}
                           <div className="absolute inset-8 border-2 border-blue-500 rounded-2xl">
-                            <div className="absolute inset-0 border-2 border-transparent rounded-2xl animate-ping border-blue-400"></div>
+                            <div className="absolute inset-0 border-2 border-transparent rounded-2xl animate-ping "></div>
                             {/* Corner indicators */}
                             <div className="absolute top-0 left-0 w-6 h-6 border-l-4 border-t-4 border-blue-500 rounded-tl-lg"></div>
                             <div className="absolute top-0 right-0 w-6 h-6 border-r-4 border-t-4 border-blue-500 rounded-tr-lg"></div>
@@ -250,13 +233,13 @@ const QRScanner: React.FC = () => {
 
             {/* Controls Panel */}
             <div className="space-y-6">
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+              <Card className="bg-white/70 backdrop-blur-sm p-5 border border-white/50">
+                <CardHeader className="text-xl font-semibold text-gray-800 mb-4 flex items-center justify-center">
                   <Camera className="w-5 h-5 mr-2 text-blue-500" />
                   Scanner Controls
-                </h3>
+                </CardHeader>
 
-                <div className="grid grid-cols-2 gap-3 mb-4">
+                <CardContent className="grid grid-cols-2 gap-3">
                   <Button
                     variant={isScanning ? "destructive" : "default"}
                     onClick={isScanning ? stopScanner : startScanner}
@@ -264,13 +247,13 @@ const QRScanner: React.FC = () => {
                     className={`h-12 font-medium transition-all duration-300 ${
                       isScanning
                         ? "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 shadow-lg shadow-red-500/25"
-                        : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg shadow-blue-500/25"
+                        : "bg-teal-500 hover:bg-white hover:border-2 hover:border-gray-200"
                     }`}
                   >
                     {isScanning ? (
                       <>
                         <X className="w-4 h-4 mr-2" />
-                        Stop Scan
+                        Stop
                       </>
                     ) : (
                       <>
@@ -278,7 +261,7 @@ const QRScanner: React.FC = () => {
                         {isLoading ? (
                           <Loader className="w-4 h-4 animate-spin ml-1" />
                         ) : (
-                          "Start Scan"
+                          "Scan"
                         )}
                       </>
                     )}
@@ -300,23 +283,23 @@ const QRScanner: React.FC = () => {
                     <Upload className="w-4 h-4 mr-2" />
                     Upload
                   </Button>
-                </div>
+                </CardContent>
 
                 <Link to="/dashboard/attendance" className="block">
-                  <Button className="w-full h-12 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-lg shadow-emerald-500/25 transition-all duration-300">
+                  <Button className="w-full h-12 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 hover:text-white shadow-lg shadow-emerald-500/25 transition-all duration-300">
                     <CheckSquare className="w-4 h-4 mr-2" />
                     View Attendance Records
                   </Button>
                 </Link>
-              </div>
+              </Card>
             </div>
           </div>
         </div>
 
         {/* Scan Result */}
         {scanResult && !showConfirmation && (
-          <div className="max-w-2xl mx-auto mb-8">
-            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4 shadow-lg">
+          <Card className="max-w-2xl mx-auto mb-8">
+            <CardContent className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4 shadow-lg">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" />
@@ -333,16 +316,16 @@ const QRScanner: React.FC = () => {
                   <Clipboard className="w-4 h-4" />
                 </Button>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Confirmation Modal */}
         {showConfirmation && courseData && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+          <Card className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <CardContent className="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
               <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
-                <div className="flex items-center justify-between">
+                <CardHeader className="flex items-center justify-between">
                   <h3 className="text-xl font-bold">Confirm Attendance</h3>
                   <Button
                     variant="ghost"
@@ -352,10 +335,10 @@ const QRScanner: React.FC = () => {
                   >
                     <X className="w-4 h-4" />
                   </Button>
-                </div>
+                </CardHeader>
               </div>
 
-              <div className="p-6">
+              <CardDescription className="p-6">
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Course Code:</span>
@@ -401,13 +384,13 @@ const QRScanner: React.FC = () => {
                     Confirm
                   </Button>
                 </div>
-              </div>
-            </div>
-          </div>
+              </CardDescription>
+            </CardContent>
+          </Card>
         )}
 
         {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-6xl mx-auto ">
           {cardData.scan.map((card, index) => (
             <div
               key={card.id}
@@ -447,19 +430,6 @@ const QRScanner: React.FC = () => {
           ))}
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 };
