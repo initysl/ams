@@ -131,12 +131,58 @@ const AttendanceS = () => {
         )
     : null;
 
-  return (
-    <div className="container mx-auto space-y-6">
-      {/* <h2 className="font-semibold text-xl md:text-2xl">Attendance Record</h2> */}
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
 
-      <div className="flex gap-2 w-full ">
-        <div className="relative w-full ">
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.5,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      },
+    },
+    hover: {
+      scale: 1.02,
+      y: -5,
+      transition: { duration: 0.2 },
+    },
+  };
+
+  return (
+    <motion.div
+      className="container mx-auto space-y-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* Search Bar */}
+      <motion.div variants={itemVariants} className="flex gap-2 w-full">
+        <div className="relative w-full">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
           <Input
             type="text"
@@ -146,12 +192,15 @@ const AttendanceS = () => {
             className="pl-9 w-full rounded-md"
           />
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Content */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Fetch Controls & Table */}
-        <div className="md:col-span-2">
+        <motion.div
+          variants={itemVariants}
+          className="md:col-span-2 backdrop-blur-sm shadow-xl"
+        >
           <Card className="bg-white shadow-sm">
             <CardHeader className="card-header pb-2">
               <div className="flex flex-wrap justifybe items-center gap-2 w-full">
@@ -184,7 +233,7 @@ const AttendanceS = () => {
                     </Button>
                   )}
 
-                  {/* View selection buttons moved next to trash button */}
+                  {/* View selection buttons */}
                   {records && records.length > 0 && (
                     <div className="flex items-center gap-2 text-sm mx-auto mt-2 sm:mt-0">
                       <Button
@@ -220,38 +269,59 @@ const AttendanceS = () => {
             </CardHeader>
             <CardContent className="p-4">
               {loading && (
-                <div className="text-center py-12">
+                <motion.div
+                  className="text-center py-12"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
                   <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-500" />
                   <p className="mt-2 text-gray-500">
                     Retreving attendance records...
                   </p>
-                </div>
+                </motion.div>
               )}
 
               {!loading && !records && (
-                <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                <motion.div
+                  className="flex flex-col items-center justify-center py-12 text-gray-400"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
                   <Calendar className="h-16 w-16 mb-4 opacity-20" />
+
                   <div className="text-center space-y-2">
-                    <p className="font-medium ">No attendance records loaded</p>
-                    <p className="text-sm text-gray-400 ">
+                    <p className="font-medium">No attendance records loaded</p>
+                    <p className="text-sm text-gray-400">
                       Click "Get Records" to fetch your attendance history
                     </p>
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {!loading && filteredRecords?.length === 0 && (
-                <div className="flex flex-col items-center py-12 text-gray-500">
+                <motion.div
+                  className="flex flex-col items-center py-12 text-gray-500"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
                   <FileQuestion className="h-12 w-12 mb-3 text-gray-300" />
-                  <p className="font-medium ">No matching records found</p>
+                  <p className="font-medium">No matching records found</p>
                   <p className="text-sm text-gray-400 mt-1">
                     Try adjusting your search or view settings
                   </p>
-                </div>
+                </motion.div>
               )}
 
               {searchTerm && filteredRecords && filteredRecords.length > 0 && (
-                <div className="mb-3 flex items-center gap-2 text-sm text-blue-600">
+                <motion.div
+                  className="mb-3 flex items-center gap-2 text-sm text-blue-600"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
                   <ListFilter className="h-4 w-4" />
                   <span>
                     Found {filteredRecords.length} matching records for "
@@ -267,7 +337,7 @@ const AttendanceS = () => {
                       Clear
                     </Button>
                   )}
-                </div>
+                </motion.div>
               )}
 
               <AnimatePresence>
@@ -275,13 +345,13 @@ const AttendanceS = () => {
                   displayedRecords &&
                   displayedRecords.length > 0 && (
                     <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.4 }}
                     >
                       <Card className="bg-white overflow-x-auto overflow-y-auto sm:mx-0 border rounded-md">
-                        <Table className=" min-w-full ">
+                        <Table className="min-w-full">
                           <TableHeader className="table-header">
                             <TableRow>
                               <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -303,12 +373,20 @@ const AttendanceS = () => {
                           </TableHeader>
                           <TableBody className="table-body">
                             {displayedRecords.map((record, index) => (
-                              <TableRow
+                              <motion.tr
                                 key={index}
                                 className="hover:bg-gray-50"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{
+                                  duration: 0.3,
+                                  delay: index * 0.05,
+                                  ease: "easeOut",
+                                }}
+                                whileHover={{ backgroundColor: "#f9fafb" }}
                               >
                                 <TableCell
-                                  className="max-w-[200px] truncate font-medium "
+                                  className="max-w-[200px] truncate font-medium"
                                   title={record.courseTitle}
                                 >
                                   {record.courseTitle}
@@ -318,15 +396,18 @@ const AttendanceS = () => {
                                 </TableCell>
                                 <TableCell>{record.level}</TableCell>
                                 <TableCell>
-                                  <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium  ${
+                                  <motion.span
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
                                       record.status === "present"
                                         ? "bg-green-100 text-green-700"
                                         : "bg-red-100 text-red-600"
                                     }`}
+                                    initial={{ scale: 0.8 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ delay: index * 0.05 + 0.2 }}
                                   >
                                     {record.status}
-                                  </span>
+                                  </motion.span>
                                 </TableCell>
                                 <TableCell className="whitespace-nowrap">
                                   {record.date
@@ -340,7 +421,7 @@ const AttendanceS = () => {
                                       )
                                     : "—"}
                                 </TableCell>
-                              </TableRow>
+                              </motion.tr>
                             ))}
                           </TableBody>
                         </Table>
@@ -349,7 +430,12 @@ const AttendanceS = () => {
                       {selectedView === "recent" &&
                         filteredRecords &&
                         filteredRecords.length > 5 && (
-                          <div className="mt-4 text-center">
+                          <motion.div
+                            className="mt-4 text-center"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5 }}
+                          >
                             <Button
                               variant="ghost"
                               size="sm"
@@ -358,28 +444,32 @@ const AttendanceS = () => {
                             >
                               View All ({filteredRecords.length}) Records
                             </Button>
-                          </div>
+                          </motion.div>
                         )}
 
                       {selectedView === "all" &&
                         displayedRecords.length > 10 && (
-                          <div className="mt-4 text-center text-sm text-gray-500">
+                          <motion.div
+                            className="mt-4 text-center text-sm text-gray-500"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5 }}
+                          >
                             Showing all {displayedRecords.length} records
-                          </div>
+                          </motion.div>
                         )}
                     </motion.div>
                   )}
               </AnimatePresence>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
 
         {/* Summary & Stats Section */}
-        <div className="md:col-span-2">
+        <motion.div variants={itemVariants} className="md:col-span-2">
           <motion.div
             className="space-y-6"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{
               duration: 0.6,
@@ -388,271 +478,246 @@ const AttendanceS = () => {
           >
             {/* Summary Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="card-header bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100">
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-blue-700">
-                    <BookOpenCheck className="h-5 w-5" />
-                    Attendance Summary
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {totalCount > 0 ? (
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-gray-600">
-                          You've attended <strong>{presentCount}</strong> out of{" "}
-                          <strong>{totalCount}</strong> classes.
-                        </p>
-
-                        <div className="mt-3 w-full bg-white rounded-full h-3">
-                          <div
-                            className="bg-blue-500 h-3 rounded-full"
-                            style={{ width: `${attendancePercentage}%` }}
-                          ></div>
-                        </div>
-                        <p className="text-right text-sm mt-1 text-blue-600 font-medium ">
-                          {attendancePercentage}% Attendance
-                        </p>
-                      </div>
-
-                      <div className="pt-2 border-t border-blue-100">
-                        <p className="text-sm text-gray-600 font-medium ">
-                          Course Breakdown:
-                        </p>
-                        <ul className="mt-2 space-y-1">
-                          {Object.entries(courseAttendance)
-                            .sort((a, b) => b[1] - a[1])
-                            .slice(0, 3)
-                            .map(([course, count], index) => (
-                              <li
-                                key={index}
-                                className="flex justify-between items-center text-sm"
-                              >
-                                <span className="truncate" title={course}>
-                                  {course}
-                                </span>
-                                <span className="font-medium  text-blue-700">
-                                  {count} class(es)
-                                </span>
-                              </li>
-                            ))}
-                        </ul>
-                        {Object.keys(courseAttendance).length > 3 && (
-                          <p className="text-xs text-gray-500 mt-2">
-                            + {Object.keys(courseAttendance).length - 3} more
-                            courses
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                      <div className="text-center space-y-2">
-                        <p>No attendance records available.</p>
-                        <p className="text-sm ">
-                          {/* Click "Get Records" to fetch your data. */}
-                          Senior man, load your record naa, abi you never attend
-                          any class nii 👀.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {records && records.length > 0 && (
-                <Card className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100">
-                  <CardHeader className="card-header pb-2">
-                    <CardTitle className="flex items-center gap-2 text-amber-700">
-                      <Clock className="h-5 w-5" />
-                      Recent Activity
+              <motion.div variants={cardVariants} whileHover="hover">
+                <Card className="backdrop-blur-sm shadow-xl card-header bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 h-full">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center gap-2 text-blue-700">
+                      <BookOpenCheck className="h-5 w-5" />
+                      Attendance Summary
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {mostRecentClass && (
-                      <div className="space-y-3">
-                        <div className="p-3 bg-white rounded-lg border border-amber-100">
-                          <p className="font-medium  text-amber-800">
-                            {mostRecentClass.courseTitle}
+                    {totalCount > 0 ? (
+                      <div className="space-y-4">
+                        <div>
+                          <p className="text-gray-600">
+                            You've attended <strong>{presentCount}</strong> out
+                            of <strong>{totalCount}</strong> classes.
                           </p>
-                          <div className="flex justify-between mt-1">
-                            <p className="text-sm text-gray-500">
-                              {mostRecentClass.courseCode}
-                            </p>
-                            <p className="text-sm text-amber-600">
-                              {new Date(
-                                mostRecentClass.date
-                              ).toLocaleDateString()}
-                            </p>
+
+                          <div className="mt-3 w-full  bg-white rounded-full h-3">
+                            <motion.div
+                              className="bg-blue-500 h-3 rounded-full"
+                              initial={{ width: 0 }}
+                              whileInView={{
+                                width: `${attendancePercentage}%`,
+                              }}
+                              viewport={{ once: true }}
+                              transition={{ duration: 1, delay: 0.3 }}
+                            />
                           </div>
+                          <p className="text-right text-sm mt-1 text-blue-600 font-medium">
+                            {attendancePercentage}% Attendance
+                          </p>
                         </div>
 
-                        <p className="text-sm text-gray-600">
-                          Last attended course was{" "}
-                          <strong>{mostRecentClass.courseTitle}</strong>
-                        </p>
+                        <div className="pt-2 border-t border-blue-100 ">
+                          <p className="text-sm text-gray-600 font-medium">
+                            Course Breakdown:
+                          </p>
+                          <ul className="mt-2 space-y-1">
+                            {Object.entries(courseAttendance)
+                              .sort((a, b) => b[1] - a[1])
+                              .slice(0, 3)
+                              .map(([course, count], index) => (
+                                <motion.li
+                                  key={index}
+                                  className="flex justify-between items-center text-sm"
+                                  initial={{ opacity: 0, x: -10 }}
+                                  whileInView={{ opacity: 1, x: 0 }}
+                                  viewport={{ once: true }}
+                                  transition={{ delay: index * 0.1 + 0.5 }}
+                                >
+                                  <span className="truncate" title={course}>
+                                    {course}
+                                  </span>
+                                  <span className="font-medium text-blue-700">
+                                    {count} class(es)
+                                  </span>
+                                </motion.li>
+                              ))}
+                          </ul>
+                          {Object.keys(courseAttendance).length > 3 && (
+                            <motion.p
+                              className="text-xs text-gray-500 mt-2"
+                              initial={{ opacity: 0 }}
+                              whileInView={{ opacity: 1 }}
+                              viewport={{ once: true }}
+                              transition={{ delay: 0.8 }}
+                            >
+                              + {Object.keys(courseAttendance).length - 3} more
+                              courses
+                            </motion.p>
+                          )}
+                        </div>
                       </div>
+                    ) : (
+                      <motion.div
+                        className="flex flex-col items-center justify-center py-8 text-gray-500 "
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <div className="text-center space-y-2 backdrop-blur-sm shadow-xl">
+                          <p>No attendance records available.</p>
+                          <p className="text-sm">
+                            Senior man, load your record naa, abi you never
+                            attend any class nii 👀.
+                          </p>
+                        </div>
+                      </motion.div>
                     )}
                   </CardContent>
                 </Card>
+              </motion.div>
+
+              {records && records.length > 0 && (
+                <motion.div variants={cardVariants} whileHover="hover">
+                  <Card className="backdrop-blur-sm shadow-xl bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100 h-full">
+                    <CardHeader className="card-header pb-2">
+                      <CardTitle className="flex items-center gap-2 text-amber-700">
+                        <Clock className="h-5 w-5" />
+                        Recent Activity
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {mostRecentClass && (
+                        <div className="space-y-3">
+                          <motion.div
+                            className="p-3 bg-white rounded-lg border border-amber-100"
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.3 }}
+                          >
+                            <p className="font-medium text-amber-800">
+                              {mostRecentClass.courseTitle}
+                            </p>
+                            <div className="flex justify-between mt-1">
+                              <p className="text-sm text-gray-500">
+                                {mostRecentClass.courseCode}
+                              </p>
+                              <p className="text-sm text-amber-600">
+                                {new Date(
+                                  mostRecentClass.date
+                                ).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </motion.div>
+
+                          <p className="text-sm text-gray-600">
+                            Last attended course was{" "}
+                            <strong>{mostRecentClass.courseTitle}</strong>
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
               )}
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <motion.div
-                initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.5,
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ">
+              {[
+                {
+                  title: "Classes Attended",
+                  value: presentCount,
+                  subtitle: `out of ${totalCount} total`,
+                  icon: CheckCircle2,
+                  color: "green",
                   delay: 0.1,
-                  ease: [0.25, 0.46, 0.45, 0.94],
-                }}
-                whileHover={{
-                  scale: 1.02,
-                  y: -5,
-                  transition: { duration: 0.2 },
-                }}
-              >
-                <Card className="bg-white shadow-sm hover:shadow-lg transition-shadow duration-300">
-                  <CardHeader className="card-header pb-2">
-                    <CardTitle className="text-sm text-gray-500 flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      Classes Attended
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-2xl font-bold text-green-600">
-                      {presentCount}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      out of {totalCount} total
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.5,
+                },
+                {
+                  title: "Attendance Rate",
+                  value: `${attendancePercentage}%`,
+                  subtitle: "",
+                  icon: BarChart3,
+                  color: "blue",
                   delay: 0.2,
-                  ease: [0.25, 0.46, 0.45, 0.94],
-                }}
-                whileHover={{
-                  scale: 1.02,
-                  y: -5,
-                  transition: { duration: 0.2 },
-                }}
-              >
-                <Card className="bg-white shadow-sm hover:shadow-lg transition-shadow duration-300">
-                  <CardHeader className="card-header pb-2">
-                    <CardTitle className="text-sm text-gray-500 flex items-center gap-2">
-                      <BarChart3 className="h-4 w-4 text-blue-500" />
-                      Attendance Rate
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-2xl font-bold text-blue-600">
-                      {attendancePercentage}%
-                    </p>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                      <motion.div
-                        className="bg-blue-600 h-2.5 rounded-full"
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${attendancePercentage}%` }}
-                        viewport={{ once: true }}
-                        transition={{
-                          duration: 1,
-                          delay: 0.5,
-                          ease: "easeOut",
-                        }}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.5,
+                  showProgress: true,
+                },
+                {
+                  title: "Courses",
+                  value: coursesAttended,
+                  subtitle: "unique courses",
+                  icon: Award,
+                  color: "purple",
                   delay: 0.3,
-                  ease: [0.25, 0.46, 0.45, 0.94],
-                }}
-                whileHover={{
-                  scale: 1.02,
-                  y: -5,
-                  transition: { duration: 0.2 },
-                }}
-              >
-                <Card className="bg-white shadow-sm hover:shadow-lg transition-shadow duration-300">
-                  <CardHeader className="card-header pb-2">
-                    <CardTitle className="text-sm text-gray-500 flex items-center gap-2">
-                      <Award className="h-4 w-4 text-purple-500" />
-                      Courses
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-2xl font-bold text-purple-600">
-                      {coursesAttended}
-                    </p>
-                    <p className="text-sm text-gray-500">unique courses</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.5,
+                },
+                {
+                  title: "Last Attended",
+                  value: mostRecentClass?.courseCode || "None",
+                  subtitle: mostRecentClass
+                    ? new Date(mostRecentClass.date).toLocaleDateString()
+                    : "No classes yet",
+                  icon: Clock,
+                  color: "amber",
                   delay: 0.4,
-                  ease: [0.25, 0.46, 0.45, 0.94],
-                }}
-                whileHover={{
-                  scale: 1.02,
-                  y: -5,
-                  transition: { duration: 0.2 },
-                }}
-              >
-                <Card className="bg-white shadow-sm hover:shadow-lg transition-shadow duration-300 h-full">
-                  <CardHeader className="card-header pb-2">
-                    <CardTitle className="text-sm text-gray-500 flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-amber-500" />
-                      Last Attended
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {mostRecentClass ? (
-                      <>
-                        <p
-                          className="text-lg font-medium  text-amber-600 truncate"
-                          title={mostRecentClass.courseTitle}
-                        >
-                          {mostRecentClass.courseCode}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {new Date(mostRecentClass.date).toLocaleDateString()}
-                        </p>
-                      </>
-                    ) : (
-                      <p className="text-sm text-gray-500">No classes yet</p>
-                    )}
-                  </CardContent>
-                </Card>
-              </motion.div>
+                },
+              ].map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.5,
+                    delay: stat.delay,
+                    ease: [0.25, 0.46, 0.45, 0.94],
+                  }}
+                  whileHover={{
+                    scale: 1.02,
+                    y: -5,
+                    transition: { duration: 0.2 },
+                  }}
+                >
+                  <Card className="bg-white backdrop-blur-sm shadow-xl hover:shadow-lg transition-shadow duration-300 h-full">
+                    <CardHeader className="card-header pb-2">
+                      <CardTitle
+                        className={`text-sm text-gray-500 flex items-center gap-2`}
+                      >
+                        <stat.icon
+                          className={`h-4 w-4 text-${stat.color}-500`}
+                        />
+                        {stat.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p
+                        className={`text-2xl font-bold text-${stat.color}-600 ${
+                          stat.title === "Last Attended" ? "text-lg" : ""
+                        }`}
+                      >
+                        {stat.value}
+                      </p>
+                      {stat.subtitle && (
+                        <p className="text-sm text-gray-500">{stat.subtitle}</p>
+                      )}
+                      {stat.showProgress && (
+                        <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                          <motion.div
+                            className={`bg-${stat.color}-600 h-2.5 rounded-full`}
+                            initial={{ width: 0 }}
+                            whileInView={{ width: `${attendancePercentage}%` }}
+                            viewport={{ once: true }}
+                            transition={{
+                              duration: 1,
+                              delay: 0.5,
+                              ease: "easeOut",
+                            }}
+                          />
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
