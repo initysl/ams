@@ -6,6 +6,7 @@ import {
   Award,
   BookOpen,
   LucideIcon,
+  Loader2,
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -190,7 +191,7 @@ const Achievement = () => {
 
         {recentAttendanceMutation.isPending ? (
           <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
           </div>
         ) : achievements.length > 0 ? (
           <div className="space-y-4">

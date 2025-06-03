@@ -5,28 +5,32 @@
       "title": "Smart Attendance Management System",
       "value": "Instant Digital Check-ins",
       "description": "Generate dynamic QR codes instantly for students to mark attendance effortlessly.",
-      "icon": "QrCode"
+      "icon": "QrCode",
+      "gradient": "from-blue-500 to-cyan-400"
     },
     {
       "id": 2,
       "title": "Insightful Attendance Report Analytics",
       "value": "Trends And Data Analytics",
       "description": "Access detailed attendance reports that help monitor student patterns effectively.",
-      "icon": "FileBarChart"
+      "icon": "FileBarChart",
+      "gradient": "from-emerald-500 to-teal-400"
     },
     {
       "id": 3,
       "title": "User-Friendly Interface Design Experience",
       "value": "Simple And Easy Navigation",
       "description": "Simplified dashboard interface designed for seamless attendance management daily operations.",
-      "icon": "Users"
+      "icon": "Users",
+      "gradient": "from-purple-500 to-pink-400"
     },
     {
       "id": 4,
       "title": "Help And Support Center",
       "value": "Customer Service And Feedback",
       "description": "Get comprehensive help support and send feedback for continuous improvement.",
-      "icon": "HelpCircle"
+      "icon": "HelpCircle",
+      "gradient": "from-rose-500 to-pink-400"
     }
   ]
 }

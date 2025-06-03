@@ -1,28 +1,14 @@
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import {
   QrCode,
-  ScanQrCode,
   FileBarChart,
   Users,
   HelpCircle,
-  Bell,
-  Calendar,
-  Trophy,
-  AlertCircle,
-  Star,
-  Target,
   Smile,
   CheckCircle,
   Settings2,
 } from "lucide-react";
-import rawCardData from "@/components/app-ui/json/card.json";
 import Status from "@/components/app-ui/lct/Status";
 import Chart from "@/components/app-ui/general/Chart";
 import img1 from "@/assets/images/card/qrb.png";
@@ -33,47 +19,45 @@ import { motion } from "framer-motion";
 import Activity from "@/components/app-ui/general/Activity";
 import Achievement from "@/components/app-ui/general/Achievement";
 
-type CardItem = {
-  id: number;
-  title: string;
-  value: string;
-  description: string;
-  icon: keyof typeof iconMap;
-};
-
-// ✅ Create a proper icon mapping object
-const iconMap = {
-  QrCode,
-  ScanQrCode,
-  FileBarChart,
-  Users,
-  HelpCircle,
-  Bell,
-  Calendar,
-  Trophy,
-  AlertCircle,
-  Star,
-  Target,
-  Smile,
-  CheckCircle,
-};
-
-const cardData: { cards: CardItem[] } = rawCardData as { cards: CardItem[] };
-const cardColors = [
-  "bg-gradient-to-br from-blue-50 to-indigo-100",
-  "bg-gradient-to-br from-orange-50 to-red-100",
-  "bg-gradient-to-br from-yellow-50 to-orange-100",
-  "bg-gradient-to-br from-purple-50 to-pink-100",
-  "bg-gradient-to-br from-green-50 to-emerald-100",
-  "bg-gradient-to-br from-teal-50 to-cyan-100",
-];
-
-// ✅ Fixed Icon component
-const Icon = ({ name }: { name: keyof typeof iconMap }) => {
-  const LucideIcon = iconMap[name];
-  return LucideIcon ? (
-    <LucideIcon className="h-10 w-10 text-primary bg-white text-indigo-500 shadow p-2 rounded-2xl" />
-  ) : null;
+const cardData = {
+  cards: [
+    {
+      id: 1,
+      title: "Smart Attendance Management System",
+      value: "Instant Digital Check-ins",
+      description:
+        "Generate dynamic QR codes instantly for students to mark attendance effortlessly.",
+      icon: <QrCode className="w-5 h-5" />,
+      gradient: "from-blue-500 to-cyan-400",
+    },
+    {
+      id: 2,
+      title: "Insightful Attendance Report Analytics",
+      value: "Trends And Data Analytics",
+      description:
+        "Access detailed attendance reports that help monitor student patterns effectively.",
+      icon: <FileBarChart className="w-5 h-5" />,
+      gradient: "from-emerald-500 to-teal-400",
+    },
+    {
+      id: 3,
+      title: "User-Friendly Interface Design Experience",
+      value: "Simple And Easy Navigation",
+      description:
+        "Simplified dashboard interface designed for seamless attendance.",
+      icon: <Users className="w-5 h-5" />,
+      gradient: "from-purple-500 to-pink-400",
+    },
+    {
+      id: 4,
+      title: "Help And Support Center Page",
+      value: "Customer Service And Feedback",
+      description:
+        "Get comprehensive help support and send feedback for continuous improvement.",
+      icon: <HelpCircle className="w-5 h-5" />,
+      gradient: "from-rose-500 to-pink-400",
+    },
+  ],
 };
 
 const Home: React.FC = () => {
@@ -242,11 +226,12 @@ const Home: React.FC = () => {
         {cardData.cards.map((card, index) => (
           <motion.div
             key={card.id}
+            className="group relative bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50 hover:shadow-2xl transition-all duration-500"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
               duration: 0.4,
-              delay: 0.7 + index * 0.1,
+              delay: 0.9 + index * 0.1,
             }}
             whileHover={{
               scale: 1.02,
@@ -254,34 +239,31 @@ const Home: React.FC = () => {
               transition: { duration: 0.2 },
             }}
           >
-            <Card
-              className={`${
-                cardColors[index % cardColors.length]
-              } border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden h-full`}
-            >
-              <CardHeader className="p-6 pb-4">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-base font-bold text-gray-800 mb-2">
-                      {card.title}
-                    </CardTitle>
-                    <CardDescription className="card-des text-gray-600 text-sm">
-                      {card.description}
-                    </CardDescription>
-                  </div>
+            {/* Gradient background on hover */}
+            <div
+              className={`absolute inset-0 opacity-0 group-hover:opacity-100 rounded-2xl bg-gradient-to-br ${card.gradient} transition-opacity duration-500`}
+            ></div>
+
+            {/* Content */}
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <div
+                  className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${card.gradient} text-white shadow-lg`}
+                >
+                  {card.icon}
                 </div>
-              </CardHeader>
-              <CardContent className="flex justify-between items-center px-6 pb-6">
-                <p className="text-sm font-bold text-gray-800 mb-2">
-                  {card.value}
-                </p>
-                <div className="flex items-center text-sm text-green-600">
-                  <div>
-                    <Icon name={card.icon} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+
+              <h3 className="text-lg font-bold text-gray-800 group-hover:text-white mb-2 transition-colors duration-300">
+                {card.title}
+              </h3>
+              <p className="text-gray-600 group-hover:text-white/90 text-sm mb-3 transition-colors duration-300">
+                {card.description}
+              </p>
+              <div className="text-sm font-semibold text-gray-700 group-hover:text-white transition-colors duration-300">
+                {card.value}
+              </div>
+            </div>
           </motion.div>
         ))}
       </motion.div>

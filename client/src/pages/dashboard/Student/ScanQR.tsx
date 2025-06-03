@@ -450,15 +450,13 @@ const QRScanner: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Card className="max-w-2xl mx-auto mb-8 bg-white">
-              <CardContent className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4 shadow-lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" />
-                    <span className="text-emerald-800 font-medium">
-                      QR Code Scanned Successfully
-                    </span>
-                  </div>
+            <Card className="max-w-2xl mx-auto mb-8 border border-emerald-200 rounded-2xl p-4 shadow-lg">
+              <CardContent className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" />
+                  <span className="text-emerald-800 font-medium">
+                    QR Code Scanned Successfully
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -467,7 +465,7 @@ const QRScanner: React.FC = () => {
 
         {/* Confirmation Modal */}
         {showConfirmation && courseData && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <MarkPopover
               courseData={courseData}
               isOpen={showConfirmation}
