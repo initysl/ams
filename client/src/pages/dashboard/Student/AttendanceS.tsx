@@ -209,7 +209,7 @@ const AttendanceS = () => {
                     type="text"
                     value={matricNumber}
                     readOnly
-                    className="cursor-not-allowed bg-gray-100 w-36"
+                    className="cursor-not-allowed bg-gray-100 w-36 font-semibold  "
                   />
                   <Button
                     onClick={fetchAttendance}
@@ -371,7 +371,7 @@ const AttendanceS = () => {
                               </TableHead>
                             </TableRow>
                           </TableHeader>
-                          <TableBody className="table-body">
+                          <TableBody className="table-body font-bold">
                             {displayedRecords.map((record, index) => (
                               <motion.tr
                                 key={index}
