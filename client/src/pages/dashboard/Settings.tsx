@@ -31,7 +31,7 @@ const Settings = () => {
   return (
     <div className="flex flex-col md:flex-row gap-6">
       {/* Sidebar */}
-      <Card className="bg-white md:max-w-xs w-full relative top-10 md:top-0">
+      <Card className="bg-white backdrop-blur-sm shadow-xl md:max-w-xs w-full relative top-10 md:top-0">
         <CardContent>
           <div className="flex flex-col items-center">
             <img
@@ -119,7 +119,7 @@ const Settings = () => {
       {/* Desktop Outlet */}
       {!isMobile && (
         <div className="flex-1">
-          <Card className="bg-white h-full">
+          <Card className="bg-white backdrop-blur-sm shadow-xl h-full">
             <CardContent>
               <Outlet />
             </CardContent>

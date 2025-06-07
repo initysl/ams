@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Check, Users, Calendar, ArrowRightCircle, QrCode } from "lucide-react";
+import {
+  Check,
+  Users,
+  Calendar,
+  ArrowRightCircle,
+  QrCode,
+  Clock9,
+  Clock8,
+  ListCheck,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/images/at.png";
 import { useNavigate } from "react-router-dom";
@@ -126,12 +135,12 @@ const SplashScreen = () => {
                       <div className="flex items-center justify-center gap-1 sm:gap-2">
                         <div className="h-16 w-12 sm:h-20 sm:w-16 bg-neutral-800 rounded-xl flex items-end justify-center pb-2">
                           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-500 flex items-center justify-center animate-bounce">
-                            <Check size={16} className="text-white" />
+                            <ListCheck size={32} className="text-white" />
                           </div>
                         </div>
                         <div className="h-16 w-12 sm:h-20 sm:w-16 bg-neutral-800 rounded-xl flex items-end justify-center pb-2">
                           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-500 flex items-center justify-center">
-                            <Check size={16} className="text-white" />
+                            <Clock8 size={32} className="text-white" />
                           </div>
                         </div>
                         <div className="h-16 w-12 sm:h-20 sm:w-16 bg-neutral-800 rounded-xl flex items-end justify-center pb-2">
@@ -182,7 +191,7 @@ const SplashScreen = () => {
 
                     <div className="w-full bg-neutral-100 rounded-xl p-3 flex items-center transform transition-all hover:scale-105 duration-300">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-amber-600 flex items-center justify-center mr-3">
-                        <Calendar size={18} className="text-white" />
+                        <Calendar size={32} className="text-white" />
                       </div>
                       <div className="flex-1">
                         <span>Real-time attendance trend</span>

@@ -293,7 +293,7 @@ const AttendanceS = () => {
 
                   <div className="text-center space-y-2">
                     <p className="font-medium">No attendance records loaded</p>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-granoy-400">
                       Click "Get Records" to fetch your attendance history
                     </p>
                   </div>
@@ -558,8 +558,11 @@ const AttendanceS = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5 }}
                       >
-                        <div className="text-center space-y-2 backdrop-blur-sm shadow-xl">
+                        <div className="text-center space-y-2 ">
                           <p>No attendance records available.</p>
+                          {/* <p className="text-sm mt-1">
+                            Click "Get Records" to fetch your data.
+                          </p> */}
                           <p className="text-sm">
                             Senior man, load your record naa, abi you never
                             attend any class nii 👀.
