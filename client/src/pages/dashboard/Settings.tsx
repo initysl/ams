@@ -12,6 +12,7 @@ import {
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 const Settings = () => {
   const { user, logout } = useAuth();
@@ -28,10 +29,42 @@ const Settings = () => {
     }
   }, [location, isMobile]);
 
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.5,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      },
+    },
+  };
+
+  const outletVariants = {
+    hidden: { opacity: 0, x: 30 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.6,
+        ease: [0.25, 0.46, 0.45, 0.94],
+        delay: 0.2,
+      },
+    },
+  };
+
   return (
     <div className="flex flex-col md:flex-row gap-6">
-      {/* Sidebar */}
-      <Card className="bg-white backdrop-blur-sm shadow-xl md:max-w-xs w-full relative top-10 md:top-0">
+      {/* Sidebar with motion */}
+      <motion.div
+        variants={cardVariants}
+        initial="hidden"
+        animate="visible"
+        whileHover="hover"
+        className="bg-white backdrop-blur-sm shadow-xl md:max-w-xs w-full relative top-10 md:top-0 rounded-xl"
+      >
         <CardContent>
           <div className="flex flex-col items-center">
             <img
@@ -114,17 +147,22 @@ const Settings = () => {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </motion.div>
 
-      {/* Desktop Outlet */}
+      {/* Desktop Outlet with motion */}
       {!isMobile && (
-        <div className="flex-1">
+        <motion.div
+          className="flex-1"
+          variants={outletVariants}
+          initial="hidden"
+          animate="visible"
+        >
           <Card className="bg-white backdrop-blur-sm shadow-xl h-full">
             <CardContent>
               <Outlet />
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
       )}
 
       {/* Mobile full-screen dialog */}
