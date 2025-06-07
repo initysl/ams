@@ -189,7 +189,7 @@ const AttendanceS = () => {
             placeholder="Search courses..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 w-full rounded-md"
+            className="pl-9 w-full rounded-md bg-white"
           />
         </div>
       </motion.div>

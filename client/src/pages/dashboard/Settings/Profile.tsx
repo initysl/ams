@@ -91,13 +91,40 @@ const Profile = () => {
 
       return response.data;
     },
-    onSuccess: () => {
-      toast.success("Profile updated successfully!");
-      refetchUser();
+    onSuccess: (data) => {
+      // Handle success response based on backend response structure
+      if (data.success) {
+        toast.success(data.message || "Profile updated successfully!");
+
+        // If email verification is required, show additional message
+        if (data.message?.includes("verification")) {
+          toast.info(
+            "Please check your email to verify the new email address."
+          );
+        }
+
+        refetchUser();
+      } else {
+        toast.error(data.message || "Profile update failed.");
+      }
     },
     onError: (error: any) => {
-      const message =
-        error?.response?.data?.message || "Profile update failed.";
+      // Handle error response based on backend error structure
+      let message = "Profile update failed.";
+
+      if (error?.response?.data) {
+        const errorData = error.response.data;
+
+        if (errorData.message) {
+          message = errorData.message;
+        } else if (errorData.errors && Array.isArray(errorData.errors)) {
+          // Handle validation errors
+          message = errorData.errors
+            .map((err: any) => err.msg || err.message)
+            .join(", ");
+        }
+      }
+
       toast.error(message);
     },
   });
