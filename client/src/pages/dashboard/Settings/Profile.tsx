@@ -21,7 +21,6 @@ const profileSchema = z.object({
     .regex(/^\d{4}\/\d+$/, { message: "Invalid matric number" })
     .optional(),
   password: z.string().optional(),
-  profilePic: z.any().optional(),
 });
 
 type ProfileFields = z.infer<typeof profileSchema>;
@@ -58,6 +57,7 @@ const Profile = () => {
         department: user.department,
         matricNumber: user.matricNumber || "",
       });
+      // Use profilePic instead of profilePicture to match backend response
       if (user.profilePicture) setPreviewURL(user.profilePicture);
     }
   }, [user, reset]);
@@ -74,11 +74,13 @@ const Profile = () => {
         formData.append("matricNumber", data.matricNumber);
       }
 
-      if (data.password) {
+      // Only append password if it's provided and not empty
+      if (data.password && data.password.trim() !== "") {
         formData.append("password", data.password);
       }
 
       if (profilePic) {
+        // Use 'profilePicture' to match backend multer field name
         formData.append("profilePicture", profilePic);
       }
 
@@ -92,36 +94,31 @@ const Profile = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      // Handle success response based on backend response structure
-      if (data.success) {
-        toast.success(data.message || "Profile updated successfully!");
-
-        // If email verification is required, show additional message
-        if (data.message?.includes("verification")) {
-          toast.info(
-            "Please check your email to verify the new email address."
-          );
-        }
-
-        refetchUser();
+      // Handle different response types from backend
+      if (data.message && data.message.includes("Verification email sent")) {
+        toast.success(data.message);
       } else {
-        toast.error(data.message || "Profile update failed.");
+        toast.success("Profile updated successfully!");
+        // Only refetch if we got updated user data (not email verification case)
+        if (data._id) {
+          refetchUser();
+        }
       }
     },
     onError: (error: any) => {
-      // Handle error response based on backend error structure
+      // Handle validation errors array from backend
       let message = "Profile update failed.";
 
-      if (error?.response?.data) {
-        const errorData = error.response.data;
+      if (error?.response?.data?.message) {
+        const errorData = error.response.data.message;
 
-        if (errorData.message) {
-          message = errorData.message;
-        } else if (errorData.errors && Array.isArray(errorData.errors)) {
-          // Handle validation errors
-          message = errorData.errors
-            .map((err: any) => err.msg || err.message)
+        // If it's an array of validation errors
+        if (Array.isArray(errorData)) {
+          message = errorData
+            .map((err: any) => err.msg || err.message || err)
             .join(", ");
+        } else {
+          message = errorData;
         }
       }
 
@@ -171,6 +168,9 @@ const Profile = () => {
             {errors.email && (
               <p className="text-red-500 text-sm">{errors.email.message}</p>
             )}
+            <p className="text-xs text-gray-500 mt-1">
+              Changing email will require verification
+            </p>
           </div>
 
           {/* Department */}
@@ -188,26 +188,25 @@ const Profile = () => {
             )}
           </div>
 
-          <div className="space-y-6">
-            {/* Matric Number (Only for students) */}
-            {user?.role === "student" && (
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Matric Number
-                </label>
-                <Input
-                  type="text"
-                  {...register("matricNumber")}
-                  placeholder="e.g., 2021/12345"
-                />
-                {errors.matricNumber && (
-                  <p className="text-red-500 text-sm">
-                    {errors.matricNumber.message}
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
+          {/* Matric Number (Only for students) */}
+          {user?.role === "student" && (
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Matric Number
+              </label>
+              <Input
+                type="text"
+                {...register("matricNumber")}
+                placeholder="e.g., 2021/12345"
+              />
+              {errors.matricNumber && (
+                <p className="text-red-500 text-sm">
+                  {errors.matricNumber.message}
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Password */}
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -222,6 +221,9 @@ const Profile = () => {
             {errors.password && (
               <p className="text-red-500 text-sm">{errors.password.message}</p>
             )}
+            <p className="text-xs text-gray-500 mt-1">
+              Must be different from current password
+            </p>
           </div>
         </div>
 
