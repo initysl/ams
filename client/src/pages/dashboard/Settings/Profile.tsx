@@ -49,6 +49,19 @@ const Profile = () => {
     resolver: zodResolver(profileSchema),
   });
 
+  // Function to get image URL with cache busting
+  const getImageUrl = (profilePicture: string | null | undefined) => {
+    if (!profilePicture) return "";
+
+    const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
+
+    if (profilePicture.startsWith("http")) {
+      return `${profilePicture}?t=${Date.now()}`;
+    }
+
+    return `${baseUrl}${profilePicture}?t=${Date.now()}`;
+  };
+
   useEffect(() => {
     if (user) {
       reset({
@@ -57,7 +70,11 @@ const Profile = () => {
         department: user.department,
         matricNumber: user.matricNumber || "",
       });
-      if (user.profilePicture) setPreviewURL(user.profilePicture);
+
+      // Set preview URL with cache busting if user has profile picture
+      if (user.profilePicture) {
+        setPreviewURL(getImageUrl(user.profilePicture));
+      }
     }
   }, [user, reset]);
 
@@ -91,15 +108,25 @@ const Profile = () => {
 
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // Handle different response types from backend
       if (data.message && data.message.includes("Verification email sent")) {
         toast.success(data.message);
       } else {
         toast.success("Profile updated successfully!");
-        // Only refetch if we got updated user data (not email verification case)
-        if (data._id) {
-          refetchUser();
+
+        // Wait a moment for the server to process the image
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        // Always refetch user data to get the latest profile info
+        await refetchUser();
+
+        // Clear the local profile picture state since we now have the updated user data
+        setProfilePicture(null);
+
+        // Force update preview URL with new cache busting parameter
+        if (user?.profilePicture) {
+          setPreviewURL(getImageUrl(user.profilePicture));
         }
       }
     },
@@ -135,6 +162,7 @@ const Profile = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="w-fit">
           <Profilebox
+            key={previewURL} // Force re-render when preview URL changes
             profilePicture={previewURL}
             onImageChange={handleImageChange}
           />

@@ -18,7 +18,15 @@ const Settings = () => {
   const { user, logout } = useAuth();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [showMobileDialog, setShowMobileDialog] = useState(false);
+  const [imageKey, setImageKey] = useState(Date.now());
   const location = useLocation();
+
+  // Reset image cache when user data changes
+  useEffect(() => {
+    if (user?.profilePicture) {
+      setImageKey(Date.now());
+    }
+  }, [user?.profilePicture]); // Listen to profile picture changes
 
   // Detect route changes to open dialog on mobile
   useEffect(() => {
@@ -29,7 +37,7 @@ const Settings = () => {
     }
   }, [location, isMobile]);
 
-  // Function to get the correct image URL
+  // Function to get the correct image URL with cache busting
   const getImageUrl = (profilePicture: string | null | undefined) => {
     // Get base server URL (remove /api/ from VITE_API_URL)
     const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
@@ -37,19 +45,19 @@ const Settings = () => {
     console.log("Profile Picture from DB:", profilePicture);
 
     if (!profilePicture) {
-      const defaultUrl = `${baseUrl}/api/images/default.png`;
+      const defaultUrl = `${baseUrl}/api/images/default.png?t=${imageKey}`;
       console.log("No profile picture, using default:", defaultUrl);
       return defaultUrl;
     }
 
-    // If it's already a full URL (starts with http), use as is
+    // If it's already a full URL (starts with http), add cache busting
     if (profilePicture.startsWith("http")) {
       console.log("Full URL detected:", profilePicture);
-      return profilePicture;
+      return `${profilePicture}?t=${imageKey}`;
     }
 
-    // Construct full URL for any relative path
-    const fullUrl = `${baseUrl}${profilePicture}`;
+    // Construct full URL for any relative path with cache busting
+    const fullUrl = `${baseUrl}${profilePicture}?t=${imageKey}`;
     console.log("Constructed full URL:", fullUrl);
     return fullUrl;
   };
@@ -93,8 +101,9 @@ const Settings = () => {
         <CardContent>
           <div className="flex flex-col items-center pt-5">
             <img
+              key={imageKey} // Force re-render when key changes
               src={getImageUrl(user?.profilePicture)}
-              className="w-32 h-32 rounded-full object-cover "
+              className="w-32 h-32 rounded-full object-cover"
               alt="Profile picture"
               crossOrigin="use-credentials"
               onError={(e) => {
@@ -105,7 +114,7 @@ const Settings = () => {
                 );
                 (
                   e.target as HTMLImageElement
-                ).src = `${baseUrl}/api/images/default.png`;
+                ).src = `${baseUrl}/api/images/default.png?t=${Date.now()}`;
                 console.log(
                   "Image failed to load, using fallback:",
                   (e.target as HTMLImageElement).src
