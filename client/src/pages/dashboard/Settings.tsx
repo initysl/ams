@@ -91,10 +91,10 @@ const Settings = () => {
         className="bg-white backdrop-blur-sm shadow-xl md:max-w-xs w-full relative top-10 md:top-0 rounded-xl"
       >
         <CardContent>
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center pt-5">
             <img
               src={getImageUrl(user?.profilePicture)}
-              className="w-32 h-32 rounded-full object-cover"
+              className="w-32 h-32 rounded-full object-cover "
               alt="Profile picture"
               crossOrigin="use-credentials"
               onError={(e) => {
