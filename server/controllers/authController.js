@@ -11,10 +11,9 @@ const {
   sendResetPasswordEmail,
 } = require("../utils/sendEmail");
 
-const upload = require("../utils/multerConfig");
-// Ensure you store jwt using cookies here
+// REMOVED: Don't import upload here - it should be used as middleware in routes
 
-// Registration
+// Registration - FIXED
 const register = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -23,47 +22,87 @@ const register = asyncHandler(async (req, res) => {
 
   const { name, email, matricNumber, department, password } = req.body;
 
-  const existingUser = await User.findOne({
-    $or: [{ email }, { matricNumber }],
-  });
-
-  if (existingUser) {
-    return res.status(400).json({ message: "User already exists" });
+  // FIXED: Better validation for matricNumber
+  if (matricNumber && matricNumber.trim() === "") {
+    return res.status(400).json({ message: "Matric number cannot be empty" });
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  // FIXED: Check email and matricNumber separately for better error messages
+  const existingEmail = await User.findOne({ email });
+  if (existingEmail) {
+    return res.status(400).json({ message: "Email already exists" });
+  }
 
-  // If a profile picture was uploaded, use the filename; else fallback to default
-  const profilePicture = req.file
-    ? `/uploads/${req.file.filename}` // frontend can access via this path
-    : "/images/default.png"; // use your fallback image path
+  if (matricNumber) {
+    const existingMatric = await User.findOne({ matricNumber });
+    if (existingMatric) {
+      return res.status(400).json({ message: "Matric number already exists" });
+    }
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 12);
+
+  let profilePicture;
+  if (req.file) {
+    profilePicture = `/uploads/${req.file.filename}`;
+  } else {
+    profilePicture = "/api/images/default.png";
+  }
+
+  const role =
+    matricNumber && matricNumber.trim() !== "" ? "student" : "lecturer";
 
   const newUser = new User({
-    name,
-    email,
-    matricNumber,
-    department,
+    name: name.trim(),
+    email: email.toLowerCase().trim(),
+    matricNumber: matricNumber ? matricNumber.trim() : undefined,
+    department: department.trim(),
     profilePicture,
     password: hashedPassword,
-    role: matricNumber ? "student" : "lecturer",
+    role,
   });
 
-  await newUser.save();
+  try {
+    await newUser.save();
+  } catch (saveError) {
+    // FIXED: Handle duplicate key errors that might slip through
+    if (saveError.code === 11000) {
+      const field = Object.keys(saveError.keyPattern)[0];
+      return res.status(400).json({
+        message: `${
+          field === "email" ? "Email" : "Matric number"
+        } already exists`,
+      });
+    }
+    throw saveError;
+  }
 
   const token = jwt.sign({ id: newUser._id }, SECRET_KEY, {
     expiresIn: "1h",
   });
 
-  await sendVerificationEmail(newUser.email, token);
+  try {
+    await sendVerificationEmail(newUser.email, token);
 
-  res.status(201).json({
-    message: "User registered successfully! Please verify your email",
-  });
+    res.status(201).json({
+      message: "User registered successfully! Please verify your email",
+    });
 
-  logger.info(`User registered: ${newUser.email}, ${newUser.matricNumber}`);
+    logger.info(
+      `User registered: ${newUser.email}, ${newUser.matricNumber || "lecturer"}`
+    );
+  } catch (emailError) {
+    // FIXED: Handle email sending failure
+    logger.error(`Failed to send verification email: ${emailError.message}`);
+    // User is created but email failed - still return success but with different message
+    res.status(201).json({
+      message:
+        "User registered successfully! Please contact support for email verification.",
+    });
+  }
 });
 
-// Login
+// Login - FIXED minor issues
 const login = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -71,7 +110,9 @@ const login = asyncHandler(async (req, res) => {
   }
 
   const { email, password } = req.body;
-  const user = await User.findOne({ email });
+
+  // FIXED: Normalize email for lookup
+  const user = await User.findOne({ email: email.toLowerCase().trim() });
 
   if (!user) {
     return res.status(400).json({ message: "User does not exist" });
@@ -79,8 +120,11 @@ const login = asyncHandler(async (req, res) => {
 
   // Check if account is locked
   if (user.lockUntil && user.lockUntil > Date.now()) {
+    const lockTimeRemaining = Math.ceil(
+      (user.lockUntil - Date.now()) / (1000 * 60)
+    );
     return res.status(429).json({
-      message: "Too many failed attempts. Please try again later.",
+      message: `Account locked. Try again in ${lockTimeRemaining} minutes.`,
     });
   }
 
@@ -88,11 +132,20 @@ const login = asyncHandler(async (req, res) => {
     const token = jwt.sign({ id: user._id }, SECRET_KEY, {
       expiresIn: "1h",
     });
-    await sendVerificationEmail(user.email, token);
-    return res.status(400).json({
-      message:
-        "Verification email sent.Please verify your email before logging in.",
-    });
+
+    try {
+      await sendVerificationEmail(user.email, token);
+      return res.status(400).json({
+        message:
+          "Verification email sent. Please verify your email before logging in.",
+      });
+    } catch (emailError) {
+      logger.error(`Failed to send verification email: ${emailError.message}`);
+      return res.status(400).json({
+        message:
+          "Please verify your email before logging in. Contact support if needed.",
+      });
+    }
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
@@ -110,7 +163,8 @@ const login = asyncHandler(async (req, res) => {
   }
 
   // Reset failed attempts on successful login
-  Object.assign(user, { loginAttempts: 0, lockUntil: undefined });
+  user.loginAttempts = 0;
+  user.lockUntil = undefined;
   await user.save();
 
   const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "5d" });
@@ -125,9 +179,12 @@ const login = asyncHandler(async (req, res) => {
   res.status(200).json({
     message: "User logged in successfully",
     user: {
+      _id: user._id, // FIXED: Include user ID
+      name: user.name, // FIXED: Include name
       matricNumber: user.matricNumber,
       email: user.email,
-      profilePic: user.profilePicture,
+      department: user.department, // FIXED: Include department
+      profilePicture: user.profilePicture,
       role: user.role,
     },
   });
@@ -135,35 +192,60 @@ const login = asyncHandler(async (req, res) => {
   logger.info(`User logged in: ${user.email}`);
 });
 
-// Verify Email Address
+// Verify Email Address - FIXED
 const verifyEmail = asyncHandler(async (req, res) => {
   const { token } = req.query;
+
+  if (!token) {
+    return res.status(400).json({
+      success: false,
+      message: "Verification token is required.",
+    });
+  }
 
   let decoded;
   try {
     decoded = jwt.verify(token, SECRET_KEY);
   } catch (error) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid or expired token." });
+    if (error.name === "TokenExpiredError") {
+      return res.status(400).json({
+        success: false,
+        message: "Verification token has expired. Please request a new one.",
+      });
+    }
+    return res.status(400).json({
+      success: false,
+      message: "Invalid verification token.",
+    });
   }
 
   const user = await User.findById(decoded.id);
   if (!user) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid verification link." });
+    return res.status(400).json({
+      success: false,
+      message: "User not found.",
+    });
+  }
+
+  if (user.isVerified) {
+    return res.status(200).json({
+      success: true,
+      message: "Email is already verified!",
+    });
   }
 
   user.isVerified = true;
   await user.save();
 
-  res
-    .status(200)
-    .json({ success: true, message: "Email verified successfully!" });
+  res.status(200).json({
+    success: true,
+    message: "Email verified successfully!",
+  });
+
+  logger.info(`Email verified for user: ${user.email}`);
 });
 
-// Forget Password
+// Forget Password - FIXED
 const forgotPassword = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -171,61 +253,108 @@ const forgotPassword = asyncHandler(async (req, res) => {
   }
 
   const { email } = req.body;
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email: email.toLowerCase().trim() });
+
   if (!user) {
     return res.status(400).json({ message: "User does not exist" });
   }
+
   if (!user.isVerified) {
     return res.status(400).json({
-      message: "Please atempt login to verify your email.",
+      message: "Please verify your email first by attempting to login.",
     });
   }
+
   const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
-  await sendResetPasswordEmail(user.email, token);
-  res.status(200).json({
-    message: "Password reset link sent",
-  });
-  logger.info(`Password reset link sent to: ${user.email}`);
+
+  try {
+    await sendResetPasswordEmail(user.email, token);
+    res.status(200).json({
+      message: "Password reset link sent to your email",
+    });
+    logger.info(`Password reset link sent to: ${user.email}`);
+  } catch (emailError) {
+    logger.error(`Failed to send reset email: ${emailError.message}`);
+    res.status(500).json({
+      message: "Failed to send reset email. Please try again later.",
+    });
+  }
 });
 
-// Reset Password
+// Reset Password - FIXED
 const resetPassword = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ message: errors.array() });
   }
+
   const { token, newPassword, confirmPassword } = req.body;
 
+  if (!token) {
+    return res.status(400).json({
+      success: false,
+      message: "Reset token is required.",
+    });
+  }
+
   if (newPassword !== confirmPassword) {
-    return res.status(400).json({ message: "Passwords do not match" });
+    return res.status(400).json({
+      success: false,
+      message: "Passwords do not match",
+    });
   }
 
   let decoded;
   try {
     decoded = jwt.verify(token, SECRET_KEY);
   } catch (error) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid or expired token." });
+    if (error.name === "TokenExpiredError") {
+      return res.status(400).json({
+        success: false,
+        message: "Reset token has expired. Please request a new one.",
+      });
+    }
+    return res.status(400).json({
+      success: false,
+      message: "Invalid reset token.",
+    });
   }
 
   const user = await User.findById(decoded.id);
   if (!user) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid verification link." });
+    return res.status(400).json({
+      success: false,
+      message: "User not found.",
+    });
   }
 
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  // FIXED: Check if new password is same as current
+  const isSamePassword = await bcrypt.compare(newPassword, user.password);
+  if (isSamePassword) {
+    return res.status(400).json({
+      success: false,
+      message: "New password cannot be the same as your current password.",
+    });
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 12);
   user.password = hashedPassword;
+
+  // FIXED: Reset login attempts when password is reset
+  user.loginAttempts = 0;
+  user.lockUntil = undefined;
+
   await user.save();
 
-  res
-    .status(200)
-    .json({ success: true, message: "Password reset successfully!" });
+  res.status(200).json({
+    success: true,
+    message: "Password reset successfully!",
+  });
+
+  logger.info(`Password reset successfully for user: ${user.email}`);
 });
 
-// Logout; Handle this in frontend using cookies
+// Logout - FIXED
 const logout = asyncHandler(async (req, res) => {
   res.cookie("token", "", {
     httpOnly: true,
@@ -233,10 +362,14 @@ const logout = asyncHandler(async (req, res) => {
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
   });
-  res
-    .status(200)
-    .json({ message: `User logged out successfully: ${req.user.email}` });
-  logger.info(`User logged out: ${req.user.email}`);
+
+  const userEmail = req.user ? req.user.email : "unknown";
+
+  res.status(200).json({
+    message: "User logged out successfully",
+  });
+
+  logger.info(`User logged out: ${userEmail}`);
 });
 
 module.exports = {

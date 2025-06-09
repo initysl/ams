@@ -1,3 +1,4 @@
+// Fixed User Schema
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
@@ -6,7 +7,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     email: {
       type: String,
       required: true,
@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
     matricNumber: {
       type: String,
       unique: true,
-      sparse: true, // Ensures only students have this field (lecturers can have null)
+      sparse: true,
     },
     department: {
       type: String,
@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
     },
     profilePicture: {
       type: String,
-      default: "/public/images/default.png", // Default profile picture
+      default: "/public/images/default.png",
     },
     password: {
       type: String,
@@ -32,15 +32,12 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       required: true,
-      enum: ["student", "lecturer"], // Roles can be expanded
+      enum: ["student", "lecturer"],
     },
     isVerified: {
       type: Boolean,
       default: false,
     },
-    // pendingEmail: {
-    //   type: String,
-    // },
     loginAttempts: {
       type: Number,
       default: 0,

@@ -18,8 +18,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-  // Find user by ID
-  // In getUserProfile, make sure you're not including password
+
   const user = await User.findById(req.user._id).select("-password");
   if (user) {
     res.json({
@@ -29,8 +28,9 @@ const getUserProfile = asyncHandler(async (req, res) => {
         email: user.email,
         matricNumber: user.matricNumber,
         department: user.department,
-        profilePic: user.profilePicture,
+        profilePicture: user.profilePicture,
         role: user.role,
+        isVerified: user.isVerified,
       },
     });
   } else {
@@ -76,11 +76,12 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     delete updates.password;
   }
 
-  // Handle Profile Picture Upload
+  // Handle Profile Picture Upload - FIXED
   if (req.file) {
-    updates.profilePicture = `../uploads/${req.file.filename}`;
-  } else if (!user.profilePicture) {
-    updates.profilePicture = "../public/images/default.png";
+    // Use absolute URL or proper relative path
+    updates.profilePicture = `/uploads/${req.file.filename}`;
+    // Or if you want to serve from a specific directory:
+    // updates.profilePicture = `${process.env.BASE_URL}/uploads/${req.file.filename}`;
   }
 
   // Validate Email Change
@@ -108,7 +109,9 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     try {
       await sendVerificationEmail(updates.email, token);
       logger.info(
-        `Verification email sent to ${updates.email} for ${user.matricNumber}`
+        `Verification email sent to ${updates.email} for ${
+          user.matricNumber || user.email
+        }`
       );
     } catch (emailError) {
       logger.error(`Failed to send verification email: ${emailError.message}`);
@@ -120,11 +123,11 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     delete updates.email; // Prevent direct email update before verification
   }
 
-  // Update User Profile (including pendingEmail if email was changed)
+  // Update User Profile
   const updatedUser = await User.findByIdAndUpdate(req.user._id, updates, {
     new: true,
     runValidators: true,
-  });
+  }).select("-password"); // Don't return password
 
   if (!updatedUser) {
     return res.status(404).json({ message: "User profile not found" });
@@ -138,7 +141,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     });
   }
 
-  // Return updated user data
+  // Return updated user data with consistent property names
   res.json({
     _id: updatedUser._id,
     name: updatedUser.name,
@@ -146,11 +149,14 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     matricNumber: updatedUser.matricNumber,
     email: updatedUser.email,
     profilePicture: updatedUser.profilePicture,
+    role: updatedUser.role,
     isVerified: updatedUser.isVerified,
   });
 
   logger.info(
-    `User profile updated: ${updatedUser.email}, ${updatedUser.matricNumber}`
+    `User profile updated: ${updatedUser.email}, ${
+      updatedUser.matricNumber || "lecturer"
+    }`
   );
 });
 

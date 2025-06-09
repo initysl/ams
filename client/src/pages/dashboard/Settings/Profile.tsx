@@ -26,7 +26,7 @@ const profileSchema = z.object({
 type ProfileFields = z.infer<typeof profileSchema>;
 
 const Profile = () => {
-  const [profilePic, setProfilePic] = useState<File | null>(null);
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState<string>("");
   const { user, refetchUser } = useAuth();
 
@@ -36,7 +36,7 @@ const Profile = () => {
       toast.error("Only JPG, JPEG, and PNG files are allowed");
       return;
     }
-    setProfilePic(file);
+    setProfilePicture(file);
     setPreviewURL(URL.createObjectURL(file));
   };
 
@@ -57,7 +57,6 @@ const Profile = () => {
         department: user.department,
         matricNumber: user.matricNumber || "",
       });
-      // Use profilePic instead of profilePicture to match backend response
       if (user.profilePicture) setPreviewURL(user.profilePicture);
     }
   }, [user, reset]);
@@ -79,9 +78,8 @@ const Profile = () => {
         formData.append("password", data.password);
       }
 
-      if (profilePic) {
-        // Use 'profilePicture' to match backend multer field name
-        formData.append("profilePicture", profilePic);
+      if (profilePicture) {
+        formData.append("profilePicture", profilePicture);
       }
 
       const response = await api.put("user/profile/update", formData, {
@@ -137,7 +135,7 @@ const Profile = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="w-fit">
           <Profilebox
-            profilePic={previewURL}
+            profilePicture={previewURL}
             onImageChange={handleImageChange}
           />
         </div>

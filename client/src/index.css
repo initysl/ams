@@ -20,7 +20,8 @@ h3,
 h4,
 h5,
 .card-header,
-.table-header {
+.table-header,
+.sidebar-gl {
   font-family: "Space Grotesk", sans-serif;
 }
 

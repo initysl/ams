@@ -1,12 +1,12 @@
 import { useRef } from "react";
 
 interface ProfileboxProps {
-  profilePic?: string;
+  profilePicture?: string;
   onImageChange: (file: File) => void;
 }
 
 const Profilebox: React.FC<ProfileboxProps> = ({
-  profilePic,
+  profilePicture,
   onImageChange,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -20,9 +20,9 @@ const Profilebox: React.FC<ProfileboxProps> = ({
   return (
     <div className="relative flex items-center">
       <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-2 border-green-500">
-        {profilePic ? (
+        {profilePicture ? (
           <img
-            src={profilePic}
+            src={profilePicture}
             alt="Profile"
             className="w-full h-full object-cover"
             crossOrigin="use-credentials"

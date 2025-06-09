@@ -15,14 +15,18 @@ const storage = multer.diskStorage({
     cb(null, uploadPath); // use the resolved path
   },
   filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${file.originalname}`;
+    // Generate a more unique filename to avoid conflicts
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const fileExtension = path.extname(file.originalname);
+    const baseName = path.basename(file.originalname, fileExtension);
+    const uniqueName = `${baseName}-${uniqueSuffix}${fileExtension}`;
     cb(null, uniqueName);
   },
 });
 
 // File filter to allow only specific image types
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif/;
+  const allowedTypes = /jpeg|jpg|png/;
   const extname = allowedTypes.test(
     path.extname(file.originalname).toLowerCase()
   );
@@ -31,8 +35,12 @@ const fileFilter = (req, file, cb) => {
   if (extname && mimetype) {
     return cb(null, true);
   }
+
+  // FIXED: Pass an Error object instead of a string
   cb(
-    "Error: File upload only supports the following filetypes - jpeg, jpg, png, gif"
+    new Error(
+      "File upload only supports the following filetypes - jpeg, jpg, png"
+    )
   );
 };
 

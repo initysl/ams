@@ -43,7 +43,7 @@ export function AppSidebar() {
     >
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-3xl font-bold py-8 mb-5 text-center text-green-400 tracking-widest">
+          <SidebarGroupLabel className="sidebar-gl text-3xl font-bold py-8 mb-5 text-center text-green-400 tracking-widest">
             AttendEase
           </SidebarGroupLabel>
           <Separator className="bg-stone-600 mb-5" />

@@ -32,7 +32,7 @@ interface RegisterData {
 
 const AuthForm: React.FC = () => {
   const [isSignIn, setIsSignIn] = useState(true);
-  const [profilePic, setProfilePic] = useState<File | null>(null);
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState<string>("");
   const navigate = useNavigate();
 
@@ -46,7 +46,7 @@ const AuthForm: React.FC = () => {
       toast.error("Only JPG, JPEG, and PNG files are allowed");
       return;
     }
-    setProfilePic(file);
+    setProfilePicture(file);
     setPreviewURL(URL.createObjectURL(file));
   };
 
@@ -76,8 +76,8 @@ const AuthForm: React.FC = () => {
       );
       formData.append("password", data.password);
       formData.append("confirmPassword", data.confirmPassword);
-      if (profilePic) {
-        formData.append("profilePicture", profilePic);
+      if (profilePicture) {
+        formData.append("profilePicture", profilePicture);
       }
 
       return api.post("auth/register", formData, {
@@ -88,7 +88,7 @@ const AuthForm: React.FC = () => {
     },
     onSuccess: (res) => {
       toast.success(`Registered successfully: ${res.data.message}`);
-      setProfilePic(null);
+      setProfilePicture(null);
       setPreviewURL("");
       // Automatically switch to sign in form after successful registration
       setIsSignIn(true);

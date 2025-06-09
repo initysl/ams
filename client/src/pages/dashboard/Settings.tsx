@@ -73,7 +73,7 @@ const Settings = () => {
                 `${import.meta.env.VITE_API_URL}images/default.png`
               }
               className="w-32 h-32 rounded-full object-cover"
-              alt="profilepic"
+              alt="Profile picture"
               crossOrigin="use-credentials"
             />
             <div className="mt-4 text-center">

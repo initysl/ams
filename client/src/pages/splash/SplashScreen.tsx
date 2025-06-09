@@ -5,7 +5,6 @@ import {
   Calendar,
   ArrowRightCircle,
   QrCode,
-  Clock9,
   Clock8,
   ListCheck,
 } from "lucide-react";

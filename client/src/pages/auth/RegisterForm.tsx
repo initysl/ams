@@ -17,7 +17,7 @@ const registerSchema = z
       .or(z.literal("").optional()),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(6, "Confirm your password"),
-    profilePic: z.any().optional(),
+    profilePicture: z.any().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -56,7 +56,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       autoComplete="on"
     >
       <div className="mb-4 w-fit ">
-        <Profilebox profilePic={previewURL} onImageChange={onImageChange} />
+        <Profilebox profilePicture={previewURL} onImageChange={onImageChange} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
