@@ -29,6 +29,31 @@ const Settings = () => {
     }
   }, [location, isMobile]);
 
+  // Function to get the correct image URL
+  const getImageUrl = (profilePicture: string | null | undefined) => {
+    // Get base server URL (remove /api/ from VITE_API_URL)
+    const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
+    console.log("Base URL:", baseUrl);
+    console.log("Profile Picture from DB:", profilePicture);
+
+    if (!profilePicture) {
+      const defaultUrl = `${baseUrl}/api/images/default.png`;
+      console.log("No profile picture, using default:", defaultUrl);
+      return defaultUrl;
+    }
+
+    // If it's already a full URL (starts with http), use as is
+    if (profilePicture.startsWith("http")) {
+      console.log("Full URL detected:", profilePicture);
+      return profilePicture;
+    }
+
+    // Construct full URL for any relative path
+    const fullUrl = `${baseUrl}${profilePicture}`;
+    console.log("Constructed full URL:", fullUrl);
+    return fullUrl;
+  };
+
   const cardVariants = {
     hidden: { opacity: 0, y: 20, scale: 0.95 },
     visible: {
@@ -68,13 +93,30 @@ const Settings = () => {
         <CardContent>
           <div className="flex flex-col items-center">
             <img
-              src={
-                user?.profilePicture ||
-                `${import.meta.env.VITE_API_URL}images/default.png`
-              }
+              src={getImageUrl(user?.profilePicture)}
               className="w-32 h-32 rounded-full object-cover"
               alt="Profile picture"
               crossOrigin="use-credentials"
+              onError={(e) => {
+                // Fallback to default image if loading fails
+                const baseUrl = import.meta.env.VITE_API_URL.replace(
+                  "/api/",
+                  ""
+                );
+                (
+                  e.target as HTMLImageElement
+                ).src = `${baseUrl}/api/images/default.png`;
+                console.log(
+                  "Image failed to load, using fallback:",
+                  (e.target as HTMLImageElement).src
+                );
+              }}
+              onLoad={() => {
+                console.log(
+                  "Image loaded successfully:",
+                  getImageUrl(user?.profilePicture)
+                );
+              }}
             />
             <div className="mt-4 text-center">
               <ul className="space-y-1">
