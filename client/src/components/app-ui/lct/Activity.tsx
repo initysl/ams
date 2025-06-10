@@ -1,4 +1,4 @@
-import { Card, CardTitle } from "../ui/card";
+import { Card, CardTitle } from "@/components/ui/card";
 
 export const Activity = () => {
   const mockActivity = [

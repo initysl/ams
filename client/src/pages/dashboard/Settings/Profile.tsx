@@ -11,24 +11,50 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Profilebox from "@/components/ui/Profilebox";
 
-const profileSchema = z.object({
-  name: z.string().min(5, "Name is required"),
-  email: z.string().email("Invalid email format"),
-  department: z.string().min(3, "Department is required"),
-  matricNumber: z
-    .string()
-    .min(10)
-    .regex(/^\d{4}\/\d+$/, { message: "Invalid matric number" })
-    .optional(),
-  password: z.string().optional(),
-});
+// Create dynamic schema based on user role
+const createProfileSchema = (userRole: string | undefined) => {
+  const baseSchema = {
+    name: z.string().min(5, "Name is required"),
+    email: z.string().email("Invalid email format"),
+    department: z.string().min(3, "Department is required"),
+    password: z.string().optional(),
+  };
 
-type ProfileFields = z.infer<typeof profileSchema>;
+  // Only add matricNumber validation for students
+  if (userRole === "student") {
+    return z.object({
+      ...baseSchema,
+      matricNumber: z
+        .string()
+        .min(10, "Matric number must be at least 10 characters")
+        .regex(/^\d{4}\/\d+$/, {
+          message: "Invalid matric number format (e.g., 2021/12345)",
+        }),
+    });
+  }
+
+  // For non-students, matricNumber is optional and can be empty
+  return z.object({
+    ...baseSchema,
+    matricNumber: z.string().optional(),
+  });
+};
+
+type ProfileFields = {
+  name: string;
+  email: string;
+  department: string;
+  matricNumber?: string;
+  password?: string;
+};
 
 const Profile = () => {
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState<string>("");
   const { user, refetchUser } = useAuth();
+
+  // Create schema based on user role
+  const profileSchema = createProfileSchema(user?.role);
 
   const handleImageChange = (file: File) => {
     const validTypes = ["image/jpeg", "image/png", "image/jpg"];
@@ -64,12 +90,18 @@ const Profile = () => {
 
   useEffect(() => {
     if (user) {
-      reset({
+      const formData: ProfileFields = {
         name: user.name,
         email: user.email,
         department: user.department,
-        matricNumber: user.matricNumber || "",
-      });
+      };
+
+      // Only include matricNumber for students
+      if (user.role === "student") {
+        formData.matricNumber = user.matricNumber || "";
+      }
+
+      reset(formData);
 
       // Set preview URL with cache busting if user has profile picture
       if (user.profilePicture) {
@@ -86,6 +118,7 @@ const Profile = () => {
       formData.append("email", data.email);
       formData.append("department", data.department);
 
+      // Only append matricNumber for students and if it's provided
       if (user?.role === "student" && data.matricNumber) {
         formData.append("matricNumber", data.matricNumber);
       }
@@ -131,6 +164,7 @@ const Profile = () => {
       }
     },
     onError: (error: any) => {
+      console.error("Update error:", error);
       // Handle validation errors array from backend
       let message = "Profile update failed.";
 

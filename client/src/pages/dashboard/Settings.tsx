@@ -45,7 +45,7 @@ const Settings = () => {
     console.log("Profile Picture from DB:", profilePicture);
 
     if (!profilePicture) {
-      const defaultUrl = `${baseUrl}/api/images/default.png?t=${imageKey}`;
+      const defaultUrl = `${baseUrl}/images/default.png?t=${imageKey}`;
       console.log("No profile picture, using default:", defaultUrl);
       return defaultUrl;
     }

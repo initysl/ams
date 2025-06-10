@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { CheckCircle, Trophy, Bell, BookOpen } from "lucide-react";
+import { CheckCircle, Trophy, Bell, BookOpen, Loader2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import api from "@/lib/axios";
@@ -189,16 +189,13 @@ const Activity = () => {
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-gray-800">Recent Activity</h3>
         <div className="flex items-center space-x-2">
-          {recentAttendanceMutation.isPending && (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-          )}
           <Bell className="h-5 w-5 text-gray-400" />
         </div>
       </div>
 
       {recentAttendanceMutation.isPending ? (
         <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
         </div>
       ) : recentActivities.length > 0 ? (
         <div className="space-y-4 max-h-96 overflow-y-auto">

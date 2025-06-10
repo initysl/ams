@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import api from "@/lib/axios";
 import { TooltipProps as RechartsTooltipProps } from "recharts";
+import { Loader2 } from "lucide-react";
 
 interface AttendanceRecord {
   sessionDate: string;
@@ -206,7 +207,9 @@ const ChartOne = () => {
 
         <CardContent>
           {loading ? (
-            <p className="text-sm text-zinc-500">Loading chart...</p>
+            <div className="flex justify-center items-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+            </div>
           ) : error ? (
             <p className="text-sm text-red-500">{error}</p>
           ) : filteredData.length === 0 ? (
