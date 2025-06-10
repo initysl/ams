@@ -244,7 +244,7 @@ const ChartOne = () => {
                   stroke="#4ade80"
                   strokeWidth={2}
                   name="Attendance"
-                  dot={{ r: 10 }}
+                  dot={{ r: 8 }}
                   activeDot={{ r: 6, fill: "#166534" }}
                   animationDuration={1000}
                 />
