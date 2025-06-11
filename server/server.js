@@ -47,7 +47,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use("/api/images", express.static(path.join(__dirname, "/images")));
+app.use("/api/images", express.static(path.join(__dirname, "/public/images")));
 
 // Server Start
 const PORT = process.env.PORT || 5060;

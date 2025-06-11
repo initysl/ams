@@ -27,6 +27,7 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { useMutation } from "@tanstack/react-query";
 
 type AttendanceRecord = {
   courseTitle: string;
@@ -40,7 +41,6 @@ const AttendanceS = () => {
   const { user } = useAuth();
   const [matricNumber] = useState(user?.matricNumber || "");
   const [records, setRecords] = useState<AttendanceRecord[] | null>(null);
-  const [loading, setLoading] = useState(false);
   const [selectedView, setSelectedView] = useState<"all" | "recent">("all");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -49,26 +49,31 @@ const AttendanceS = () => {
     if (saved) setRecords(JSON.parse(saved));
   }, []);
 
-  const fetchAttendance = async () => {
-    setLoading(true);
-    try {
+  // Fetch attendance mutation
+  const fetchAttendanceMutation = useMutation({
+    mutationFn: async (matricNumber: string) => {
       const response = await api.get("attendance/record", {
         params: { matricNumber },
         withCredentials: true,
       });
-      setRecords(response.data);
-      sessionStorage.setItem(
-        "attendanceRecords",
-        JSON.stringify(response.data)
-      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      setRecords(data);
+      sessionStorage.setItem("attendanceRecords", JSON.stringify(data));
       toast.success("Attendance records retrieved successfully");
-    } catch (error: any) {
+    },
+    onError: (error: any) => {
       toast.error(
         error?.response?.data?.error ||
           "An error occurred while retrieving attendance records"
       );
-    } finally {
-      setLoading(false);
+    },
+  });
+
+  const handleFetchAttendance = () => {
+    if (matricNumber) {
+      fetchAttendanceMutation.mutate(matricNumber);
     }
   };
 
@@ -173,6 +178,8 @@ const AttendanceS = () => {
     },
   };
 
+  const isLoading = fetchAttendanceMutation.isPending;
+
   return (
     <motion.div
       className="container mx-auto space-y-6"
@@ -212,14 +219,14 @@ const AttendanceS = () => {
                     className="cursor-not-allowed bg-gray-100 w-36 font-semibold  "
                   />
                   <Button
-                    onClick={fetchAttendance}
+                    onClick={handleFetchAttendance}
                     className="bg-blue-500 hover:bg-blue-600 text-white"
-                    disabled={loading}
+                    disabled={isLoading}
                   >
-                    {loading ? (
+                    {isLoading ? (
                       <Loader2 className="animate-spin w-4 h-4 mr-2" />
                     ) : null}
-                    {loading ? "Loading..." : "Get Records"}
+                    {isLoading ? "Loading..." : "Get Records"}
                   </Button>
                   {records && (
                     <Button
@@ -268,7 +275,7 @@ const AttendanceS = () => {
               </div>
             </CardHeader>
             <CardContent className="p-4">
-              {loading && (
+              {isLoading && (
                 <motion.div
                   className="text-center py-12"
                   initial={{ opacity: 0 }}
@@ -282,7 +289,7 @@ const AttendanceS = () => {
                 </motion.div>
               )}
 
-              {!loading && !records && (
+              {!isLoading && !records && (
                 <motion.div
                   className="flex flex-col items-center justify-center py-12 text-gray-400"
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -300,7 +307,7 @@ const AttendanceS = () => {
                 </motion.div>
               )}
 
-              {!loading && filteredRecords?.length === 0 && (
+              {!isLoading && filteredRecords?.length === 0 && (
                 <motion.div
                   className="flex flex-col items-center py-12 text-gray-500"
                   initial={{ opacity: 0 }}
@@ -341,7 +348,7 @@ const AttendanceS = () => {
               )}
 
               <AnimatePresence>
-                {!loading &&
+                {!isLoading &&
                   displayedRecords &&
                   displayedRecords.length > 0 && (
                     <motion.div
