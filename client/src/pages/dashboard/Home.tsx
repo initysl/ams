@@ -8,6 +8,11 @@ import {
   Smile,
   CheckCircle,
   Settings2,
+  ListCheck,
+  ScanQrCode,
+  Smartphone,
+  TabletSmartphone,
+  CalendarCheck2,
 } from "lucide-react";
 import Status from "@/components/app-ui/lct/Status";
 import Chart from "@/components/app-ui/general/Chart";
@@ -81,12 +86,12 @@ const Home: React.FC = () => {
     <div className="space-y-8  min-h-screen">
       {/* Enhanced Top Section with Greeting and Quick Stats */}
       <motion.div
-        className="relative overflow-hidden "
+        className="relative overflow-hidden"
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <Card className="bg-white p-4 flex flex-row items-center justify-between">
+        <Card className="bg-white p-4 flex flex-row items-center justify-between relative">
           <div>
             <h1 className="text-2xl lg:text-4xl font-bold mb-1">
               Welcome Back, {user?.matricNumber || user?.name}
@@ -104,6 +109,15 @@ const Home: React.FC = () => {
             </div>
           </motion.div>
         </Card>
+
+        {/* Scattered Background Icons */}
+        <div className="md:hidden absolute inset-0 z-10 pointer-events-none">
+          <ListCheck className="absolute top-12 left-90 h-10 w-10 text-teal-300 opacity-50 -rotate-45" />
+          <ScanQrCode className="absolute bottom-8 left-12 h-10 w-10 text-gray-200 opacity-50 rotate-45" />
+          <Smartphone className="absolute top-1/2 right-40 h-10 w-10 text-gray-300 opacity-50 -rotate-12" />
+          <TabletSmartphone className="absolute bottom-4 right-8 h-9 w-9 text-gray-200 rotate-90" />
+          <CalendarCheck2 className="absolute top-4 right-4 h-6 w-6 text-purple-300 opacity-50 -rotate-30" />
+        </div>
       </motion.div>
 
       {/* Hero Card with Flip Animation */}
