@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { jsPDF } from "jspdf";
@@ -52,15 +53,95 @@ type AttendanceRecord = {
   date: string | number;
 };
 
+type AttendanceReportResponse = {
+  report: AttendanceRecord[];
+};
+
 const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [reportLoading, setReportLoading] = useState<boolean>(false);
-  const [sessions, setSessions] = useState<LectureSession[]>([]);
   const [selectedSession, setSelectedSession] = useState<string>("");
   const [report, setReport] = useState<AttendanceRecord[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const { updateTotalStudents } = useAttendance();
+
+  // Fetch lecture sessions
+  const {
+    data: sessions = [],
+    isLoading: sessionsLoading,
+    error: sessionsError,
+    refetch: refetchSessions,
+  } = useQuery({
+    queryKey: ["lectureSessions"],
+    queryFn: async (): Promise<LectureSession[]> => {
+      const response = await api.get("attendance/lecture", {
+        withCredentials: true,
+      });
+      return response.data;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (replaced cacheTime)
+  });
+
+  // Generate attendance report mutation
+  const generateReportMutation = useMutation({
+    mutationFn: async (
+      sessionId: string
+    ): Promise<AttendanceReportResponse> => {
+      const response = await api.get(`attendance/report/${sessionId}`, {
+        withCredentials: true,
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      setReport(data.report);
+      // Cache the report for this session
+      if (selectedSession) {
+        const cachedReportKey = `report_${selectedSession}`;
+        sessionStorage.setItem(cachedReportKey, JSON.stringify(data.report));
+      }
+      toast.success("Attendance report generated successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.error || "Failed to generate report");
+      setReport([]);
+    },
+  });
+
+  // Clear cache mutation
+  const clearCacheMutation = useMutation({
+    mutationFn: async () => {
+      // Simulate async operation for consistency
+      return new Promise<void>((resolve) => {
+        // Clear specific cache items related to attendance
+        const keysToRemove = [];
+
+        // Find all report keys
+        for (let i = 0; i < sessionStorage.length; i++) {
+          const key = sessionStorage.key(i);
+          if (key && key.startsWith("report_")) {
+            keysToRemove.push(key);
+          }
+        }
+
+        // Remove specific keys
+        keysToRemove.forEach((key) => sessionStorage.removeItem(key));
+        sessionStorage.removeItem("selectedSession");
+
+        resolve();
+      });
+    },
+    onSuccess: () => {
+      // Reset state
+      setReport([]);
+      setSelectedSession("");
+      // Refetch sessions
+      refetchSessions();
+      toast.success("Cache cleared successfully");
+    },
+    onError: () => {
+      toast.error("Failed to clear cache");
+    },
+  });
 
   // Statistics
   const totalStudents = report.length;
@@ -77,19 +158,14 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     return acc;
   }, {} as Record<string, number>);
 
-  // Load cached sessions
+  // Load cached data on mount
   useEffect(() => {
-    const cachedSessions = sessionStorage.getItem("lectureSessions");
-    if (cachedSessions) {
-      setSessions(JSON.parse(cachedSessions));
-    }
     // Load cached selected session
     const cachedSelectedSession = sessionStorage.getItem("selectedSession");
     if (cachedSelectedSession) {
       setSelectedSession(cachedSelectedSession);
-    }
-    // Load cached report based on the selected session
-    if (cachedSelectedSession) {
+
+      // Load cached report based on the selected session
       const cachedReportKey = `report_${cachedSelectedSession}`;
       const cachedReport = sessionStorage.getItem(cachedReportKey);
       if (cachedReport) {
@@ -98,12 +174,6 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     }
   }, []);
 
-  // Fetch lecture sessions if not cached
-  useEffect(() => {
-    if (sessions.length === 0) {
-      fetchLectureSessions();
-    }
-  }, [sessions.length]);
   // Update total students count whenever report changes
   useEffect(() => {
     updateTotalStudents(totalStudents);
@@ -113,62 +183,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     }
   }, [totalStudents, onUpdateRecord, updateTotalStudents]);
 
-  const fetchLectureSessions = async () => {
-    setLoading(true);
-    try {
-      const response = await api.get("attendance/lecture", {
-        withCredentials: true,
-      });
-      setSessions(response.data);
-      // Cache lecture sessions
-      sessionStorage.setItem("lectureSessions", JSON.stringify(response.data));
-    } catch (error: any) {
-      toast.error(
-        error?.response?.data?.error || "Failed to fetch lecture sessions"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const generateReport = async (sessionId: string) => {
-    if (!sessionId) {
-      toast.error("Please select a lecture session");
-      return;
-    }
-
-    // Check if we have cached report for this session
-    const cachedReportKey = `report_${sessionId}`;
-    const cachedReport = sessionStorage.getItem(cachedReportKey);
-
-    if (cachedReport) {
-      setReport(JSON.parse(cachedReport));
-      toast.success("Loaded cached attendance report");
-      return;
-    }
-
-    setReportLoading(true);
-    try {
-      const response = await api.get(`attendance/report/${sessionId}`, {
-        withCredentials: true,
-      });
-      setReport(response.data.report);
-
-      // Cache the report for this session
-      sessionStorage.setItem(
-        cachedReportKey,
-        JSON.stringify(response.data.report)
-      );
-
-      toast.success("Attendance report generated successfully");
-    } catch (error: any) {
-      toast.error(error?.response?.data?.error || "Failed to generate report");
-      setReport([]);
-    } finally {
-      setReportLoading(false);
-    }
-  };
-
+  // Handle session selection change
   const handleSessionChange = (value: string) => {
     setSelectedSession(value);
     sessionStorage.setItem("selectedSession", value);
@@ -184,37 +199,33 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     }
   };
 
-  const clearCache = () => {
-    // Clear specific cache items related to attendance
-    const keysToRemove = [];
-
-    // Find all report keys
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
-      if (key && key.startsWith("report_")) {
-        keysToRemove.push(key);
-      }
+  // Generate report handler
+  const handleGenerateReport = () => {
+    if (!selectedSession) {
+      toast.error("Please select a lecture session");
+      return;
     }
 
-    // Remove specific keys
-    keysToRemove.forEach((key) => sessionStorage.removeItem(key));
-    sessionStorage.removeItem("lectureSessions");
-    sessionStorage.removeItem("selectedSession");
+    // Check if we have cached report for this session
+    const cachedReportKey = `report_${selectedSession}`;
+    const cachedReport = sessionStorage.getItem(cachedReportKey);
 
-    // Reset state
-    setReport([]);
-    setSessions([]);
-    setSelectedSession("");
+    if (cachedReport) {
+      setReport(JSON.parse(cachedReport));
+      toast.success("Loaded cached attendance report");
+      return;
+    }
 
-    // Fetch sessions again
-    fetchLectureSessions();
-    toast.success("Cache cleared successfully");
+    generateReportMutation.mutate(selectedSession);
   };
 
+  // Export functions
   const exportAsCSV = () => {
     if (!report.length) return;
 
-    const selectedSessionData = sessions.find((s) => s._id === selectedSession);
+    const selectedSessionData = (sessions as LectureSession[]).find(
+      (s: LectureSession) => s._id === selectedSession
+    );
     const headers = ["Name", "Matric Number", "Course Code", "Level", "Status"];
     const csvData = report.map((r) => [
       r.name,
@@ -240,12 +251,15 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast.success("Report processing......");
+    toast.success("Report exported successfully");
   };
 
   const exportAsPDF = () => {
     if (!report.length) return;
-    const selectedSessionData = sessions.find((s) => s._id === selectedSession);
+
+    const selectedSessionData = (sessions as LectureSession[]).find(
+      (s: LectureSession) => s._id === selectedSession
+    );
     const doc = new jsPDF();
     doc.setFontSize(20);
     doc.text(
@@ -276,9 +290,10 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
       startY: 50,
     });
     doc.save(`${selectedSessionData?.courseCode}-attendance-report.pdf`);
-    toast.success("Report processing......");
+    toast.success("Report exported successfully");
   };
 
+  // Filter report based on search and status
   const filteredReport = report.filter((record) => {
     const matchesSearch =
       record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -291,16 +306,21 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     return matchesSearch && matchesStatus;
   });
 
-  const selectedSessionData = sessions.find((s) => s._id === selectedSession);
+  const selectedSessionData = (sessions as LectureSession[]).find(
+    (s: LectureSession) => s._id === selectedSession
+  );
+
+  // Handle sessions error
+  useEffect(() => {
+    if (sessionsError) {
+      toast.error("Failed to load lecture sessions");
+    }
+  }, [sessionsError]);
 
   return (
     <div className="container mx-auto space-y-6 pb-8">
-      {/* <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="font-semibold text-xl md:text-2xl">Attendance Report</h2>
-      </div> */}
-
       {/* Session Selection */}
-      <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-100 shadow-sm ">
+      <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-100 shadow-xl">
         <CardHeader className="card-header pb-4">
           <CardTitle className="flex items-center gap-2 text-blue-700">
             <Calendar className="h-5 w-5" />
@@ -313,53 +333,60 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
               <Select
                 value={selectedSession}
                 onValueChange={handleSessionChange}
-                disabled={loading}
+                disabled={sessionsLoading}
               >
                 <SelectTrigger className="w-full bg-white border-none">
                   <SelectValue placeholder="Select a lecture session" />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
-                  {sessions.length === 0 && loading && (
+                  {sessionsLoading && (
                     <div className="flex items-center justify-center py-2 text-gray-500">
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                       Loading sessions...
                     </div>
                   )}
-                  {sessions.length === 0 && !loading && (
+                  {!sessionsLoading && sessions.length === 0 && (
                     <div className="text-center py-2 text-gray-500">
                       No lecture sessions found
                     </div>
                   )}
-                  {sessions.map((session) => (
-                    <SelectItem key={session._id} value={session._id}>
-                      {session.courseCode} - {session.courseTitle} (
-                      {new Date(session.date).toLocaleDateString()})
-                    </SelectItem>
-                  ))}
+                  {(sessions as LectureSession[]).map(
+                    (session: LectureSession) => (
+                      <SelectItem key={session._id} value={session._id}>
+                        {session.courseCode} - {session.courseTitle} (
+                        {new Date(session.date).toLocaleDateString()})
+                      </SelectItem>
+                    )
+                  )}
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex flex-col md:flex-row space-y-2 space-x-2 ">
+            <div className="flex flex-col md:flex-row space-y-2 space-x-2">
               <Button
-                onClick={() => generateReport(selectedSession)}
-                disabled={!selectedSession || reportLoading}
+                onClick={handleGenerateReport}
+                disabled={!selectedSession || generateReportMutation.isPending}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               >
-                {reportLoading ? (
+                {generateReportMutation.isPending ? (
                   <>
-                    <Loader2 className="animate-spin w-4 h-4 mr-2" />
                     Loading...
+                    <Loader2 className="animate-spin w-4 h-4 ml-2" />
                   </>
                 ) : (
                   <>Generate Report</>
                 )}
               </Button>
               <Button
-                onClick={clearCache}
+                onClick={() => clearCacheMutation.mutate()}
+                disabled={clearCacheMutation.isPending}
                 variant="outline"
                 className="w-full bg-red-600 hover:bg-red-700 text-white"
               >
-                Clear
+                {clearCacheMutation.isPending ? (
+                  <Loader2 className="animate-spin w-4 h-4 mr-2" />
+                ) : (
+                  "Clear"
+                )}
               </Button>
             </div>
           </div>
@@ -394,9 +421,63 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
           )}
         </CardContent>
       </Card>
+      {/* Filter and Export Controls */}
+      {report.length > 0 && (
+        <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4">
+          <div className="flex flex-1 flex-col sm:flex-row gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search by name or matric number..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 rounded-md bg-white"
+              />
+            </div>
 
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-40 bg-yellow-100 hover:bg-yellow-400 border-none">
+                <div className="flex items-center">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <span>Status</span>
+                </div>
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                <SelectItem className="hover:bg-amber-300" value="all">
+                  All Statuses
+                </SelectItem>
+                <SelectItem className="hover:bg-teal-300" value="present">
+                  Present
+                </SelectItem>
+                <SelectItem className="hover:bg-indigo-300" value="absent">
+                  Absent
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              onClick={exportAsCSV}
+              disabled={!report.length}
+              className="flex items-center gap-2 bg-lime-100 hover:bg-lime-400 border-none"
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Export CSV
+            </Button>
+            <Button
+              onClick={exportAsPDF}
+              disabled={!report.length}
+              className="flex items-center gap-2 bg-green-100 hover:bg-green-400 border-none"
+            >
+              <File className="h-4 w-4" />
+              Export PDF
+            </Button>
+          </div>
+        </div>
+      )}
       {/* Attendance Table */}
-      <div className="bg-white overflow-x-auto rounded-md shadow-sm">
+      <div className="bg-white overflow-x-auto rounded-md shadow-xl">
         {/* Regular Table for Medium and Up Screens */}
         <div className="hidden md:block">
           <table className="min-w-full divide-y divide-gray-200">
@@ -434,7 +515,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
                 </th>
               </tr>
             </thead>
-            <tbody className="table-body not-last:bg-white divide-y divide-gray-200">
+            <tbody className="table-body bg-white divide-y divide-gray-200">
               {filteredReport.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-8 text-center">
@@ -517,57 +598,6 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
           )}
         </div>
       </div>
-
-      {/* Filter and Export Controls */}
-      <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4">
-        <div className="flex flex-1 flex-col sm:flex-row gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search by name or matric number..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 rounded-md bg-white"
-            />
-          </div>
-
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-40 bg-yellow-100 hover:bg-yellow-400 border-none">
-              <div className="flex items-center">
-                <Filter className="h-4 w-4 mr-2" />
-                <span>Status</span>
-              </div>
-            </SelectTrigger>
-            <SelectContent className="bg-white">
-              <SelectItem className="hover:bg-amber-300" value="all">
-                All Statuses
-              </SelectItem>
-              <SelectItem className="hover:bg-teal-300" value="present">
-                Present
-              </SelectItem>
-              <SelectItem className="hover:bg-indigo-300" value="absent">
-                Absent
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <Button
-          onClick={exportAsCSV}
-          className="flex items-center gap-2 bg-lime-100 hover:bg-lime-400 border-none"
-        >
-          <FileSpreadsheet className="h-4 w-4" />
-          Export as CSV
-        </Button>
-        <Button
-          onClick={exportAsPDF}
-          className="flex items-center gap-2 bg-green-100 hover:bg-green-400 border-none"
-        >
-          <File className="h-4 w-4" />
-          Export as PDF
-        </Button>
-      </div>
-
       {/* Report Content */}
       {report.length > 0 && (
         <motion.div
@@ -577,7 +607,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
         >
           {/* Statistics Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <Card className="bg-yellow-100 shadow-sm">
+            <Card className="bg-yellow-100 shadow-xl">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
                   <div>
@@ -593,7 +623,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
               </CardContent>
             </Card>
 
-            <Card className="bg-white ">
+            <Card className="bg-white shadow-xl">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
                   <div>
@@ -609,7 +639,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
               </CardContent>
             </Card>
 
-            <Card className="bg-white">
+            <Card className="bg-white shadow-xl">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
                   <div>
@@ -625,7 +655,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
               </CardContent>
             </Card>
 
-            <Card className="bg-green-100">
+            <Card className="bg-green-100 shadow-xl">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
                   <div>
@@ -650,7 +680,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
 
           {/* Level Breakdown */}
           {levels.length > 0 && (
-            <Card className="bg-white shadow-sm mb-6">
+            <Card className="bg-white shadow-xl mb-6">
               <CardHeader className="card-header pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
                   <FileText className="h-5 w-5 text-gray-500" />
@@ -682,40 +712,50 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
           )}
         </motion.div>
       )}
-
       {/* Empty State */}
-      {!report.length && !reportLoading && selectedSession && (
-        <div className="bg-white shadow-sm rounded-lg p-12 text-center">
-          <FileSpreadsheet className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-          <h3 className="text-lg font-medium text-gray-800 mb-2">
-            No Report Generated Yet
-          </h3>
-          <p className="text-gray-500 mb-6">
-            Select a lecture session and click "Generate Report" to view
-            attendance data.
-          </p>
-          <Button
-            onClick={() => generateReport(selectedSession)}
-            className="bg-yellow-600 hover:bg-yellow-700 text-white"
-          >
-            Generate Report
-          </Button>
-        </div>
-      )}
-
+      {!report.length &&
+        !generateReportMutation.isPending &&
+        selectedSession && (
+          <div className="bg-white shadow-sm rounded-lg p-12 text-center">
+            <FileSpreadsheet className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+            <h3 className="text-lg font-medium text-gray-800 mb-2">
+              No Report Generated Yet / No Report Found
+            </h3>
+            <p className="text-gray-500 mb-6">
+              Select a lecture session and click "Generate Report" to view
+              attendance data.
+            </p>
+            <Button
+              onClick={handleGenerateReport}
+              className="bg-yellow-600 hover:bg-yellow-700 text-white"
+              disabled={generateReportMutation.isPending}
+            >
+              {generateReportMutation.isPending ? (
+                <>
+                  Generating...
+                  <Loader2 className="animate-spin w-4 h-4 ml-2" />
+                </>
+              ) : (
+                "Generate Report"
+              )}
+            </Button>
+          </div>
+        )}
       {/* Initial State */}
-      {!report.length && !reportLoading && !selectedSession && (
-        <div className="bg-white shadow-sm rounded-lg p-12 text-center">
-          <Calendar className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-          <h3 className="text-lg font-medium text-gray-800 mb-2">
-            Select a Lecture Session
-          </h3>
-          <p className="text-gray-500">
-            Choose a session from the dropdown above to view its attendance
-            report.
-          </p>
-        </div>
-      )}
+      {!report.length &&
+        !generateReportMutation.isPending &&
+        !selectedSession && (
+          <div className="bg-white shadow-sm rounded-lg p-12 text-center">
+            <Calendar className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+            <h3 className="text-lg font-medium text-gray-800 mb-2">
+              Select a Lecture Session
+            </h3>
+            <p className="text-gray-500">
+              Choose a session from the dropdown above to view its attendance
+              report.
+            </p>
+          </div>
+        )}
     </div>
   );
 };

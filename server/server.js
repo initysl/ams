@@ -7,7 +7,6 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const connectDB = require("./config/database");
 const app = express();
-const lectureRoutes = require("./routes/lectureRoutes");
 const attendanceRoutes = require("./routes/attendanceRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -43,7 +42,6 @@ app.use(
 connectDB();
 
 // Routes
-// app.use("/api/lecture", lectureRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
