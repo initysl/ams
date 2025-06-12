@@ -13,11 +13,11 @@ import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-// Import SVG as a string
 import qrplaceholder from "../../../assets/images/qr-placeholder.svg";
 import {
   AlertCircle,
@@ -46,7 +46,7 @@ const STORAGE_KEY = "qr_session_data";
 
 type GenerateFields = z.infer<typeof qrSchema>;
 
-// Animation variants
+// Animation variants (keeping the same as before)
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
@@ -73,32 +73,6 @@ const itemVariants = {
   },
 };
 
-const qrCodeVariants = {
-  hidden: {
-    opacity: 0,
-    scale: 0.8,
-    rotate: -10,
-  },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    rotate: 0,
-    transition: {
-      duration: 0.6,
-      type: "spring",
-      stiffness: 100,
-    },
-  },
-  pulse: {
-    scale: [1, 1.05, 1],
-    transition: {
-      duration: 2,
-      repeat: Infinity,
-      ease: "easeInOut",
-    },
-  },
-};
-
 const buttonVariants = {
   initial: { scale: 1 },
   hover: {
@@ -111,28 +85,7 @@ const buttonVariants = {
   },
 };
 
-const timerVariants = {
-  hidden: { opacity: 0, x: -20 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.4 },
-  },
-  warning: {
-    scale: [1, 1.1, 1],
-    color: ["#f59e0b", "#ef4444", "#f59e0b"],
-    transition: {
-      duration: 1,
-      repeat: Infinity,
-      ease: "easeInOut",
-    },
-  },
-};
-
 const GenerateQR = () => {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isStopping, setIsStopping] = useState(false);
   const [qrGenerated, setQrGenerated] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [sessionId, setSessionId] = useState("");
@@ -147,8 +100,6 @@ const GenerateQR = () => {
     minutes: 0,
     seconds: 0,
   });
-
-  // Add state to track if QR code is expired
   const [isExpired, setIsExpired] = useState(false);
 
   const {
@@ -164,6 +115,87 @@ const GenerateQR = () => {
       courseCode: "",
       level: "400",
       duration: 20,
+    },
+  });
+
+  // Generate QR Code Mutation
+  const generateQRMutation = useMutation({
+    mutationFn: async (data: GenerateFields) => {
+      const response = await api.post("attendance/generate", data, {
+        withCredentials: true,
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      const { qrCodeUrl, sessionId, expiryTime, courseDetails } = data;
+      setQrCodeUrl(qrCodeUrl);
+      setSessionId(sessionId);
+      setExpiryTime(expiryTime);
+      setCourseDetails(courseDetails);
+      setQrGenerated(true);
+      setIsExpired(false);
+      toast.success("QR code generated successfully");
+    },
+    onError: (error) => {
+      toast.error("Error generating QR code");
+      console.error("Error generating QR code:", error);
+    },
+  });
+
+  // Stop Session Mutation
+  const stopSessionMutation = useMutation({
+    mutationFn: async (sessionId: string) => {
+      await api.post(
+        `attendance/stop/${sessionId}`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+    },
+    onSuccess: () => {
+      setQrGenerated(false);
+      setIsExpired(false);
+      localStorage.removeItem(STORAGE_KEY);
+      toast.success("QR code stopped successfully");
+    },
+    onError: (error) => {
+      toast.error("Error stopping QR code session");
+      console.error("Error stopping session:", error);
+    },
+  });
+
+  // Delete Session Mutation
+  const deleteSessionMutation = useMutation({
+    mutationFn: async (sessionId: string) => {
+      await api.delete(`attendance/session/${sessionId}`, {
+        withCredentials: true,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Session deleted successfully");
+      // Reset UI state
+      setQrGenerated(false);
+      setQrCodeUrl("");
+      setSessionId("");
+      setExpiryTime("");
+      setCourseDetails(null);
+      setIsExpired(false);
+      localStorage.removeItem(STORAGE_KEY);
+      reset();
+    },
+    onError: (error) => {
+      toast.error("Error deleting session");
+      console.error("Error deleting session:", error);
+      // Still reset UI state even if API fails
+      setQrGenerated(false);
+      setQrCodeUrl("");
+      setSessionId("");
+      setExpiryTime("");
+      setCourseDetails(null);
+      setIsExpired(false);
+      localStorage.removeItem(STORAGE_KEY);
+      reset();
     },
   });
 
@@ -202,7 +234,7 @@ const GenerateQR = () => {
     loadSavedSession();
   }, []);
 
-  // Function to calculate time remaining and update every second
+  // Timer effect (keeping the same as before)
   useEffect(() => {
     if (!expiryTime || !qrGenerated) return;
 
@@ -225,28 +257,23 @@ const GenerateQR = () => {
       return { minutes, seconds };
     };
 
-    // Initial calculation
     const initialTimeLeft = calculateTimeLeft();
     setTimeRemaining(initialTimeLeft);
 
-    // Check if already expired
     if (initialTimeLeft.minutes === 0 && initialTimeLeft.seconds === 0) {
       setIsExpired(true);
     }
 
-    // Set up interval to update time remaining
     const timer = setInterval(() => {
       const timeLeft = calculateTimeLeft();
       setTimeRemaining(timeLeft);
 
-      // If time is up, clear the interval and set expired state
       if (timeLeft.minutes === 0 && timeLeft.seconds === 0) {
         setIsExpired(true);
         clearInterval(timer);
       }
     }, 1000);
 
-    // Clean up interval on unmount or when QR code is no longer generated
     return () => clearInterval(timer);
   }, [expiryTime, qrGenerated]);
 
@@ -264,88 +291,30 @@ const GenerateQR = () => {
     }
   }, [qrGenerated, qrCodeUrl, sessionId, expiryTime, courseDetails, isExpired]);
 
-  const handleGenerateQR = async (data: GenerateFields) => {
-    setIsGenerating(true);
-    try {
-      const response = await api.post("attendance/generate", data, {
-        withCredentials: true,
-      });
-
-      // Extract data from response
-      const { qrCodeUrl, sessionId, expiryTime, courseDetails } = response.data;
-
-      setQrCodeUrl(qrCodeUrl);
-      setSessionId(sessionId);
-      setExpiryTime(expiryTime);
-      setCourseDetails(courseDetails);
-      setQrGenerated(true);
-      setIsExpired(false); // Reset expired state for new QR code
-
-      toast.success("QR code generated successfully");
-    } catch (error) {
-      toast.error("Error generating QR code");
-      console.error("Error generating QR code:", error);
-    } finally {
-      setIsGenerating(false);
-    }
+  // Handler functions
+  const handleGenerateQR = (data: GenerateFields) => {
+    generateQRMutation.mutate(data);
   };
 
-  const handleStop = async () => {
+  const handleStop = () => {
     if (!sessionId) return;
+    stopSessionMutation.mutate(sessionId);
+  };
 
-    setIsStopping(true);
-    try {
-      // Call API to stop the session but retain it in the database
-      await api.post(
-        `attendance/stop/${sessionId}`,
-        {},
-        {
-          withCredentials: true,
-        }
-      );
-
+  const handleCancel = () => {
+    if (qrGenerated && sessionId) {
+      deleteSessionMutation.mutate(sessionId);
+    } else {
+      // If no active session, just reset the form
       setQrGenerated(false);
+      setQrCodeUrl("");
+      setSessionId("");
+      setExpiryTime("");
+      setCourseDetails(null);
       setIsExpired(false);
       localStorage.removeItem(STORAGE_KEY);
-      toast.success("QR code stopped successfully");
-    } catch (error) {
-      toast.error("Error stopping QR code session");
-      console.error("Error stopping session:", error);
-    } finally {
-      setIsStopping(false);
+      reset();
     }
-  };
-
-  const handleCancel = async () => {
-    if (qrGenerated && sessionId) {
-      setIsDeleting(true);
-      try {
-        // Call API to delete the session from the database
-        await api.delete(`attendance/session/${sessionId}`, {
-          withCredentials: true,
-        });
-
-        toast.success("Session deleted successfully");
-      } catch (error) {
-        toast.error("Error deleting session");
-        console.error("Error deleting session:", error);
-      } finally {
-        setIsDeleting(false);
-      }
-    }
-
-    // Reset UI state regardless of API success/failure
-    setQrGenerated(false);
-    setQrCodeUrl("");
-    setSessionId("");
-    setExpiryTime("");
-    setCourseDetails(null);
-    setIsExpired(false);
-
-    // Remove from localStorage
-    localStorage.removeItem(STORAGE_KEY);
-
-    reset(); // Reset form to default values
   };
 
   const handleDownload = () => {
@@ -373,7 +342,7 @@ const GenerateQR = () => {
       printWindow.document.writeln(`
         <html>
           <head>
-            <title className="text-cente ">QR Code - ${courseDetails?.courseCode}</title>
+            <title>QR Code - ${courseDetails?.courseCode}</title>
             <style>
               body {
                 display: flex;
@@ -586,11 +555,11 @@ const GenerateQR = () => {
                     >
                       <Button
                         onClick={handleStop}
-                        disabled={isStopping}
+                        disabled={stopSessionMutation.isPending}
                         className="bg-amber-500 hover:bg-amber-600 text-white h-10 rounded-md font-medium transition-colors flex items-center justify-center gap-2 w-full"
                       >
                         <AnimatePresence mode="wait">
-                          {isStopping ? (
+                          {stopSessionMutation.isPending ? (
                             <motion.div
                               key="stopping"
                               initial={{ opacity: 0 }}
@@ -623,12 +592,12 @@ const GenerateQR = () => {
                     >
                       <Button
                         onClick={handleCancel}
-                        disabled={isDeleting}
+                        disabled={deleteSessionMutation.isPending}
                         variant="outline"
                         className="border-red-500 text-red-500 hover:bg-red-50 h-10 rounded-md font-medium transition-colors flex items-center justify-center gap-2 w-full"
                       >
                         <AnimatePresence mode="wait">
-                          {isDeleting ? (
+                          {deleteSessionMutation.isPending ? (
                             <motion.div
                               key="deleting"
                               initial={{ opacity: 0 }}
@@ -841,11 +810,11 @@ const GenerateQR = () => {
                 >
                   <Button
                     type="submit"
-                    disabled={isGenerating}
+                    disabled={generateQRMutation.isPending}
                     className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-md font-medium transition-colors flex items-center justify-center gap-2"
                   >
                     <AnimatePresence mode="wait">
-                      {isGenerating ? (
+                      {generateQRMutation.isPending ? (
                         <motion.div
                           key="generating"
                           initial={{ opacity: 0 }}

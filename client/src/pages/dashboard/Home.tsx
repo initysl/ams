@@ -202,12 +202,12 @@ const Home: React.FC = () => {
                 }`}
               >
                 <img
-                  className="absolute backface-hidden h-64 w-full object-cover md:h-full md:w-full"
+                  className="absolute backface-hidden h-64 w-full object-cover md:h-full md:w-full lazyload"
                   src={img1}
                   alt="A boy with a phone displaying a QR code image in a classroom"
                 />
                 <img
-                  className="backface-hidden transform rotate-y-180 h-64 w-full object-cover md:h-full md:w-full"
+                  className="backface-hidden transform rotate-y-180 h-64 w-full object-cover md:h-full md:w-full lazyload"
                   src={img2}
                   alt="A boy with a phone displaying a QR code image in a classroom"
                 />
