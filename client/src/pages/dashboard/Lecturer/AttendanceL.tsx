@@ -564,12 +564,12 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
               <p className="text-gray-500">No matching records found</p>
             </div>
           ) : (
-            <div className="max-h-[40vh] overflow-y-auto divide-y divide-gray-200 ">
+            <div className="max-h-[60vh] overflow-y-auto divide-y divide-gray-200 relative">
               {filteredReport.map((record, index) => (
                 <div key={index} className="p-4 hover:bg-gray-50">
                   <div className="flex justify-between items-start mb-2">
                     <div className="font-medium text-gray-900">
-                      {record.name}
+                      {record.name} 
                     </div>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
