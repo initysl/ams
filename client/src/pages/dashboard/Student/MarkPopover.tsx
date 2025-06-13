@@ -29,7 +29,7 @@ const MarkPopover: React.FC<MarkPopoverProps> = ({
   onConfirm,
   onCancel,
   isLoading = false,
-  triggerText = "Mark Attendance",
+  triggerText = "Confirm Attendance",
 }) => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
@@ -155,7 +155,7 @@ const MarkPopover: React.FC<MarkPopoverProps> = ({
                       : ""
                   }`}
                 >
-                  {isLoading ? "Marking Attendance..." : "Confirm Attendance"}
+                  {isLoading ? "Marking Attendance..." : triggerText}
                 </Button>
               </div>
             </div>

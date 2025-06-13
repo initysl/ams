@@ -22,9 +22,9 @@ interface ApiError extends Error {
 // Define types for register data
 interface RegisterData {
   name: string;
-  matricNumber?: string | null;
   email: string;
   department: string;
+  matricNumber?: string | null;
   password: string;
   confirmPassword: string;
   profilePicture?: File | null;

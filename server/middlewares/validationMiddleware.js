@@ -7,30 +7,29 @@ const validateRegistration = [
     .customSanitizer((value) => (value ? value.trim() : ""))
     .isLength({ min: 5 })
     .withMessage("Name must be at least 5 characters long"),
-
   check("email").exists().trim().isEmail().withMessage("Invalid email address"),
-
   check("matricNumber")
     .optional()
     .customSanitizer((value) => (value ? value.trim().replace(/\s+/g, "") : ""))
     .matches(/^[A-Za-z0-9/]+$/)
     .isLength({ min: 10 })
     .withMessage("Matric number must be at least 10 characters long"),
-
   check("department")
     .exists()
     .customSanitizer((value) => (value ? value.trim() : ""))
     .isLength({ min: 3 })
     .withMessage("Department must be at least 3 characters long"),
-
   check("password")
     .exists()
-    .customSanitizer((value) => (value ? value.trim().replace(/\s+/g, "") : ""))
-    .matches(/^[A-Za-z0-9/]+$/)
-    .withMessage("Password can only contain letters and numbers")
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long"),
-
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters long")
+    .custom((value) => {
+      // Allow all printable characters, just check it's not empty after trim
+      if (!value || value.trim().length === 0) {
+        throw new Error("Password cannot be empty");
+      }
+      return true;
+    }),
   check("confirmPassword")
     .exists()
     .custom((value, { req }) => {
@@ -44,14 +43,16 @@ const validateRegistration = [
 // Login Validation
 const validateLogin = [
   check("email").exists().isEmail().withMessage("Invalid email address"),
-
   check("password")
     .exists()
-    .customSanitizer((value) => (value ? value.replace(/\s+/g, "") : ""))
-    .matches(/^[A-Za-z0-9/]+$/)
-    .withMessage("Password can only contain letters and numbers")
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long"),
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters long")
+    .custom((value) => {
+      if (!value || value.trim().length === 0) {
+        throw new Error("Password cannot be empty");
+      }
+      return true;
+    }),
 ];
 
 // Session ID Validation
@@ -70,31 +71,32 @@ const validateProfileUpdate = [
     .customSanitizer((value) => (value ? value.trim() : ""))
     .isLength({ min: 5 })
     .withMessage("Name must be at least 5 characters long"),
-
   check("email")
     .optional()
     .trim()
     .isEmail()
     .withMessage("Invalid email address"),
-
   check("matricNumber")
     .optional()
     .customSanitizer((value) => (value ? value.trim().replace(/\s+/g, "") : ""))
     .matches(/^[A-Za-z0-9/]+$/)
     .isLength({ min: 10 })
     .withMessage("Matric number must be at least 10 characters long"),
-
   check("department")
     .optional()
     .customSanitizer((value) => (value ? value.trim() : ""))
     .isLength({ min: 3 })
     .withMessage("Department must be at least 3 characters long"),
-
   check("password")
     .optional()
-    .customSanitizer((value) => (value ? value.replace(/\s+/g, "") : ""))
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long"),
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters long")
+    .custom((value) => {
+      if (value && value.trim().length === 0) {
+        throw new Error("Password cannot be empty");
+      }
+      return true;
+    }),
 ];
 
 module.exports = {

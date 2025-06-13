@@ -52,7 +52,7 @@ const Profilebox: React.FC<ProfileboxProps> = ({
       <input
         type="file"
         name="image"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/jpg"
         className="hidden"
         ref={fileInputRef}
         onChange={handleFileChange}
