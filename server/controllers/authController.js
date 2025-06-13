@@ -11,8 +11,6 @@ const {
   sendResetPasswordEmail,
 } = require("../utils/sendEmail");
 
-// REMOVED: Don't import upload here - it should be used as middleware in routes
-
 // Registration - FIXED
 const register = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -154,7 +152,7 @@ const login = asyncHandler(async (req, res) => {
 
     // Lock account after 5 failed attempts
     if (user.loginAttempts >= 5) {
-      user.lockUntil = Date.now() + 10 * 60 * 1000; // Lock for 10 minutes
+      user.lockUntil = Date.now() + 5 * 60 * 1000; // Lock for 5 minutes
       logger.warn(`User locked out: ${user.email}`);
     }
 
@@ -179,11 +177,11 @@ const login = asyncHandler(async (req, res) => {
   res.status(200).json({
     message: "User logged in successfully",
     user: {
-      _id: user._id, // FIXED: Include user ID
-      name: user.name, // FIXED: Include name
+      _id: user._id,
+      name: user.name,
       matricNumber: user.matricNumber,
       email: user.email,
-      department: user.department, // FIXED: Include department
+      department: user.department,
       profilePicture: user.profilePicture,
       role: user.role,
     },
