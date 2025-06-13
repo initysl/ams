@@ -21,15 +21,10 @@ const validateRegistration = [
     .withMessage("Department must be at least 3 characters long"),
   check("password")
     .exists()
-    .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters long")
-    .custom((value) => {
-      // Allow all printable characters, just check it's not empty after trim
-      if (!value || value.trim().length === 0) {
-        throw new Error("Password cannot be empty");
-      }
-      return true;
-    }),
+    .customSanitizer((value) => (value ? value.trim() : ""))
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+
   check("confirmPassword")
     .exists()
     .custom((value, { req }) => {
@@ -45,14 +40,9 @@ const validateLogin = [
   check("email").exists().isEmail().withMessage("Invalid email address"),
   check("password")
     .exists()
-    .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters long")
-    .custom((value) => {
-      if (!value || value.trim().length === 0) {
-        throw new Error("Password cannot be empty");
-      }
-      return true;
-    }),
+    .customSanitizer((value) => (value ? value.trim() : ""))
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
 ];
 
 // Session ID Validation
@@ -89,8 +79,8 @@ const validateProfileUpdate = [
     .withMessage("Department must be at least 3 characters long"),
   check("password")
     .optional()
-    .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters long")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long")
     .custom((value) => {
       if (value && value.trim().length === 0) {
         throw new Error("Password cannot be empty");
