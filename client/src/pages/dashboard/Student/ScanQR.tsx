@@ -95,7 +95,7 @@ const QRScanner: React.FC = () => {
     mutationFn: async (token: string) => {
       const response = await api.post<AttendanceResponse>("attendance/mark", {
         token,
-        confirmAttendance: false, // Just get course data first
+        confirmAttendance: false, // Get course data first
       });
       return response.data;
     },

@@ -460,7 +460,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
             <Button
               onClick={exportAsCSV}
               disabled={!report.length}
-              className="flex items-center gap-2 bg-lime-100 hover:bg-lime-400 border-none"
+              className="flex items-center gap-2 bg-lime-100 hover:bg-lime-400 hover:text-white border-none"
             >
               <FileSpreadsheet className="h-4 w-4" />
               Export CSV
@@ -468,7 +468,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
             <Button
               onClick={exportAsPDF}
               disabled={!report.length}
-              className="flex items-center gap-2 bg-green-100 hover:bg-green-400 border-none"
+              className="flex items-center gap-2 bg-green-100 hover:bg-green-400 hover:text-white border-none"
             >
               <File className="h-4 w-4" />
               Export PDF
@@ -569,7 +569,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
                 <div key={index} className="p-4 hover:bg-gray-50">
                   <div className="flex justify-between items-start mb-2">
                     <div className="font-medium text-gray-900">
-                      {record.name} 
+                      {record.name}
                     </div>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${

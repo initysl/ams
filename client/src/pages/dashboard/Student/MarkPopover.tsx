@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { QrCode, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AnimatePresence, motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
 
 type CourseData = {
   courseCode: string;
@@ -63,12 +64,12 @@ const MarkPopover: React.FC<MarkPopoverProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-50">
+    <Card className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-50">
       <AnimatePresence>
         <motion.div
           {...popoverAnimation}
           transition={{ duration: 0.3 }}
-          className="w-96 bg-white border border-gray-200 rounded-lg shadow-lg relative"
+          className="w-96 bg-white border border-gray-200 rounded-xl shadow-lg relative"
           role="dialog"
           exit={{ opacity: 0 }} // scale: 0.95
           aria-labelledby="popover-title"
@@ -93,7 +94,7 @@ const MarkPopover: React.FC<MarkPopoverProps> = ({
                 />
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm text-gray-500">Course Code</p>
@@ -141,7 +142,7 @@ const MarkPopover: React.FC<MarkPopoverProps> = ({
                     htmlFor="terms"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    Check to confirm attendance for this lecture
+                    Check to mark attendance for this lecture
                   </Label>
                 </div>
 
@@ -209,7 +210,7 @@ const MarkPopover: React.FC<MarkPopoverProps> = ({
           )}
         </motion.div>
       </AnimatePresence>
-    </div>
+    </Card>
   );
 };
 
