@@ -479,7 +479,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
       {/* Attendance Table */}
       <div className="bg-white overflow-x-auto rounded-md shadow-xl">
         {/* Regular Table for Medium and Up Screens */}
-        <div className="hidden md:block">
+        <div className="hidden md:block max-h-[70vh] overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="table-header bg-gray-50">
               <tr>
@@ -564,7 +564,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
               <p className="text-gray-500">No matching records found</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
+            <div className="max-h-[40vh] overflow-y-auto divide-y divide-gray-200 ">
               {filteredReport.map((record, index) => (
                 <div key={index} className="p-4 hover:bg-gray-50">
                   <div className="flex justify-between items-start mb-2">

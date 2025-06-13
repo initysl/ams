@@ -21,18 +21,18 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
 });
 
 const loginLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 5, // Limit to 3 attempts per IP
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 5, // Limit to 5 attempts per IP
   keyGenerator: (req) => {
     return req.headers["x-forwarded-for"] || req.ip; // Works with proxies
   },
   message: {
-    message: "Too many login attecmpts, try again after ten minutes",
+    message: "Too many login attecmpts, try again after five minutes",
   },
   handler: (req, res) => {
     logger.warn(`🚨 Too many login attempts from IP: ${req.ip}`);
     res.status(429).json({
-      message: "Too many login attempts, try again after ten minutes",
+      message: "Too many login attempts, try again after five minutes",
     });
   },
   standardHeaders: true, // Return rate limit headers
