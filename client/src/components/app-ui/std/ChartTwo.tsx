@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import api from "@/lib/axios";
+import { Button } from "@/components/ui/button";
 
 // Types
 interface AttendanceRecord {
@@ -20,7 +21,7 @@ interface AttendanceRecord {
   courseCode: string;
   courseTitle: string;
   level: number;
-  status: 'present' | 'absent' | 'late';
+  status: "present" | "absent" | "late";
   date: string;
   exactDate?: Date;
 }
@@ -61,7 +62,7 @@ const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const STATUS_COLORS = {
   present: "#10B981",
-  absent: "#EF4444", 
+  absent: "#EF4444",
   late: "#F59E0B",
 } as const;
 
@@ -77,13 +78,13 @@ const useAttendanceData = (timeFilter: TimeFilterType) => {
     setLoading(true);
     setError(null);
     setHasNoRecords(false);
-    
+
     try {
       const response = await api.get("/attendance/record", {
         timeout: 10000, // 10 second timeout
-        params: { filter: timeFilter }
+        params: { filter: timeFilter },
       });
-      
+
       if (response.status === 200) {
         const responseData = Array.isArray(response.data) ? response.data : [];
         setData(responseData);
@@ -104,7 +105,8 @@ const useAttendanceData = (timeFilter: TimeFilterType) => {
         setHasNoRecords(true);
         setLastFetch(new Date());
       } else {
-        const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error occurred";
         setError(`Failed to load attendance data: ${errorMessage}`);
         console.error("Attendance data fetch error:", err);
       }
@@ -144,7 +146,11 @@ const calculateAttendanceRate = (present: number, total: number): number => {
 };
 
 // Components
-const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label }) => {
+const CustomTooltip: React.FC<CustomTooltipProps> = ({
+  active,
+  payload,
+  label,
+}) => {
   if (!active || !payload?.length) return null;
 
   const data = payload[0]?.payload;
@@ -179,7 +185,10 @@ const LoadingState: React.FC = () => (
   </div>
 );
 
-const ErrorState: React.FC<{ error: string; onRetry: () => void }> = ({ error, onRetry }) => (
+const ErrorState: React.FC<{ error: string; onRetry: () => void }> = ({
+  error,
+  onRetry,
+}) => (
   <div className="flex flex-col justify-center items-center h-64 space-y-4">
     <AlertCircle className="h-12 w-12 text-red-500" />
     <div className="text-center">
@@ -197,13 +206,18 @@ const ErrorState: React.FC<{ error: string; onRetry: () => void }> = ({ error, o
   </div>
 );
 
-const NoRecordsState: React.FC<{ timeFilter: TimeFilterType }> = ({ timeFilter }) => (
+const NoRecordsState: React.FC<{ timeFilter: TimeFilterType }> = ({
+  timeFilter,
+}) => (
   <div className="flex flex-col justify-center items-center h-64 space-y-4">
     <div className="text-6xl">📋</div>
     <div className="text-center">
-      <p className="text-gray-700 font-medium text-lg">No Attendance Records Found</p>
+      <p className="text-gray-700 font-medium text-lg">
+        No Attendance Records Found
+      </p>
       <p className="text-gray-500 text-sm mt-2">
-        You haven't recorded any attendance for the selected {timeFilter} period.
+        You haven't recorded any attendance for the selected {timeFilter}{" "}
+        period.
       </p>
       <p className="text-gray-400 text-xs mt-1">
         Start attending classes to see your attendance analytics here.
@@ -212,7 +226,9 @@ const NoRecordsState: React.FC<{ timeFilter: TimeFilterType }> = ({ timeFilter }
   </div>
 );
 
-const EmptyState: React.FC<{ timeFilter: TimeFilterType }> = ({ timeFilter }) => (
+const EmptyState: React.FC<{ timeFilter: TimeFilterType }> = ({
+  timeFilter,
+}) => (
   <div className="flex flex-col justify-center items-center h-64 space-y-2">
     <div className="text-gray-400 text-4xl">📊</div>
     <p className="text-gray-500 text-center">
@@ -224,13 +240,21 @@ const EmptyState: React.FC<{ timeFilter: TimeFilterType }> = ({ timeFilter }) =>
 // Main Component
 const AttendanceChart: React.FC = () => {
   const [timeFilter, setTimeFilter] = useState<TimeFilterType>("week");
-  const { data: attendanceData, loading, error, hasNoRecords, lastFetch, refetch } = useAttendanceData(timeFilter);
+  const {
+    data: attendanceData,
+    loading,
+    error,
+    hasNoRecords,
+    lastFetch,
+    refetch,
+  } = useAttendanceData(timeFilter);
 
   const chartData = useMemo((): ChartDataPoint[] => {
     if (attendanceData.length === 0) return [];
 
-    const filterDays = TIME_FILTERS.find(f => f.key === timeFilter)?.days ?? 7;
-    
+    const filterDays =
+      TIME_FILTERS.find((f) => f.key === timeFilter)?.days ?? 7;
+
     const filteredData = attendanceData.filter((record) => {
       const recordDate = new Date(record.date);
       return isDateInRange(recordDate, filterDays);
@@ -265,25 +289,25 @@ const AttendanceChart: React.FC = () => {
       // Count by status
       const status = record.status?.toLowerCase();
       switch (status) {
-        case 'present':
+        case "present":
           groupedByDay[dayKey].present++;
           break;
-        case 'absent':
+        case "absent":
           groupedByDay[dayKey].absent++;
           break;
-        case 'late':
+        case "late":
           groupedByDay[dayKey].late++;
           break;
       }
-      
+
       groupedByDay[dayKey].total++;
     });
 
     // Calculate attendance rates and sort
     const chartData = Object.values(groupedByDay)
-      .map(item => ({
+      .map((item) => ({
         ...item,
-        attendanceRate: calculateAttendanceRate(item.present, item.total)
+        attendanceRate: calculateAttendanceRate(item.present, item.total),
       }))
       .sort((a, b) => a.dateValue.getTime() - b.dateValue.getTime());
 
@@ -297,7 +321,7 @@ const AttendanceChart: React.FC = () => {
   return (
     <Card className="bg-white rounded-xl shadow-sm">
       <CardHeader className="pb-4">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
+        <div className="flex flex-col justify-between items-start space-y-3 ">
           <div>
             <CardTitle className="text-xl font-semibold text-gray-900">
               Attendance Analytics
@@ -311,19 +335,19 @@ const AttendanceChart: React.FC = () => {
 
           <div className="flex flex-wrap gap-2">
             {TIME_FILTERS.map((filter) => (
-              <button
+              <Button
                 key={filter.key}
                 onClick={() => handleFilterChange(filter.key)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`text-sm  transition-all duration-200 ${
                   timeFilter === filter.key
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:shadow-sm"
+                    ? "bg-yellow-500 hover: text-white "
+                    : "bg-gray-100 text-gray-600  hover:shadow-sm "
                 }`}
                 type="button"
                 aria-pressed={timeFilter === filter.key}
               >
                 {filter.label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -345,15 +369,19 @@ const AttendanceChart: React.FC = () => {
                 data={chartData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#f0f0f0"
+                />
                 <XAxis
                   dataKey="date"
-                  tick={{ fontSize: 12, fill: '#6B7280' }}
+                  tick={{ fontSize: 12, fill: "#6B7280" }}
                   axisLine={{ stroke: "#E5E7EB" }}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 12, fill: '#6B7280' }}
+                  tick={{ fontSize: 12, fill: "#6B7280" }}
                   axisLine={{ stroke: "#E5E7EB" }}
                   tickLine={false}
                   width={40}
