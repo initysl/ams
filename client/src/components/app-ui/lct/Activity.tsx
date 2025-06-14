@@ -302,7 +302,7 @@ const Activity = () => {
           {recentActivities.map((activity, index) => (
             <motion.div
               key={activity.id}
-              className="flex items-center space-x-4 p-4 rounded-full bg-gray-50 hover:bg-gray-200 transition-colors"
+              className="flex items-center space-x-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-200 transition-colors"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
