@@ -361,19 +361,19 @@ const AttendanceS = () => {
                         <Table className="min-w-full">
                           <TableHeader className="table-header">
                             <TableRow>
-                              <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                                 Course
                               </TableHead>
-                              <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                                 Code
                               </TableHead>
-                              <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                                 Level
                               </TableHead>
-                              <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                                 Status
                               </TableHead>
-                              <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                                 Date
                               </TableHead>
                             </TableRow>
