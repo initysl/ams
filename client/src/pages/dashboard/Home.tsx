@@ -21,8 +21,8 @@ import img2 from "@/assets/images/card/qrw.png";
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import Activity from "@/components/app-ui/general/Activity";
-import Achievement from "@/components/app-ui/general/Achievement";
+import Activity from "@/components/app-ui/lct/Activity";
+import Achievement from "@/components/app-ui/std/Achievement";
 
 const cardData = {
   cards: [

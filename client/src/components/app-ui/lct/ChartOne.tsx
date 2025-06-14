@@ -11,15 +11,17 @@ import {
   Legend,
   ReferenceLine,
 } from "recharts";
+import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { TooltipProps as RechartsTooltipProps } from "recharts";
-import { Loader2 } from "lucide-react";
+import { Loader2, TrendingUp, BarChart3 } from "lucide-react";
 
 interface AttendanceRecord {
   sessionDate: string;
   attendanceCount: number;
   courseCode: string;
 }
+
 interface ChartDataPoint {
   name: string;
   attendance: number;
@@ -27,10 +29,14 @@ interface ChartDataPoint {
   date: string;
 }
 
+interface EmptyStateProps {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+}
+
 const ChartOne = () => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<string>("all");
   const [timeRange, setTimeRange] = useState<string>("week");
   const [courses, setCourses] = useState<string[]>([]);
@@ -47,60 +53,68 @@ const ChartOne = () => {
     return `${day} ${dayOfMonth}/${month}`;
   };
 
+  const fetchAttendanceMutation = useMutation({
+    mutationFn: async (): Promise<AttendanceRecord[]> => {
+      const response = await api.get<AttendanceRecord[]>("attendance/trend", {
+        withCredentials: true,
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      // Extract all unique courses
+      const uniqueCourses = Array.from(
+        new Set(data.map((entry: AttendanceRecord) => entry.courseCode))
+      );
+      setCourses(uniqueCourses);
+
+      const formattedData: ChartDataPoint[] = data.map(
+        (entry: AttendanceRecord) => ({
+          name: formatDate(entry.sessionDate),
+          attendance: entry.attendanceCount,
+          courseCode: entry.courseCode,
+          date: entry.sessionDate,
+        })
+      );
+
+      // Calculate statistics
+      const total = formattedData.reduce(
+        (sum: number, entry: ChartDataPoint) => sum + entry.attendance,
+        0
+      );
+      const avg =
+        formattedData.length > 0 ? Math.round(total / formattedData.length) : 0;
+      setAverageAttendance(avg);
+
+      const max =
+        formattedData.length > 0
+          ? Math.max(
+              ...formattedData.map((entry: ChartDataPoint) => entry.attendance)
+            )
+          : 0;
+      setMaxAttendance(max);
+
+      setChartData(formattedData);
+    },
+    onError: (error: any) => {
+      console.error("Error fetching attendance trend:", error);
+      setChartData([]);
+      setCourses([]);
+      setAverageAttendance(0);
+      setMaxAttendance(0);
+    },
+  });
+
   useEffect(() => {
-    const fetchAttendance = async () => {
-      try {
-        const res = await api.get<AttendanceRecord[]>("attendance/trend", {
-          withCredentials: true,
-        });
-
-        // Extract all unique courses
-        const uniqueCourses = Array.from(
-          new Set(res.data.map((entry: AttendanceRecord) => entry.courseCode))
-        );
-        setCourses(uniqueCourses);
-
-        const formattedData: ChartDataPoint[] = res.data.map(
-          (entry: AttendanceRecord) => ({
-            name: formatDate(entry.sessionDate),
-            attendance: entry.attendanceCount,
-            courseCode: entry.courseCode,
-            date: entry.sessionDate,
-          })
-        );
-
-        // Calculate statistics
-        const total = formattedData.reduce(
-          (sum: number, entry: ChartDataPoint) => sum + entry.attendance,
-          0
-        );
-        const avg =
-          formattedData.length > 0
-            ? Math.round(total / formattedData.length)
-            : 0;
-        setAverageAttendance(avg);
-
-        const max =
-          formattedData.length > 0
-            ? Math.max(
-                ...formattedData.map(
-                  (entry: ChartDataPoint) => entry.attendance
-                )
-              )
-            : 0;
-        setMaxAttendance(max);
-
-        setChartData(formattedData);
-      } catch (err) {
-        console.error("Error fetching attendance trend:", err);
-        setError("Failed to load chart data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAttendance();
+    fetchAttendanceMutation.mutate();
   }, []);
+
+  // Check if it's a 404 error (no records found)
+  const isNoRecordsFound =
+    fetchAttendanceMutation.isError &&
+    fetchAttendanceMutation.error?.response?.status === 404;
+
+  // Check if it's a different error
+  const hasError = fetchAttendanceMutation.isError && !isNoRecordsFound;
 
   // Filter data based on selected course and time range
   const filteredData = chartData.filter((entry: ChartDataPoint) => {
@@ -153,19 +167,29 @@ const ChartOne = () => {
     );
   };
 
+  const EmptyState = ({ title, description, icon: Icon }: EmptyStateProps) => (
+    <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+      <Icon className="h-12 w-12 mb-4 text-gray-300" />
+      <h3 className="text-lg font-medium text-gray-700 mb-2">{title}</h3>
+      <p className="text-sm text-center max-w-sm">{description}</p>
+    </div>
+  );
+
   return (
     <div>
       <Card className="bg-white">
         <CardHeader className="pb-2">
           <div className="flex justify-between items-center flex-wrap space-y-2">
-            <CardTitle className="text-lg font-semibold">
+            <CardTitle className="card-title text-lg font-semibold flex items-center">
               Attendance Trend
+              <TrendingUp className="h-5 w-5 ml-2 text-blue-600" />
             </CardTitle>
             <div className="flex space-x-3">
               <select
                 value={selectedCourse}
                 onChange={handleCourseChange}
-                className="p-1 text-sm rounded-md bg-yellow-100 "
+                disabled={fetchAttendanceMutation.isPending}
+                className="p-1 text-sm rounded-md bg-yellow-100 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <option value="all">All Courses</option>
                 {courses.map((course) => (
@@ -177,7 +201,8 @@ const ChartOne = () => {
               <select
                 value={timeRange}
                 onChange={handleTimeRangeChange}
-                className="p-1 text-sm rounded-md bg-gray-100"
+                disabled={fetchAttendanceMutation.isPending}
+                className="p-1 text-sm rounded-md bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <option value="week">Last Week</option>
                 <option value="month">Last Month</option>
@@ -186,80 +211,101 @@ const ChartOne = () => {
             </div>
           </div>
 
-          {/* Quick Stats */}
-          <div className="flex mt-2 gap-4  text-sm flex-wrap">
-            <div className="bg-blue-50 p-2 rounded-md">
-              <span className="font-medium">Average: </span>
-              <span className="text-blue-700">
-                {averageAttendance} students
-              </span>
-            </div>
-            <div className="bg-green-50 p-2 rounded-md">
-              <span className="font-medium">Highest: </span>
-              <span className="text-green-700">{maxAttendance} students</span>
-            </div>
-            <div className="bg-purple-50 p-2 rounded-md">
-              <span className="font-medium">Sessions: </span>
-              <span className="text-purple-700">{filteredData.length}</span>
-            </div>
-          </div>
+          {/* Quick Stats - Only show when we have data */}
+          {!fetchAttendanceMutation.isPending &&
+            !hasError &&
+            !isNoRecordsFound &&
+            chartData.length > 0 && (
+              <div className="flex mt-2 gap-4 text-sm flex-wrap">
+                <div className="bg-blue-50 p-2 rounded-md">
+                  <span className="font-medium">Average: </span>
+                  <span className="text-blue-700">
+                    {averageAttendance} students
+                  </span>
+                </div>
+                <div className="bg-green-50 p-2 rounded-md">
+                  <span className="font-medium">Highest: </span>
+                  <span className="text-green-700">
+                    {maxAttendance} students
+                  </span>
+                </div>
+                <div className="bg-purple-50 p-2 rounded-md">
+                  <span className="font-medium">Sessions: </span>
+                  <span className="text-purple-700">{filteredData.length}</span>
+                </div>
+              </div>
+            )}
         </CardHeader>
 
         <CardContent>
-          {loading ? (
+          {fetchAttendanceMutation.isPending ? (
             <div className="flex justify-center items-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
             </div>
-          ) : error ? (
-            <p className="text-sm text-red-500">{error}</p>
+          ) : hasError ? (
+            <EmptyState
+              icon={BarChart3}
+              title="Unable to Load Trend Data"
+              description="There was an error loading your attendance trend data. Please try again later."
+            />
+          ) : isNoRecordsFound ? (
+            <EmptyState
+              icon={BarChart3}
+              title="No Attendance Trend Data"
+              description="You don't have any attendance trend records yet. Your attendance trends will appear here once you start attending classes."
+            />
           ) : filteredData.length === 0 ? (
-            <p className="text-sm text-zinc-500">
-              No attendance data available for the selected filter
-            </p>
+            <EmptyState
+              icon={BarChart3}
+              title="No Data for Selected Filter"
+              description={`No attendance data available for the selected ${timeRange} ${
+                selectedCourse !== "all" ? `and course ${selectedCourse}` : ""
+              }. Try adjusting your filters.`}
+            />
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart
-                data={filteredData}
-                margin={{ top: 10, right: 30, left: -25, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis dataKey="name" stroke="#8884d8" fontSize={13} />
-                <YAxis fontSize={13} />
-                <Tooltip content={renderTooltipContent} />
-                <Legend verticalAlign="top" height={36} />
+            <>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart
+                  data={filteredData}
+                  margin={{ top: 10, right: 30, left: -25, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                  <XAxis dataKey="name" stroke="#8884d8" fontSize={13} />
+                  <YAxis fontSize={13} />
+                  <Tooltip content={renderTooltipContent} />
+                  <Legend verticalAlign="top" height={36} />
 
-                {/* Reference line for average attendance */}
-                <ReferenceLine
-                  y={averageAttendance}
-                  stroke="#8884d8"
-                  strokeDasharray="3 3"
-                  label={{
-                    position: "insideBottomRight",
-                    value: "Average",
-                    fill: "#8884d8",
-                    fontSize: 13,
-                  }}
-                />
+                  {/* Reference line for average attendance */}
+                  <ReferenceLine
+                    y={averageAttendance}
+                    stroke="#8884d8"
+                    strokeDasharray="3 3"
+                    label={{
+                      position: "insideBottomRight",
+                      value: "Average",
+                      fill: "#8884d8",
+                      fontSize: 13,
+                    }}
+                  />
 
-                <Line
-                  type="monotone"
-                  dataKey="attendance"
-                  stroke="#4ade80"
-                  strokeWidth={2}
-                  name="Attendance"
-                  dot={{ r: 8 }}
-                  activeDot={{ r: 6, fill: "#166534" }}
-                  animationDuration={1000}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          )}
+                  <Line
+                    type="monotone"
+                    dataKey="attendance"
+                    stroke="#4ade80"
+                    strokeWidth={2}
+                    name="Attendance"
+                    dot={{ r: 8 }}
+                    activeDot={{ r: 6, fill: "#166534" }}
+                    animationDuration={1000}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
 
-          {!loading && !error && filteredData.length > 0 && (
-            <div className="mt-2 text-xs text-gray-500 text-center">
-              Click on data points for more details. Use the filters above to
-              refine your view.
-            </div>
+              <div className="mt-2 text-xs text-gray-500 text-center">
+                Click on data points for more details. Use the filters above to
+                refine your view.
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

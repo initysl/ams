@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   BarChart,
@@ -11,31 +11,26 @@ import {
   TooltipProps,
   Legend,
 } from "recharts";
-import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
+import { Loader2, Calendar, TrendingUp } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
-import { Button } from "@/components/ui/button";
 
-// Types
 interface AttendanceRecord {
   sessionId: string;
   courseCode: string;
   courseTitle: string;
   level: number;
-  status: "present" | "absent" | "late";
+  status: string;
   date: string;
-  exactDate?: Date;
+  exactDate: Date | null;
 }
 
 interface ChartDataPoint {
   day: string;
   date: string;
-  dateValue: Date;
-  courses: string[];
+  courseCode: string;
   present: number;
-  absent: number;
-  late: number;
   total: number;
-  attendanceRate: number;
 }
 
 interface CustomTooltipProps extends TooltipProps<number, string> {
@@ -49,379 +44,256 @@ interface CustomTooltipProps extends TooltipProps<number, string> {
   label?: string;
 }
 
-type TimeFilterType = "week" | "month" | "quarter";
+interface EmptyStateProps {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+}
 
-// Constants
-const TIME_FILTERS = [
-  { key: "week" as const, label: "This Week", days: 7 },
-  { key: "month" as const, label: "This Month", days: 30 },
-  { key: "quarter" as const, label: "This Quarter", days: 90 },
-];
+type TimeFilterType = "week" | "month";
 
-const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const ChartTwo: React.FC = () => {
+  const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
+  const [timeFilter, setTimeFilter] = useState<TimeFilterType>("week");
 
-const STATUS_COLORS = {
-  present: "#10B981",
-  absent: "#EF4444",
-  late: "#F59E0B",
-} as const;
-
-// Custom Hooks
-const useAttendanceData = (timeFilter: TimeFilterType) => {
-  const [data, setData] = useState<AttendanceRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [hasNoRecords, setHasNoRecords] = useState(false);
-  const [lastFetch, setLastFetch] = useState<Date | null>(null);
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    setHasNoRecords(false);
-
-    try {
-      const response = await api.get("/attendance/record", {
-        timeout: 10000, // 10 second timeout
-        params: { filter: timeFilter },
-      });
-
-      if (response.status === 200) {
-        const responseData = Array.isArray(response.data) ? response.data : [];
-        setData(responseData);
-        setLastFetch(new Date());
-        setHasNoRecords(responseData.length === 0);
-      } else if (response.status === 404) {
-        // 404 means no records found, not an error
-        setData([]);
-        setHasNoRecords(true);
-        setLastFetch(new Date());
-      } else {
-        throw new Error(`Unexpected response status: ${response.status}`);
-      }
-    } catch (err: any) {
-      // Check if it's a 404 error from axios
-      if (err.response?.status === 404) {
-        setData([]);
-        setHasNoRecords(true);
-        setLastFetch(new Date());
-      } else {
-        const errorMessage =
-          err instanceof Error ? err.message : "Unknown error occurred";
-        setError(`Failed to load attendance data: ${errorMessage}`);
-        console.error("Attendance data fetch error:", err);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [timeFilter]);
+  const fetchAttendanceMutation = useMutation({
+    mutationFn: async (): Promise<AttendanceRecord[]> => {
+      const response = await api.get("attendance/record");
+      return response.data;
+    },
+    onSuccess: (data) => {
+      setAttendanceData(data);
+    },
+    onError: (error: any) => {
+      console.error("Error fetching attendance data:", error);
+      setAttendanceData([]);
+    },
+  });
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchAttendanceMutation.mutate();
+  }, [timeFilter]);
 
-  const refetch = useCallback(() => {
-    fetchData();
-  }, [fetchData]);
+  // Check if it's a 404 error (no records found)
+  const isNoRecordsFound =
+    fetchAttendanceMutation.isError &&
+    fetchAttendanceMutation.error?.response?.status === 404;
 
-  return { data, loading, error, hasNoRecords, lastFetch, refetch };
-};
+  // Check if it's a different error
+  const hasError = fetchAttendanceMutation.isError && !isNoRecordsFound;
 
-// Utility Functions
-const formatDate = (date: Date): string => {
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
-};
-
-const isDateInRange = (date: Date, days: number): boolean => {
-  const now = new Date();
-  const rangeStart = new Date();
-  rangeStart.setDate(now.getDate() - days);
-  return date >= rangeStart && date <= now;
-};
-
-const calculateAttendanceRate = (present: number, total: number): number => {
-  return total > 0 ? Math.round((present / total) * 100) : 0;
-};
-
-// Components
-const CustomTooltip: React.FC<CustomTooltipProps> = ({
-  active,
-  payload,
-  label,
-}) => {
-  if (!active || !payload?.length) return null;
-
-  const data = payload[0]?.payload;
-  if (!data) return null;
-
-  return (
-    <div className="bg-white p-4 border border-gray-200 shadow-lg rounded-lg max-w-xs">
-      <p className="font-semibold text-gray-900 mb-2">
-        {`${label} (${data.day})`}
-      </p>
-      <div className="space-y-1">
-        <p className="text-sm text-gray-600">
-          Courses: {data.courses.join(", ") || "N/A"}
-        </p>
-        <p className="text-sm text-gray-600">
-          Attendance Rate: {data.attendanceRate}%
-        </p>
-        {payload.map((entry, index) => (
-          <p key={index} className="text-sm" style={{ color: entry.color }}>
-            {`${entry.name}: ${entry.value}`}
-          </p>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const LoadingState: React.FC = () => (
-  <div className="flex flex-col justify-center items-center h-64 space-y-2">
-    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-    <p className="text-sm text-gray-500">Loading attendance data...</p>
-  </div>
-);
-
-const ErrorState: React.FC<{ error: string; onRetry: () => void }> = ({
-  error,
-  onRetry,
-}) => (
-  <div className="flex flex-col justify-center items-center h-64 space-y-4">
-    <AlertCircle className="h-12 w-12 text-red-500" />
-    <div className="text-center">
-      <p className="text-red-600 font-medium">Error Loading Data</p>
-      <p className="text-sm text-gray-500 mt-1">{error}</p>
-    </div>
-    <button
-      onClick={onRetry}
-      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-      type="button"
-    >
-      <RefreshCw className="h-4 w-4" />
-      <span>Retry</span>
-    </button>
-  </div>
-);
-
-const NoRecordsState: React.FC<{ timeFilter: TimeFilterType }> = ({
-  timeFilter,
-}) => (
-  <div className="flex flex-col justify-center items-center h-64 space-y-4">
-    <div className="text-6xl">📋</div>
-    <div className="text-center">
-      <p className="text-gray-700 font-medium text-lg">
-        No Attendance Records Found
-      </p>
-      <p className="text-gray-500 text-sm mt-2">
-        You haven't recorded any attendance for the selected {timeFilter}{" "}
-        period.
-      </p>
-      <p className="text-gray-400 text-xs mt-1">
-        Start attending classes to see your attendance analytics here.
-      </p>
-    </div>
-  </div>
-);
-
-const EmptyState: React.FC<{ timeFilter: TimeFilterType }> = ({
-  timeFilter,
-}) => (
-  <div className="flex flex-col justify-center items-center h-64 space-y-2">
-    <div className="text-gray-400 text-4xl">📊</div>
-    <p className="text-gray-500 text-center">
-      No attendance data available for the selected {timeFilter} period
-    </p>
-  </div>
-);
-
-// Main Component
-const AttendanceChart: React.FC = () => {
-  const [timeFilter, setTimeFilter] = useState<TimeFilterType>("week");
-  const {
-    data: attendanceData,
-    loading,
-    error,
-    hasNoRecords,
-    lastFetch,
-    refetch,
-  } = useAttendanceData(timeFilter);
-
-  const chartData = useMemo((): ChartDataPoint[] => {
+  // Process data for chart visualization based on time filter
+  const prepareChartData = (): ChartDataPoint[] => {
     if (attendanceData.length === 0) return [];
 
-    const filterDays =
-      TIME_FILTERS.find((f) => f.key === timeFilter)?.days ?? 7;
-
+    const now = new Date();
     const filteredData = attendanceData.filter((record) => {
       const recordDate = new Date(record.date);
-      return isDateInRange(recordDate, filterDays);
+
+      if (timeFilter === "week") {
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(now.getDate() - 7);
+        return recordDate >= oneWeekAgo;
+      } else {
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setDate(now.getDate() - 30);
+        return recordDate >= oneMonthAgo;
+      }
     });
 
+    // Format date strings for display
+    const formatDate = (date: Date): string => {
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+    };
     const groupedByDay: Record<string, ChartDataPoint> = {};
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     filteredData.forEach((record) => {
       const recordDate = new Date(record.date);
       const formattedDate = formatDate(recordDate);
       const dayKey = formattedDate;
+      const courseCode = record.courseCode;
 
       if (!groupedByDay[dayKey]) {
         groupedByDay[dayKey] = {
-          day: DAYS_OF_WEEK[recordDate.getDay()],
+          day: daysOfWeek[recordDate.getDay()],
           date: formattedDate,
-          dateValue: recordDate,
-          courses: [],
+          courseCode: courseCode,
           present: 0,
-          absent: 0,
-          late: 0,
           total: 0,
-          attendanceRate: 0,
         };
+      } else {
+        // If we have multiple course codes on the same day, combine them
+        // This approach keeps the most recent course code for display
+        groupedByDay[dayKey].courseCode = courseCode;
       }
-
-      // Track unique courses
-      if (!groupedByDay[dayKey].courses.includes(record.courseCode)) {
-        groupedByDay[dayKey].courses.push(record.courseCode);
+      if (record.status && record.status.toLowerCase() === "present") {
+        groupedByDay[dayKey].present++;
       }
-
-      // Count by status
-      const status = record.status?.toLowerCase();
-      switch (status) {
-        case "present":
-          groupedByDay[dayKey].present++;
-          break;
-        case "absent":
-          groupedByDay[dayKey].absent++;
-          break;
-        case "late":
-          groupedByDay[dayKey].late++;
-          break;
-      }
-
       groupedByDay[dayKey].total++;
     });
 
-    // Calculate attendance rates and sort
-    const chartData = Object.values(groupedByDay)
-      .map((item) => ({
-        ...item,
-        attendanceRate: calculateAttendanceRate(item.present, item.total),
-      }))
-      .sort((a, b) => a.dateValue.getTime() - b.dateValue.getTime());
+    // Convert to array and sort by date
+    let chartData = Object.values(groupedByDay);
+
+    // Sort chronologically
+    chartData.sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateA.getTime() - dateB.getTime();
+    });
 
     return chartData;
-  }, [attendanceData, timeFilter]);
+  };
 
-  const handleFilterChange = useCallback((filter: TimeFilterType) => {
-    setTimeFilter(filter);
-  }, []);
+  const chartData = prepareChartData();
+
+  const CustomTooltip: React.FC<CustomTooltipProps> = ({
+    active,
+    payload,
+    label,
+  }) => {
+    if (active && payload && payload.length) {
+      const courseCode = payload[0]?.payload.courseCode || "N/A";
+
+      return (
+        <div className="bg-white p-4 border border-gray-200 shadow-md rounded-md">
+          <p className="font-semibold">{`${label} (${payload[0]?.payload.day})`}</p>
+          <p className="text-gray-700">{`Course: ${courseCode}`}</p>
+          {payload.map((entry, index) => (
+            <p key={index} style={{ color: entry.color }}>
+              {`${entry.name}: ${entry.value}`}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const EmptyState = ({ title, description, icon: Icon }: EmptyStateProps) => (
+    <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+      <Icon className="h-12 w-12 mb-4 text-gray-300" />
+      <h3 className="text-lg font-medium text-gray-700 mb-2">{title}</h3>
+      <p className="text-sm text-center max-w-sm">{description}</p>
+    </div>
+  );
 
   return (
-    <Card className="bg-white rounded-xl shadow-sm">
-      <CardHeader className="pb-4">
-        <div className="flex flex-col justify-between items-start space-y-3 ">
-          <div>
-            <CardTitle className="text-xl font-semibold text-gray-900">
-              Attendance Analytics
+    <div>
+      <Card className="bg-white rounded-xl">
+        <CardHeader className="card-header pb-2">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
+            <CardTitle className="text-lg font-semibold flex items-center mb-2">
+              Attendance Trend
+              <TrendingUp className="h-5 w-5 ml-2 text-blue-600" />
             </CardTitle>
-            {lastFetch && (
-              <p className="text-sm text-gray-500 mt-1">
-                Last updated: {lastFetch.toLocaleTimeString()}
-              </p>
-            )}
-          </div>
 
-          <div className="flex flex-wrap gap-2">
-            {TIME_FILTERS.map((filter) => (
-              <Button
-                key={filter.key}
-                onClick={() => handleFilterChange(filter.key)}
-                className={`text-sm  transition-all duration-200 ${
-                  timeFilter === filter.key
-                    ? "bg-yellow-500 hover: text-white "
-                    : "bg-gray-100 text-gray-600  hover:shadow-sm "
-                }`}
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setTimeFilter("week")}
+                disabled={fetchAttendanceMutation.isPending}
+                className={`px-4 py-1 rounded-full text-sm font-medium transition-colors ${
+                  timeFilter === "week"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
                 type="button"
-                aria-pressed={timeFilter === filter.key}
+                aria-pressed={timeFilter === "week"}
               >
-                {filter.label}
-              </Button>
-            ))}
+                This Week
+              </button>
+              <button
+                onClick={() => setTimeFilter("month")}
+                disabled={fetchAttendanceMutation.isPending}
+                className={`px-4 py-1 rounded-full text-sm font-medium transition-colors ${
+                  timeFilter === "month"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                type="button"
+                aria-pressed={timeFilter === "month"}
+              >
+                This Month
+              </button>
+            </div>
           </div>
-        </div>
-      </CardHeader>
+        </CardHeader>
 
-      <CardContent>
-        {loading ? (
-          <LoadingState />
-        ) : error ? (
-          <ErrorState error={error} onRetry={refetch} />
-        ) : hasNoRecords ? (
-          <NoRecordsState timeFilter={timeFilter} />
-        ) : chartData.length === 0 ? (
-          <EmptyState timeFilter={timeFilter} />
-        ) : (
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={chartData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="#f0f0f0"
-                />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 12, fill: "#6B7280" }}
-                  axisLine={{ stroke: "#E5E7EB" }}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 12, fill: "#6B7280" }}
-                  axisLine={{ stroke: "#E5E7EB" }}
-                  tickLine={false}
-                  width={40}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend
-                  verticalAlign="top"
-                  align="right"
-                  iconType="circle"
-                  iconSize={8}
-                  wrapperStyle={{ paddingBottom: 20 }}
-                />
-                <Bar
-                  dataKey="present"
-                  name="Present"
-                  fill={STATUS_COLORS.present}
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={40}
-                />
-                <Bar
-                  dataKey="late"
-                  name="Late"
-                  fill={STATUS_COLORS.late}
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={40}
-                />
-                <Bar
-                  dataKey="absent"
-                  name="Absent"
-                  fill={STATUS_COLORS.absent}
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={40}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        <CardContent>
+          {fetchAttendanceMutation.isPending ? (
+            <div className="flex justify-center items-center h-64">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+            </div>
+          ) : hasError ? (
+            <EmptyState
+              icon={Calendar}
+              title="Unable to Load Data"
+              description="There was an error loading your attendance data. Please try again later."
+            />
+          ) : isNoRecordsFound ? (
+            <EmptyState
+              icon={Calendar}
+              title="No Attendance Records"
+              description="You don't have any attendance records yet. Your attendance data will appear here once you start attending classes."
+            />
+          ) : chartData.length === 0 ? (
+            <EmptyState
+              icon={Calendar}
+              title="No Data for Selected Period"
+              description={`No attendance records found for the selected ${timeFilter}. Try selecting a different time period.`}
+            />
+          ) : (
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={chartData}
+                  margin={{ top: 5, right: 19, left: 1, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 12 }}
+                    axisLine={{ stroke: "#E5E7EB" }}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 12 }}
+                    axisLine={{ stroke: "#E5E7EB" }}
+                    tickLine={false}
+                    width={30}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend
+                    verticalAlign="top"
+                    align="right"
+                    iconType="circle"
+                    iconSize={8}
+                    wrapperStyle={{ paddingTop: 10 }}
+                    formatter={(value, entry) => (
+                      <span className="text-sm" style={{ color: entry.color }}>
+                        {value}
+                      </span>
+                    )}
+                  />
+                  <Bar
+                    dataKey="present"
+                    name="present"
+                    fill="#10B981"
+                    radius={[10, 4, 0, 0]}
+                    barSize={15}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
-export default AttendanceChart;
+export default ChartTwo;

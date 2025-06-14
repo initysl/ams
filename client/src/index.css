@@ -21,7 +21,8 @@ h4,
 h5,
 .card-header,
 .table-header,
-.sidebar-gl {
+.sidebar-gl,
+.card-title {
   font-family: "Space Grotesk", sans-serif;
 }
 
