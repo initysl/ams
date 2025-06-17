@@ -10,6 +10,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Profilebox from "@/components/ui/Profilebox";
+import DeleteProfile from "@/pages/dashboard/Settings/DeleteProfile";
 
 // Create dynamic schema based on user role
 const createProfileSchema = (userRole: string | undefined) => {
@@ -287,8 +288,8 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Submit */}
-        <div>
+        {/* Action Buttons */}
+        <div className="flex justify-center gap-4 pt-4">
           <Button
             type="submit"
             disabled={updateMutation.isPending}
@@ -300,6 +301,8 @@ const Profile = () => {
               "Save Changes"
             )}
           </Button>
+
+          <DeleteProfile />
         </div>
       </form>
     </div>

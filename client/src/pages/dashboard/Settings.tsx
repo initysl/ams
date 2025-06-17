@@ -99,7 +99,7 @@ const Settings = () => {
         className="bg-white backdrop-blur-sm shadow-xl md:max-w-xs w-full relative top-10 md:top-0 rounded-xl"
       >
         <CardContent>
-          <div className="flex flex-col items-center pt-5">
+          <div className="flex flex-col items-center py-5">
             <img
               key={imageKey} // Force re-render when key changes
               src={getImageUrl(user?.profilePicture)}

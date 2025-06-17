@@ -1,7 +1,7 @@
 const express = require("express");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 const {
-  getUserProfile,
+  UserProfile,
   updateUserProfile,
   deleteUserProfile,
   userFeedback,
@@ -14,7 +14,7 @@ const upload = require("../utils/multerConfig");
 const router = express.Router();
 
 // GET user profile
-router.get("/profile/me", authMiddleware, getUserProfile);
+router.get("/profile/me", authMiddleware, UserProfile);
 
 // PUT update profile with upload and validation
 router.put(

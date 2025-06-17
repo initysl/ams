@@ -745,7 +745,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
       {!report.length &&
         !generateReportMutation.isPending &&
         !selectedSession && (
-          <div className="bg-white shadow-sm rounded-lg p-12 text-center">
+          <div className="bg-white shadow-xl rounded-lg p-12 text-center">
             <Calendar className="h-12 w-12 mx-auto text-gray-300 mb-4" />
             <h3 className="text-lg font-medium text-gray-800 mb-2">
               Select a Lecture Session

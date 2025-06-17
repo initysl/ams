@@ -10,17 +10,14 @@ const { sendVerificationEmail } = require("../utils/sendEmail");
 const Feedback = require("../models/Feedback");
 
 // Get User Profile
-const getUserProfile = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ message: errors.array() });
-  }
-
-  // Check if user is authenticated
+const UserProfile = asyncHandler(async (req, res) => {
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   return res.status(400).json({ message: errors.array() });
+  // }
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-
   const user = await User.findById(req.user._id).select("-password");
   if (user) {
     res.json({
@@ -47,20 +44,15 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ message: errors.array() });
   }
-
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-
   const user = await User.findById(req.user._id).select("+password");
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
-
   const updates = { ...req.body };
   let isEmailUpdated = false;
-
-  // Handle password change
   if (updates.password && updates.password.trim() !== "") {
     const isSamePassword = await bcrypt.compare(
       updates.password,
@@ -75,7 +67,6 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   } else {
     delete updates.password;
   }
-
   // Handle profile picture upload with deletion
   if (req.file) {
     // Delete old profile picture if exists
@@ -92,22 +83,17 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         }
       });
     }
-
-    // Save new path
     updates.profilePicture = `/uploads/${req.file.filename}`;
   }
-
   // Email update logic
   if (updates.email && updates.email !== user.email) {
     const emailExists = await User.findOne({
       email: updates.email,
       _id: { $ne: req.user._id },
     });
-
     if (emailExists) {
-      return res.status(400).json({ message: "Email is already in use" });
+      return res.status(400).json({ message: "Email exits" });
     }
-
     updates.pendingEmail = updates.email;
     updates.isVerified = false;
     isEmailUpdated = true;
@@ -117,7 +103,6 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-
     try {
       await sendVerificationEmail(updates.email, token);
       logger.info(`Verification email sent to ${updates.email}`);
@@ -127,7 +112,6 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         .status(500)
         .json({ message: "Failed to send verification email" });
     }
-
     delete updates.email;
   }
 
@@ -147,7 +131,6 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         "Verification email sent. Please verify before changes take effect.",
     });
   }
-
   res.json({
     _id: updatedUser._id,
     name: updatedUser.name,
@@ -158,32 +141,22 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     role: updatedUser.role,
     isVerified: updatedUser.isVerified,
   });
-
   logger.info(`User profile updated: ${updatedUser.email}`);
 });
 
 // Delete User Profile
 const deleteUserProfile = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ message: errors.array() });
-  }
-
-  // Check if user is authenticated
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-
   const user = await User.findById(req.user._id);
-
   if (!user) {
     res.status(404);
     throw new Error("User profile not found");
   }
-
   await User.deleteOne({ _id: req.user._id });
-  logger.info(`User profile deleted: ${user.email}, ${user.matricNumber}`);
-  res.json({ message: "User profile deleted successfully" });
+  logger.info(`User account deleted: ${user.email}, ${user.matricNumber}`);
+  res.json({ message: "Account deleted successfully" });
 });
 
 // User Feedback
@@ -212,7 +185,7 @@ const userFeedback = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  getUserProfile,
+  UserProfile,
   updateUserProfile,
   deleteUserProfile,
   userFeedback,

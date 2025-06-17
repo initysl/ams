@@ -663,7 +663,7 @@ const GenerateQR = () => {
         variants={itemVariants}
       >
         <motion.div variants={itemVariants}>
-          <Card className="bg-white">
+          <Card className="bg-white shadow-xl">
             <CardContent>
               <div className="space-y-6">
                 <motion.div className="space-y-2" variants={itemVariants}>
@@ -798,7 +798,7 @@ const GenerateQR = () => {
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Card className="bg-white">
+          <Card className="bg-white shadow-xl">
             <CardContent className="pt-4">
               <QRPlaceholder />
               <motion.div className="flex gap-4" variants={itemVariants}>
