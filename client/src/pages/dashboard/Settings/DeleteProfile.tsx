@@ -32,7 +32,7 @@ const DeleteProfile = ({ className = "" }: DeleteProfileProps) => {
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      const response = await api.delete("profile/delete", {
+      const response = await api.delete("user/profile/delete", {
         withCredentials: true,
       });
       return response.data;
@@ -104,7 +104,7 @@ const DeleteProfile = ({ className = "" }: DeleteProfileProps) => {
         </Button>
       </AlertDialogTrigger>
 
-      <AlertDialogContent className="max-w-md">
+      <AlertDialogContent className="max-w-md bg-white">
         <AlertDialogHeader>
           <div className="flex items-center gap-3">
             <div className="p-2 bg-red-100 rounded-full">
@@ -197,12 +197,12 @@ const DeleteProfile = ({ className = "" }: DeleteProfileProps) => {
           </AlertDialogCancel>
 
           {step !== "final" ? (
-            <AlertDialogAction
+            <Button
               onClick={handleNext}
-              className="bg-red-500 hover:bg-red-600"
+              className="bg-red-500 hover:bg-red-600 text-white"
             >
               Continue
-            </AlertDialogAction>
+            </Button>
           ) : (
             <AlertDialogAction
               onClick={handleDelete}
