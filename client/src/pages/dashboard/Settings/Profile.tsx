@@ -96,13 +96,11 @@ const Profile = () => {
         email: user.email,
         department: user.department,
       };
-
       // Only include matricNumber for students
       if (user.role === "student") {
         formData.matricNumber = user.matricNumber || "";
       }
       reset(formData);
-
       // Set preview URL with cache busting if user has profile picture
       if (user.profilePicture) {
         setPreviewURL(getImageUrl(user.profilePicture));
