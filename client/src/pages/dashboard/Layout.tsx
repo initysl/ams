@@ -8,8 +8,8 @@ const Layout: React.FC = () => {
     <SidebarProvider className="flex">
       <AppSidebar />
       <main className="flex-grow p-2">
-        <SidebarTrigger className="fixed bg-green-500 shadow-3xl text-white z-50" />
-        <div className="p-2 mt-10">
+        <SidebarTrigger className="fixed top-8 bg-emerald-500 shadow-3xl text-white z-50" />
+        <div className="p-2 mt-12">
           <Outlet />
         </div>
       </main>

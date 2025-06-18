@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
-import { Loader } from "lucide-react";
+import { EyeIcon, EyeOff, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import api from "@/lib/axios";
@@ -52,6 +52,7 @@ type ProfileFields = {
 const Profile = () => {
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState<string>("");
+  const [showPassword, setShowPassword] = useState(false);
   const { user, refetchUser } = useAuth();
 
   // Create schema based on user role
@@ -270,13 +271,23 @@ const Profile = () => {
             <label className="block text-sm font-medium mb-1">
               New Password
             </label>
-            <Input
-              type="password"
-              className="text-ellipsis"
-              {...register("password")}
-              placeholder="Leave blank to keep current password"
-              autoComplete="new-password"
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                className="text-ellipsis"
+                {...register("password")}
+                placeholder="Leave blank to keep current password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2 top-2 text-gray-500"
+              >
+                {showPassword ? <EyeOff /> : <EyeIcon />}
+              </button>
+            </div>
             {errors.password && (
               <p className="text-red-500 text-sm">{errors.password.message}</p>
             )}

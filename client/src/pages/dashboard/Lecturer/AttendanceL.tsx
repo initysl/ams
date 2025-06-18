@@ -320,7 +320,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
   return (
     <div className="container mx-auto space-y-6 pb-8">
       {/* Session Selection */}
-      <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-100 shadow-xl">
+      <Card className="bg-white border-purple-100 shadow-xl">
         <CardHeader className="card-header pb-4">
           <CardTitle className="flex items-center gap-2 text-blue-700">
             <Calendar className="h-5 w-5" />
@@ -335,10 +335,10 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
                 onValueChange={handleSessionChange}
                 disabled={sessionsLoading}
               >
-                <SelectTrigger className="w-full bg-white border-none">
+                <SelectTrigger className="w-full bg-gray-100 border-none">
                   <SelectValue placeholder="Select a lecture session" />
                 </SelectTrigger>
-                <SelectContent className="bg-white">
+                <SelectContent className="bg-gray-100">
                   {sessionsLoading && (
                     <div className="flex items-center justify-center py-2 text-gray-500">
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -392,7 +392,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
           </div>
 
           {selectedSessionData && (
-            <div className="mt-4 p-3 bg-white rounded-lg border border-purple-100">
+            <div className="mt-4 p-3 bg-gray-100 rounded-lg border border-purple-100">
               <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
                 <div>
                   <p className="font-medium text-yellow-800">
@@ -716,7 +716,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
       {!report.length &&
         !generateReportMutation.isPending &&
         selectedSession && (
-          <div className="bg-white shadow-sm rounded-lg p-12 text-center">
+          <div className="bg-white shadow-xl rounded-lg p-12 text-center">
             <FileSpreadsheet className="h-12 w-12 mx-auto text-gray-300 mb-4" />
             <h3 className="text-lg font-medium text-gray-800 mb-2">
               No Report Generated Yet / No Report Found
