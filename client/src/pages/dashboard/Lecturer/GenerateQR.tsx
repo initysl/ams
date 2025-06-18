@@ -377,7 +377,7 @@ const GenerateQR = () => {
               <p>Level: ${courseDetails?.level}</p>
               <p>Duration: ${courseDetails?.duration} minutes</p>
             </div>
-            <img src="${qrCodeUrl}" alt="${courseDetails?.courseCode} QR Code" />
+            <img src=${qrCodeUrl} alt="${courseDetails?.courseCode} QR Code" />
           </body>
         </html>
       `);
@@ -567,8 +567,8 @@ const GenerateQR = () => {
                               exit={{ opacity: 0 }}
                               className="flex items-center gap-2"
                             >
-                              <Loader2 className="h-4 w-4 animate-spin" />
                               Processing...
+                              <Loader2 className="h-4 w-4 animate-spin" />
                             </motion.div>
                           ) : (
                             <motion.div
@@ -605,8 +605,8 @@ const GenerateQR = () => {
                               exit={{ opacity: 0 }}
                               className="flex items-center gap-2"
                             >
-                              <Loader2 className="h-4 w-4 animate-spin" />
                               Deleting...
+                              <Loader2 className="h-4 w-4 animate-spin" />
                             </motion.div>
                           ) : (
                             <motion.div
