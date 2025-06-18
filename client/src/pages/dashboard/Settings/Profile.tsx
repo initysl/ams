@@ -101,7 +101,6 @@ const Profile = () => {
       if (user.role === "student") {
         formData.matricNumber = user.matricNumber || "";
       }
-
       reset(formData);
 
       // Set preview URL with cache busting if user has profile picture
@@ -278,6 +277,7 @@ const Profile = () => {
               className="text-ellipsis"
               {...register("password")}
               placeholder="Leave blank to keep current password"
+              autoComplete="new-password"
             />
             {errors.password && (
               <p className="text-red-500 text-sm">{errors.password.message}</p>
