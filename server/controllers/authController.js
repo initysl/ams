@@ -83,7 +83,7 @@ const register = asyncHandler(async (req, res) => {
     await sendVerificationEmail(newUser.email, token);
 
     res.status(201).json({
-      message: "User registered successfully! Please verify your email",
+      message: "Registration successfull! Please verify your email",
     });
 
     logger.info(

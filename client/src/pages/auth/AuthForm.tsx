@@ -87,7 +87,7 @@ const AuthForm: React.FC = () => {
       });
     },
     onSuccess: (res) => {
-      toast.success(`Registered successfully: ${res.data.message}`);
+      toast.success(`${res.data.message}`);
       setProfilePicture(null);
       setPreviewURL("");
       // Automatically switch to sign in form after successful registration

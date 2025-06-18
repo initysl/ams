@@ -7,18 +7,35 @@ const validateRegistration = [
     .customSanitizer((value) => (value ? value.trim() : ""))
     .isLength({ min: 5 })
     .withMessage("Name must be at least 5 characters long"),
+
   check("email").exists().trim().isEmail().withMessage("Invalid email address"),
+
   check("matricNumber")
-    .optional()
-    .customSanitizer((value) => (value ? value.trim().replace(/\s+/g, "") : ""))
-    .matches(/^[A-Za-z0-9/]+$/)
-    .isLength({ min: 10 })
-    .withMessage("Matric number must be at least 10 characters long"),
+    .optional({ nullable: true, checkFalsy: true }) // FIXED: Allow empty/null values
+    .customSanitizer((value) => {
+      // FIXED: Return null for empty values instead of empty string
+      if (!value || value.trim() === "") return null;
+      return value.trim().replace(/\s+/g, "");
+    })
+    .custom((value) => {
+      // FIXED: Only validate if value exists and is not null
+      if (value !== null && value !== undefined) {
+        if (!/^[A-Za-z0-9/]+$/.test(value)) {
+          throw new Error("Matric number contains invalid characters");
+        }
+        if (value.length < 10) {
+          throw new Error("Matric number must be at least 10 characters long");
+        }
+      }
+      return true;
+    }),
+
   check("department")
     .exists()
     .customSanitizer((value) => (value ? value.trim() : ""))
     .isLength({ min: 3 })
     .withMessage("Department must be at least 3 characters long"),
+
   check("password")
     .exists()
     .customSanitizer((value) => (value ? value.trim() : ""))

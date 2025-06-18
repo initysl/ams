@@ -5,11 +5,11 @@ Use normal rafce in normal components
 useMutation for api POST, PUT, DELETE... good for caching
 Recheck protected routes
 Redefine the toasts `error`
-Error in register form[Email and matricNumber autocomplete]
 Add Gender;Sex: Ensure autocomplete as well..
 
 
 
+Error in register form[Email and matricNumber autocomplete]...Done
 Check the login limiter.....Done
 Handle if user does'nt exits during login....Done
 Add animation to the viewports | cards....Done
