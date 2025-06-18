@@ -471,7 +471,8 @@ const GenerateQR = () => {
                             : "bg-blue-600 hover:bg-blue-700 text-white"
                         }`}
                       >
-                        Download QR <Save size={16} />
+                        <Save size={16} />
+                        Download QR
                       </Button>
                     </motion.div>
                     <motion.div
@@ -488,7 +489,8 @@ const GenerateQR = () => {
                             : "bg-green-600 hover:bg-green-700 text-white"
                         }`}
                       >
-                        Print QR <Printer size={16} />
+                        <Printer size={16} />
+                        Print QR
                       </Button>
                     </motion.div>
                   </motion.div>
@@ -550,13 +552,17 @@ const GenerateQR = () => {
                   >
                     <motion.div
                       variants={buttonVariants}
-                      whileHover="hover"
-                      whileTap="tap"
+                      whileHover={!isExpired ? "hover" : undefined}
+                      whileTap={!isExpired ? "tap" : undefined}
                     >
                       <Button
                         onClick={handleStop}
-                        disabled={stopSessionMutation.isPending}
-                        className="bg-amber-500 hover:bg-amber-600 text-white h-10 rounded-md font-medium transition-colors flex items-center justify-center gap-2 w-full"
+                        disabled={stopSessionMutation.isPending || isExpired}
+                        className={`h-10 rounded-md font-medium transition-colors flex items-center justify-center gap-2 w-full ${
+                          isExpired
+                            ? "bg-gray-400 text-gray-600 cursor-not-allowed opacity-50"
+                            : "bg-amber-500 hover:bg-amber-600 text-white"
+                        }`}
                       >
                         <AnimatePresence mode="wait">
                           {stopSessionMutation.isPending ? (
@@ -578,7 +584,10 @@ const GenerateQR = () => {
                               exit={{ opacity: 0 }}
                               className="flex items-center gap-2"
                             >
-                              <Clock size={16} /> Stop QR Code (Keep Record)
+                              <Clock size={16} />
+                              {isExpired
+                                ? "Session Expired"
+                                : "Stop QR Code (Keep Record)"}
                             </motion.div>
                           )}
                         </AnimatePresence>
@@ -616,7 +625,10 @@ const GenerateQR = () => {
                               exit={{ opacity: 0 }}
                               className="flex items-center gap-2"
                             >
-                              <X size={16} /> Delete Session & Generate New
+                              <X size={16} />
+                              {isExpired
+                                ? "Delete Expired Session"
+                                : "Delete Session & Generate New"}
                             </motion.div>
                           )}
                         </AnimatePresence>
