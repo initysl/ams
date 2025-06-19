@@ -159,9 +159,9 @@ const GenerateQR = () => {
       localStorage.removeItem(STORAGE_KEY);
       toast.success("QR code stopped successfully");
     },
-    onError: (error) => {
+    onError: () => {
       toast.error("Error stopping QR code session");
-      console.error("Error stopping session:", error);
+      // console.error("Error stopping session:", error);
     },
   });
 
@@ -184,9 +184,9 @@ const GenerateQR = () => {
       localStorage.removeItem(STORAGE_KEY);
       reset();
     },
-    onError: (error) => {
+    onError: () => {
       toast.error("Error deleting session");
-      console.error("Error deleting session:", error);
+      // console.error("Error deleting session:", error);
       // Still reset UI state even if API fails
       setQrGenerated(false);
       setQrCodeUrl("");

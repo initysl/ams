@@ -260,7 +260,7 @@ const markAttendance = asyncHandler(async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error marking attendance:", error);
+    // console.error("Error marking attendance:", error);
     res.status(500).json({ error: "Error marking attendance" });
   }
 });

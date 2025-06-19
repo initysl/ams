@@ -61,12 +61,12 @@ const AttendanceS = () => {
     onSuccess: (data) => {
       setRecords(data);
       sessionStorage.setItem("attendanceRecords", JSON.stringify(data));
-      toast.success("Attendance records retrieved successfully");
+      toast.success("Attendance records generated successfully");
     },
     onError: (error: any) => {
       toast.error(
         error?.response?.data?.error ||
-          "An error occurred while retrieving attendance records"
+          "An error occurred while generating attendance records"
       );
     },
   });

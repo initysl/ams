@@ -71,7 +71,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
 
       <div className="text-right">
         <Link to="/recover" className="text-blue-500 hover:underline">
-          Forgotten Password?
+          Forgot Password?
         </Link>
       </div>
     </form>

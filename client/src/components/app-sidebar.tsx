@@ -7,7 +7,6 @@ import {
   ChevronDown,
   User,
   LogOut,
-  Circle,
 } from "lucide-react";
 import {
   Sidebar,
@@ -18,7 +17,6 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar";
 
 import {
@@ -33,7 +31,6 @@ import { useAuth } from "@/context/AuthContext";
 
 export function AppSidebar() {
   const { logout, user } = useAuth();
-  const { isMobile } = useSidebar();
 
   if (!user) return null;
 
@@ -91,7 +88,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-8">
               {menuItems.map((item, index) => (
-                <SidebarMenuItem key={item.path}>
+                <SidebarMenuItem key={index}>
                   <NavLink
                     to={item.path}
                     className={({ isActive }) =>
