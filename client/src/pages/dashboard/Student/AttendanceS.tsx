@@ -211,7 +211,7 @@ const AttendanceS = () => {
           <Card className="bg-white shadow-sm">
             <CardHeader className="card-header pb-2">
               <div className="flex flex-wrap justifybe items-center gap-2 w-full">
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2">
                   <Input
                     type="text"
                     value={matricNumber}

@@ -5,6 +5,11 @@ import React from "react";
 import { ChevronRight, User } from "lucide-react";
 
 import { useAuth } from "@/context/AuthContext";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Layout: React.FC = () => {
   const location = useLocation();
@@ -115,7 +120,21 @@ const Layout: React.FC = () => {
               <div>
                 <div className="flex items-center gap-2 text-slate-600 px-3">
                   <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center">
-                    <User size={14} />
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <User size={14} />
+                      </TooltipTrigger>
+                      <TooltipContent
+                        side="top"
+                        align="center"
+                        sideOffset={0}
+                        className="bg-slate-200  rounded-lg px-3 py-2"
+                      >
+                        <span className="text-xs font-medium">
+                          {user?.matricNumber}
+                        </span>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                   <div className="hidden md:block text-left">
                     <div className="text-sm font-medium text-slate-900">
