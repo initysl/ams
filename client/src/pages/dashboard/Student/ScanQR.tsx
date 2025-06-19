@@ -181,13 +181,13 @@ const QRScanner: React.FC = () => {
           handleQRCodeScanned(decodedText);
         },
         (errorMessage: string) => {
-          console.warn("QR Scan Error:", errorMessage);
+          // console.warn("QR Scan Error:", errorMessage);
         }
       );
       setIsScanning(true);
       setScannerActive(true);
     } catch (err) {
-      console.error("Error starting scanner:", err);
+      // console.error("Error starting scanner:", err);
       toast.error("Failed to start QR scanner.");
     } finally {
       setIsLoading(false);
@@ -234,7 +234,7 @@ const QRScanner: React.FC = () => {
       toast.success("QR code successfully read from image");
       handleQRCodeScanned(decodedText);
     } catch (err) {
-      console.error("Image QR scan failed:", err);
+      // console.error("Image QR scan failed:", err);
       // More specific error messages
       if (err instanceof Error) {
         if (err.message.includes("QR code not found")) {

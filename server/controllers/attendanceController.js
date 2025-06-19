@@ -67,7 +67,7 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
       courseDetails: { courseCode, courseTitle, level, duration },
     });
   } catch (error) {
-    console.error("Error generating QR code:", error);
+    // console.error("Error generating QR code:", error);
     res.status(500).json({ error: "Error generating QR code" });
   }
 });
@@ -109,7 +109,7 @@ const stopLectureSession = asyncHandler(async (req, res) => {
       sessionId: lectureSession._id,
     });
   } catch (error) {
-    console.error("Error stopping lecture session:", error);
+    // console.error("Error stopping lecture session:", error);
     res.status(500).json({ error: "Error stopping lecture session" });
   }
 });
@@ -153,7 +153,7 @@ const deleteLectureSession = asyncHandler(async (req, res) => {
       message: "Session and related attendance records deleted successfully",
     });
   } catch (error) {
-    console.error("Error deleting lecture session:", error);
+    // console.error("Error deleting lecture session:", error);
     res.status(500).json({ error: "Error deleting lecture session" });
   }
 });
@@ -297,7 +297,7 @@ const getAttendanceReport = asyncHandler(async (req, res) => {
     );
     return res.status(200).json({ report });
   } catch (error) {
-    console.error("Error generating attendance report:", error);
+    // console.error("Error generating attendance report:", error);
     res.status(500).json({ error: "Error generating attendance report" });
   }
 });
@@ -318,9 +318,9 @@ const getLectureSessions = asyncHandler(async (req, res) => {
     }).sort({ createdAt: -1 }); // Sort by creation date, newest first
 
     // For debugging
-    console.log(
-      `Found ${lectureSessions.length} lecture sessions for lecturer ID: ${req.user._id}`
-    );
+    // console.log(
+    //   `Found ${lectureSessions.length} lecture sessions for lecturer ID: ${req.user._id}`
+    // );
 
     // Format the data to match frontend expectations
     const formattedSessions = lectureSessions.map((session) => ({
@@ -333,7 +333,7 @@ const getLectureSessions = asyncHandler(async (req, res) => {
     // Return the sessions - send array directly as expected by frontend
     res.status(200).json(formattedSessions);
   } catch (error) {
-    console.error("Error fetching lecture sessions:", error);
+    // console.error("Error fetching lecture sessions:", error);
     res.status(500).json({ error: "Error fetching lecture sessions" });
   }
 });
@@ -377,7 +377,7 @@ const recentlyMarkedAttendance = asyncHandler(async (req, res) => {
 
     res.status(200).json(recentSessions);
   } catch (error) {
-    console.error("Error fetching recent attendance:", error);
+    // console.error("Error fetching recent attendance:", error);
     res.status(500).json({ error: "Error fetching recent attendance" });
   }
 });
@@ -404,7 +404,7 @@ const attendanceTrend = asyncHandler(async (req, res) => {
 
     res.status(200).json(trendData);
   } catch (error) {
-    console.error("Error generating attendance trend:", error);
+    // console.error("Error generating attendance trend:", error);
     res.status(500).json({ error: "Error generating attendance trend" });
   }
 });

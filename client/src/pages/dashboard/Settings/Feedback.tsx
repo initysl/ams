@@ -30,7 +30,7 @@ const Feedback = () => {
     },
     onError: (error: any) => {
       toast.error("Failed to submit feedback. Please try again.");
-      console.error(error);
+      // console.error(error);
     },
   });
 

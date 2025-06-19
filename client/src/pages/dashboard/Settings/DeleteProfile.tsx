@@ -43,7 +43,7 @@ const DeleteProfile = ({ className = "" }: DeleteProfileProps) => {
       logout();
     },
     onError: (error: any) => {
-      console.error("Delete error:", error);
+      // console.error("Delete error:", error);
       let message = "Failed to delete account.";
 
       if (error?.response?.data?.message) {

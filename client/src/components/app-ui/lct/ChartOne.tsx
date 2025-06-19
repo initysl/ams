@@ -96,7 +96,7 @@ const ChartOne = () => {
       setChartData(formattedData);
     },
     onError: (error: any) => {
-      console.error("Error fetching attendance trend:", error);
+      // console.error("Error fetching attendance trend:", error);
       setChartData([]);
       setCourses([]);
       setAverageAttendance(0);

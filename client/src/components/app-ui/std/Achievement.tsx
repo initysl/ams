@@ -43,8 +43,8 @@ const Achievement = () => {
     onSuccess: (data: AttendanceRecord[]) => {
       calculateAchievements(data);
     },
-    onError: (error) => {
-      console.error("Error fetching recent attendance:", error);
+    onError: () => {
+      // console.error("Error fetching recent attendance:", error); (error)
       // Fallback to empty achievements or show error state
       setAchievements([]);
     },

@@ -65,7 +65,7 @@ const ChartTwo: React.FC = () => {
       setAttendanceData(data);
     },
     onError: (error: any) => {
-      console.error("Error fetching attendance data:", error);
+      // console.error("Error fetching attendance data:", error);
       setAttendanceData([]);
     },
   });

@@ -79,7 +79,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       );
       fs.unlink(oldImagePath, (err) => {
         if (err) {
-          console.error("Failed to delete old profile picture:", err.message);
+          // console.error("Failed to delete old profile picture:", err.message);
         }
       });
     }

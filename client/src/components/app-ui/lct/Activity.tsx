@@ -52,8 +52,8 @@ const Activity = () => {
     onSuccess: (data) => {
       processLecturerActivities(data);
     },
-    onError: (error) => {
-      console.error("Error fetching lecturer activities:", error);
+    onError: () => {
+      // console.error("Error fetching lecturer activities:", error); error
       setRecentActivities([]);
     },
   });

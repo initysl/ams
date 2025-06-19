@@ -163,7 +163,7 @@ const Profile = () => {
       }
     },
     onError: (error: any) => {
-      console.error("Update error:", error);
+      // console.error("Update error:", error);
       // Handle validation errors array from backend
       let message = "Profile update failed.";
 
