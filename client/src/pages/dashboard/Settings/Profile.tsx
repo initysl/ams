@@ -189,8 +189,8 @@ const Profile = () => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6 text-center">Update Profile</h2>
+    <div className="p-2 md:p-4 max-w-4xl mx-auto">
+      <h2 className="text-2xl font-bold mb-6 text-center">Update Profile</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="w-fit">

@@ -75,11 +75,11 @@ export function AppSidebar() {
       collapsible="offcanvas"
       className="border-r border-slate-200 bg-white min-h-screen w-64"
     >
-      <SidebarContent className="px-4 py-8">
+      <SidebarContent className=" py-3">
         <SidebarGroup>
           {/* Logo Section */}
           <div className="mb-12 flex flex-col items-center justify-center">
-            <SidebarGroupLabel className="text-2xl font-semibold text-slate-800 mb-2 tracking-tight">
+            <SidebarGroupLabel className="text-2xl font-semibold text-slate-800 mb-2 tracking-wider">
               AttendEase
             </SidebarGroupLabel>
             <div className="w-12 h-0.5 bg-slate-300 rounded-full"></div>

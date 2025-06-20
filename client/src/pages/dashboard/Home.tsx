@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import {
   QrCode,
@@ -8,11 +8,6 @@ import {
   Smile,
   CheckCircle,
   Settings2,
-  ListCheck,
-  ScanQrCode,
-  Smartphone,
-  TabletSmartphone,
-  CalendarCheck2,
 } from "lucide-react";
 import Status from "@/components/app-ui/lct/Status";
 import Chart from "@/components/app-ui/general/Chart";
@@ -67,20 +62,7 @@ const cardData = {
 
 const Home: React.FC = () => {
   const { user } = useAuth();
-  const [today, setToday] = useState(() => new Date().toLocaleString());
   const [isFlipped, setIsFlipped] = useState(false);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setToday(
-        new Date().toLocaleString("en-US", {
-          hour12: true,
-        })
-      );
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className="space-y-8 min-h-screen">
@@ -93,10 +75,10 @@ const Home: React.FC = () => {
       >
         <Card className="bg-white p-4 flex flex-row items-center justify-between relative">
           <div>
-            <h1 className="text-2xl md:text-4xl font-bold mb-1">
+            <h1 className="text-xl md:text-4xl font-bold mb-1">
               Welcome Back, {user?.matricNumber || user?.name}
             </h1>
-            <p className="text-xl md:text-lg">{today}</p>
+            <p className="text-gray-600 text-sm md:text-base">Hello </p>
           </div>
           <motion.div
             className="hidden md:block"
@@ -109,77 +91,6 @@ const Home: React.FC = () => {
             </div>
           </motion.div>
         </Card>
-
-        {/* Scattered Background Icons */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="md:hidden absolute inset-0 z-10 pointer-events-none"
-        >
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={{
-              visible: {
-                transition: {
-                  staggerChildren: 0.2,
-                },
-              },
-            }}
-          >
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: -10, scale: 0.8 },
-                visible: { opacity: 1, y: 0, scale: 1 },
-              }}
-              className="absolute top-12 left-90"
-            >
-              <ListCheck className="h-10 w-10 text-teal-300 opacity-50 -rotate-45" />
-            </motion.div>
-
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: 10, scale: 0.8 },
-                visible: { opacity: 1, y: 0, scale: 1 },
-              }}
-              className="absolute bottom-8 left-12"
-            >
-              <ScanQrCode className="h-10 w-10 text-gray-200 opacity-50 rotate-45" />
-            </motion.div>
-
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, x: 20, scale: 0.8 },
-                visible: { opacity: 1, x: 0, scale: 1 },
-              }}
-              className="absolute top-1/2 right-40"
-            >
-              <Smartphone className="h-10 w-10 text-gray-300 opacity-50 -rotate-12" />
-            </motion.div>
-
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: 20, scale: 0.8 },
-                visible: { opacity: 1, y: 0, scale: 1 },
-              }}
-              className="absolute bottom-4 right-8"
-            >
-              <TabletSmartphone className="h-9 w-9 text-gray-200 rotate-90" />
-            </motion.div>
-
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, x: -20, scale: 0.8 },
-                visible: { opacity: 1, x: 0, scale: 1 },
-              }}
-              className="absolute top-4 right-4"
-            >
-              <CalendarCheck2 className="h-6 w-6 text-purple-300 opacity-50 -rotate-30" />
-            </motion.div>
-          </motion.div>
-        </motion.div>
       </motion.div>
 
       {/* Hero Card with Flip Animation */}
