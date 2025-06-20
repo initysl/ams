@@ -1,11 +1,9 @@
 import React, { useState } from "react";
-import { Card } from "@/components/ui/card";
 import {
   QrCode,
   FileBarChart,
   Users,
   HelpCircle,
-  Smile,
   CheckCircle,
   Settings2,
 } from "lucide-react";
@@ -18,6 +16,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Activity from "@/components/app-ui/lct/Activity";
 import Achievement from "@/components/app-ui/std/Achievement";
+import WelcomeBanner from "@/components/app-ui/general/WelcomeBanner";
 
 const cardData = {
   cards: [
@@ -66,32 +65,8 @@ const Home: React.FC = () => {
 
   return (
     <div className="space-y-8 min-h-screen">
-      {/* Enhanced Top Section with Greeting and Quick Stats */}
-      <motion.div
-        className="relative"
-        initial={{ opacity: 0, y: -30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <Card className="bg-white p-4 flex flex-row items-center justify-between relative">
-          <div>
-            <h1 className="text-xl md:text-4xl font-bold mb-1">
-              Welcome Back, {user?.matricNumber || user?.name}
-            </h1>
-            <p className="text-gray-600 text-sm md:text-base">Hello </p>
-          </div>
-          <motion.div
-            className="hidden md:block"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <div className="w-26 h-26 bg-blue-500 rounded-full flex items-center justify-center text-white">
-              <Smile className="h-16 w-16" />
-            </div>
-          </motion.div>
-        </Card>
-      </motion.div>
+      {/*Welcome Banner*/}
+      <WelcomeBanner />
 
       {/* Hero Card with Flip Animation */}
       <motion.div
@@ -139,6 +114,12 @@ const Home: React.FC = () => {
                 Experience seamless attendance tracking with our advanced
                 QR-based system. No more manual processes - just scan, track,
                 and succeed!
+              </p>
+              <p className="text-gray-600 leading-relaxed">
+                Revolutionize how your institution manages attendance with
+                AttendEase - built specifically for educational environments.
+                Streamline attendance across all departments with comprehensive
+                analytics
               </p>
             </div>
           </div>
