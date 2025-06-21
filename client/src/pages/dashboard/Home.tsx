@@ -140,12 +140,22 @@ const Home: React.FC = () => {
                 <CheckCircle className="h-5 w-5 text-white" />
               </div>
               <div className="text-left">
-                <Link to={"/dashboard/scan"}>
+                {user?.role === "lecturer" ? (
+                  <Link to={"/dashboard/generate"}>
+                    <p className="font-semibold text-gray-800">Easy Attendance</p>
+                    <p className="text-sm text-gray-600">
+                      Get started and generate QR code
+                    </p>
+                  </Link>
+                ) : (
+                   <Link to={"/dashboard/scan"}>
                   <p className="font-semibold text-gray-800">Easy Attendance</p>
                   <p className="text-sm text-gray-600">
-                    Generate and Scan QR code
+                    Scan QR code
                   </p>
                 </Link>
+                )}
+               
               </div>
             </motion.button>
 

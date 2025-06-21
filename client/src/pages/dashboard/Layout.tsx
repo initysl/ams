@@ -131,7 +131,7 @@ const Layout: React.FC = () => {
                         className="md:hidden bg-slate-200  rounded-lg px-3 py-2"
                       >
                         <span className="text-xs font-medium">
-                          {user?.matricNumber}
+                          {user?.matricNumber || user?.name}
                         </span>
                       </TooltipContent>
                     </Tooltip>

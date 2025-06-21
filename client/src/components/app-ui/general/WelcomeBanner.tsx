@@ -76,7 +76,7 @@ const WelcomeBanner: React.FC = () => {
       transition={{ duration: 0.6 }}
     >
       <Card
-        className={`${currentConfig.cardBg} ${currentConfig.shadowColor} shadow-xl rounded-full border ${currentConfig.borderColor} p-6 flex flex-row items-center justify-between relative overflow-hidden`}
+        className={`${currentConfig.cardBg} ${currentConfig.shadowColor} shadow-xl border ${currentConfig.borderColor} p-6 flex flex-row items-center justify-between relative overflow-hidden`}
       >
         {/* Decorative background elements */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
