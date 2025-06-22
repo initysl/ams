@@ -1,7 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronRight, User } from "lucide-react";
 
 import { useAuth } from "@/context/AuthContext";
@@ -15,6 +15,31 @@ const Layout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [imageKey, setImageKey] = useState(Date.now());
+
+  // Reset image cache when user data changes
+  useEffect(() => {
+    if (user?.profilePicture) {
+      setImageKey(Date.now());
+    }
+  }, [user?.profilePicture]);
+
+  // Function to get the correct image URL with cache busting
+  const getImageUrl = (profilePicture: string | null | undefined) => {
+    const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
+
+    if (!profilePicture) {
+      const defaultUrl = `${baseUrl}/images/default.png?t=${imageKey}`;
+      return defaultUrl;
+    }
+
+    if (profilePicture.startsWith("http")) {
+      return `${profilePicture}?t=${imageKey}`;
+    }
+
+    const fullUrl = `${baseUrl}${profilePicture}?t=${imageKey}`;
+    return fullUrl;
+  };
 
   // Generate breadcrumbs from current path
   const generateBreadcrumbs = () => {
@@ -118,26 +143,48 @@ const Layout: React.FC = () => {
 
               {/* User Info */}
               <div>
-                <div className="flex items-center gap-2 text-slate-600 px-3">
-                  <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center">
+                <div className="flex items-center gap-2 bg-slate-100 text-slate-500 px-3 py-1.5 rounded-md mr-2">
+                  <div className="w-4 h-4 flex items-center justify-center">
                     <Tooltip>
                       <TooltipTrigger>
-                        <User size={14} />
+                        {user?.profilePicture ? (
+                          <div className="relative w-4 h-4 flex-shrink-0">
+                            <img
+                              key={imageKey}
+                              src={getImageUrl(user?.profilePicture)}
+                              className="w-4 h-4 rounded-full object-cover ring-1 ring-slate-300"
+                              alt="Profile picture"
+                              crossOrigin="use-credentials"
+                              onError={(e) => {
+                                const baseUrl =
+                                  import.meta.env.VITE_API_URL.replace(
+                                    "/api/",
+                                    ""
+                                  );
+                                (
+                                  e.target as HTMLImageElement
+                                ).src = `${baseUrl}/api/images/default.png?t=${Date.now()}`;
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <User size={16} />
+                        )}
                       </TooltipTrigger>
                       <TooltipContent
                         side="top"
                         align="center"
                         sideOffset={0}
-                        className="md:hidden bg-slate-200  rounded-lg px-3 py-2"
+                        className="md:hidden bg-slate-200 rounded-lg px-3 py-2"
                       >
-                        <span className="text-xs font-medium">
+                        <span className="text-xs font-medium text-slate-500">
                           {user?.matricNumber || user?.name}
                         </span>
                       </TooltipContent>
                     </Tooltip>
                   </div>
                   <div className="hidden md:block text-left">
-                    <div className="text-sm font-medium text-slate-900">
+                    <div className="text-sm font-medium text-slate-500">
                       {user?.email}
                     </div>
                     <div className="text-xs text-slate-500 capitalize">
