@@ -16,10 +16,23 @@ import GenerateQR from "./pages/dashboard/Lecturer/GenerateQR";
 import ScanQR from "./pages/dashboard/Student/ScanQR";
 import ForgetPass from "./pages/auth/ForgetPass";
 import ResetPass from "./pages/auth/ResetPass";
-import ProtectedRoute from "./context/ProtectedRoutes";
+import ProtectedRoute, { RoleProtectedRoute } from "./context/ProtectedRoutes";
 import Feedback from "./pages/dashboard/Settings/Feedback";
 import About from "./pages/dashboard/Settings/About";
 import Profile from "./pages/dashboard/Settings/Profile";
+import { useEffect } from "react";
+
+// Unauthorized component for users without proper roles
+const Unauthorized = () => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Small delay to ensure smooth transition
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return <Navigate to="/dashboard/home" replace />;
+};
 
 function App() {
   return (
@@ -32,6 +45,7 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/recover" element={<ForgetPass />} />
           <Route path="/reset" element={<ResetPass />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
 
           {/* Protected Dashboard routes using ProtectedRoute component */}
           <Route
@@ -43,12 +57,38 @@ function App() {
             }
           >
             <Route index element={<Navigate to="/dashboard/home" replace />} />
+
+            {/* Routes accessible to all authenticated users */}
             <Route path="home" element={<Home />} />
             <Route path="attendance" element={<Attendance />} />
-            <Route path="generate" element={<GenerateQR />} />
-            <Route path="scan" element={<ScanQR />} />
 
-            {/* Settings section with nested routes */}
+            {/* Lecturer-only route */}
+            <Route
+              path="generate"
+              element={
+                <RoleProtectedRoute
+                  allowedRoles={["lecturer", "admin"]}
+                  redirectTo="/unauthorized"
+                >
+                  <GenerateQR />
+                </RoleProtectedRoute>
+              }
+            />
+
+            {/* Student-only route */}
+            <Route
+              path="scan"
+              element={
+                <RoleProtectedRoute
+                  allowedRoles={["student", "admin"]}
+                  redirectTo="/unauthorized"
+                >
+                  <ScanQR />
+                </RoleProtectedRoute>
+              }
+            />
+
+            {/* Settings section with nested routes - accessible to all authenticated users */}
             <Route path="settings" element={<Settings />}>
               {/* Redirect to profile when just "/dashboard/settings" is accessed */}
               <Route

@@ -143,16 +143,16 @@ const Layout: React.FC = () => {
 
               {/* User Info */}
               <div>
-                <div className="flex items-center gap-2 bg-slate-100 text-slate-500 px-3 py-1.5 rounded-md mr-2">
-                  <div className="w-4 h-4 flex items-center justify-center">
+                <div className="flex items-center gap-2 md:bg-slate-100 text-slate-500 px-3 py-1.5 rounded-md mr-2">
+                  <div className="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center">
                     <Tooltip>
                       <TooltipTrigger>
                         {user?.profilePicture ? (
-                          <div className="relative w-4 h-4 flex-shrink-0">
+                          <div className="relative flex-shrink-0">
                             <img
                               key={imageKey}
                               src={getImageUrl(user?.profilePicture)}
-                              className="w-4 h-4 rounded-full object-cover ring-1 ring-slate-300"
+                              className="w-8 h-8 md:w-4 md:h-4 rounded-full object-cover ring-1 ring-slate-300"
                               alt="Profile picture"
                               crossOrigin="use-credentials"
                               onError={(e) => {

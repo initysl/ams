@@ -34,10 +34,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
+
   const isAuthenticated = Boolean(user);
 
   const login = async (credentials: { email: string; password: string }) => {
     try {
+      setIsLoading(true);
       const response = await api.post("auth/login", credentials, {
         withCredentials: true,
       });
@@ -51,11 +54,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Sign in failed");
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const logout = async () => {
     try {
+      setIsLoading(true);
       await api.post(
         "auth/logout",
         {},
@@ -68,6 +74,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     } catch (error) {
       toast.error("Logout failed.");
       console.error("Logout error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -81,18 +89,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (response.data.user) {
         setUser(response.data.user);
         // console.log("User authenticated from session:", response.data.user);
+      } else {
+        setUser(null);
       }
-    } catch (error) {
+    } catch (error: any) {
       setUser(null);
-      toast.error("Session expired or unauthorized.");
+      // Only show toast error if it's not a 401 (unauthorized) during initial load
+      if (isInitialized && error?.response?.status !== 401) {
+        toast.error("Session expired or unauthorized.");
+      }
     } finally {
       setIsLoading(false);
+      setIsInitialized(true);
     }
   };
-
-  useEffect(() => {
-    fetchUser();
-  }, []);
 
   const refetchUser = async () => {
     try {
@@ -102,6 +112,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       });
       if (response.data.user) {
         setUser(response.data.user);
+      } else {
+        setUser(null);
       }
     } catch (error) {
       setUser(null);
@@ -111,16 +123,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  // Enhanced loading state - only false when both initialized and user data is resolved
+  const effectiveIsLoading = isLoading || !isInitialized;
+
   const value = useMemo(
     () => ({
       user,
       isAuthenticated,
-      isLoading,
+      isLoading: effectiveIsLoading,
       login,
       logout,
       refetchUser,
     }),
-    [user, isAuthenticated, isLoading]
+    [user, isAuthenticated, effectiveIsLoading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
