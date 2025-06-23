@@ -175,7 +175,7 @@ const login = asyncHandler(async (req, res) => {
   });
 
   res.status(200).json({
-    message: "User logged in successfully",
+    message: "User signed in successfully",
     user: {
       _id: user._id,
       name: user.name,
@@ -187,7 +187,7 @@ const login = asyncHandler(async (req, res) => {
     },
   });
 
-  logger.info(`User logged in: ${user.email}`);
+  logger.info(`User signed in: ${user.email}`);
 });
 
 // Verify Email Address - FIXED
@@ -364,10 +364,10 @@ const logout = asyncHandler(async (req, res) => {
   const userEmail = req.user ? req.user.email : "unknown";
 
   res.status(200).json({
-    message: "User logged out successfully",
+    message: "User signed out successfully",
   });
 
-  logger.info(`User logged out: ${userEmail}`);
+  logger.info(`User signed out: ${userEmail}`);
 });
 
 module.exports = {

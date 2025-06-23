@@ -70,10 +70,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         }
       );
       setUser(null);
-      toast.success("Logged out successfully.");
+      toast.success("Signed out successfully.");
     } catch (error) {
-      toast.error("Logout failed.");
-      console.error("Logout error:", error);
+      toast.error("Signed failed.");
+      console.error("Signed out error:", error);
     } finally {
       setIsLoading(false);
     }
