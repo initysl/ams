@@ -3,16 +3,16 @@ import { motion } from "framer-motion";
 import { Smile, Sun, Cloud, Moon } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
-interface CardProps {
+type CardProps = {
   children: React.ReactNode;
   className?: string;
-}
+};
 
-const Card: React.FC<CardProps> = ({ children, className }) => (
+const Card = ({ children, className }: CardProps) => (
   <div className={`rounded-lg shadow-lg ${className}`}>{children}</div>
 );
 
-const WelcomeBanner: React.FC = () => {
+const WelcomeBanner = () => {
   const { user } = useAuth();
 
   const currentDate = new Date();
@@ -25,37 +25,37 @@ const WelcomeBanner: React.FC = () => {
       ? "Good Afternoon"
       : "Good Evening";
 
-  // Time-based styling configurations
+  // Time-based styling configurations with white/gray background
   const timeConfig = {
     morning: {
       icon: Sun,
       iconBg: "bg-gradient-to-br from-yellow-400 to-orange-500",
       iconColor: "text-white",
-      cardBg: "bg-gradient-to-br from-orange-50 via-yellow-50 to-amber-50",
-      textColor: "text-orange-900",
-      avatarBg: "bg-gradient-to-br from-orange-400 to-yellow-500",
-      shadowColor: "shadow-orange-200/50",
-      borderColor: "border-orange-100",
+      cardBg: "bg-white",
+      textColor: "text-gray-800",
+      avatarBg: "bg-blue-500",
+      shadowColor: "shadow-gray-200",
+      borderColor: "border-gray-200",
     },
     afternoon: {
-      icon: Cloud,
+      icon: Sun,
       iconBg: "bg-gradient-to-br from-blue-400 to-cyan-500",
       iconColor: "text-white",
-      cardBg: "bg-gradient-to-br from-blue-50 via-cyan-50 to-sky-50",
-      textColor: "text-blue-900",
-      avatarBg: "bg-gradient-to-br from-blue-400 to-cyan-500",
-      shadowColor: "shadow-blue-200/50",
-      borderColor: "border-blue-100",
+      cardBg: "bg-white",
+      textColor: "text-gray-800",
+      avatarBg: "bg-blue-500",
+      shadowColor: "shadow-gray-200",
+      borderColor: "border-gray-200",
     },
     evening: {
       icon: Moon,
       iconBg: "bg-gradient-to-br from-purple-500 to-indigo-600",
       iconColor: "text-white",
-      cardBg: "bg-gradient-to-br from-indigo-50 via-purple-50 to-violet-50",
-      textColor: "text-indigo-900",
-      avatarBg: "bg-gradient-to-br from-purple-500 to-indigo-600",
-      shadowColor: "shadow-purple-200/50",
-      borderColor: "border-purple-100",
+      cardBg: "bg-white",
+      textColor: "text-gray-800",
+      avatarBg: "bg-blue-500",
+      shadowColor: "shadow-gray-200",
+      borderColor: "border-gray-200",
     },
   };
 
@@ -76,11 +76,11 @@ const WelcomeBanner: React.FC = () => {
       transition={{ duration: 0.6 }}
     >
       <Card
-        className={`${currentConfig.cardBg} ${currentConfig.shadowColor} shadow-xl border ${currentConfig.borderColor} p-6 flex flex-row items-center justify-between relative overflow-hidden`}
+        className={`${currentConfig.cardBg} ${currentConfig.shadowColor} shadow-lg border ${currentConfig.borderColor} p-6 flex flex-row items-center justify-between relative overflow-hidden`}
       >
         {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gray-50 rounded-full opacity-50 -translate-y-16 translate-x-16"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gray-100 rounded-full opacity-30 translate-y-12 -translate-x-12"></div>
 
         <div className="space-y-4 relative z-10">
           <motion.div
@@ -150,35 +150,10 @@ const WelcomeBanner: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                {user?.matricNumber || user?.name}
+                {user?.name || user?.matricNumber}
               </motion.p>
             </div>
           </motion.div>
-
-          {/* Time display */}
-          {/* <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className={`
-              text-sm 
-              ${currentConfig.textColor}
-              opacity-70 
-              font-medium
-            `}
-          >
-            {currentDate.toLocaleDateString("en-US", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}{" "}
-            •{" "}
-            {currentDate.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </motion.div> */}
         </div>
 
         {/* Avatar with time-based styling */}

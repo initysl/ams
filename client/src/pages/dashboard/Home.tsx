@@ -112,14 +112,8 @@ const Home: React.FC = () => {
               </Link>
               <p className="text-gray-600 leading-relaxed">
                 Experience seamless attendance tracking with our advanced
-                QR-based system. No more manual processes - just scan, track,
-                and succeed!
-              </p>
-              <p className="text-gray-600 leading-relaxed">
-                Revolutionize how your institution manages attendance with
-                AttendEase - built specifically for educational environments.
-                Streamline attendance across all departments with comprehensive
-                analytics
+                QR-based system. Streamline attendance across all lecture
+                sessions with comprehensive analytics
               </p>
             </div>
           </div>
@@ -142,20 +136,21 @@ const Home: React.FC = () => {
               <div className="text-left">
                 {user?.role === "lecturer" ? (
                   <Link to={"/dashboard/generate"}>
-                    <p className="font-semibold text-gray-800">Easy Attendance</p>
+                    <p className="font-semibold text-gray-800">
+                      Easy Attendance
+                    </p>
                     <p className="text-sm text-gray-600">
                       Get started and generate QR code
                     </p>
                   </Link>
                 ) : (
-                   <Link to={"/dashboard/scan"}>
-                  <p className="font-semibold text-gray-800">Easy Attendance</p>
-                  <p className="text-sm text-gray-600">
-                    Scan QR code
-                  </p>
-                </Link>
+                  <Link to={"/dashboard/scan"}>
+                    <p className="font-semibold text-gray-800">
+                      Easy Attendance
+                    </p>
+                    <p className="text-sm text-gray-600">Scan QR code</p>
+                  </Link>
                 )}
-               
               </div>
             </motion.button>
 
@@ -238,9 +233,9 @@ const Home: React.FC = () => {
               <p className="text-gray-600 group-hover:text-white/90 text-sm mb-3 transition-colors duration-300">
                 {card.description}
               </p>
-              <div className="text-sm font-semibold text-gray-700 group-hover:text-white transition-colors duration-300">
+              {/* <div className="text-sm font-semibold text-gray-700 group-hover:text-white transition-colors duration-300">
                 {card.value}
-              </div>
+              </div> */}
             </div>
           </motion.div>
         ))}
