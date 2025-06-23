@@ -67,7 +67,7 @@ function App() {
               path="generate"
               element={
                 <RoleProtectedRoute
-                  allowedRoles={["lecturer", "admin"]}
+                  allowedRoles={["lecturer"]}
                   redirectTo="/unauthorized"
                 >
                   <GenerateQR />
@@ -80,7 +80,7 @@ function App() {
               path="scan"
               element={
                 <RoleProtectedRoute
-                  allowedRoles={["student", "admin"]}
+                  allowedRoles={["student"]}
                   redirectTo="/unauthorized"
                 >
                   <ScanQR />
