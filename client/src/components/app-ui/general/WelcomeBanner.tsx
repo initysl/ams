@@ -75,19 +75,17 @@ const WelcomeBanner = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <Card
-        className={`${currentConfig.cardBg} ${currentConfig.shadowColor} shadow-lg border ${currentConfig.borderColor} p-6 flex flex-row items-center justify-between relative overflow-hidden`}
+      <div
+        className={`${currentConfig.cardBg} ${currentConfig.shadowColor} shadow-lg border ${currentConfig.borderColor} p-6 flex flex-row items-center justify-between relative overflow-hidden rounded-3xl`}
       >
         {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gray-50 rounded-full opacity-50 -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gray-100 rounded-full opacity-30 translate-y-12 -translate-x-12"></div>
 
         <div className="space-y-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="flex items-center gap-4"
+            className="flex items-center gap-4 "
           >
             {/* Time-based icon with proper styling */}
             <motion.div
@@ -203,7 +201,7 @@ const WelcomeBanner = () => {
             />
           </div>
         </motion.div>
-      </Card>
+      </div>
     </motion.div>
   );
 };
