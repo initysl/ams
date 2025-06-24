@@ -68,7 +68,7 @@ const Settings = () => {
   };
 
   const outletVariants = {
-    hidden: { opacity: 0, x: 10 },
+    hidden: { opacity: 0, x: 8 },
     visible: {
       opacity: 1,
       x: 0,
