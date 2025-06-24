@@ -210,14 +210,14 @@ const AttendanceS = () => {
         >
           <Card className="bg-white shadow-sm">
             <CardHeader className="card-header pb-2">
-              <div className="flex flex-wrap justifybe items-center gap-2 w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 w-full items-center">
                 <div className="flex items-center gap-2">
-                  <Input
-                    type="text"
-                    value={matricNumber}
-                    readOnly
-                    className="cursor-not-allowed bg-gray-100 w-36 font-semibold  "
-                  />
+                  {/* <Input
+                      type="text"
+                      value={matricNumber}
+                      readOnly
+                      className="cursor-not-allowed bg-gray-100 w-36 font-semibold  "
+                    /> */}
                   <Button
                     onClick={handleFetchAttendance}
                     className="bg-blue-500 hover:bg-blue-600 text-white"
@@ -242,7 +242,7 @@ const AttendanceS = () => {
 
                   {/* View selection buttons */}
                   {records && records.length > 0 && (
-                    <div className="flex items-center gap-2 text-sm mx-auto mt-2 sm:mt-0">
+                    <div className="flex items-center gap-2 text-sm ">
                       <Button
                         variant={selectedView === "all" ? "default" : "outline"}
                         size="sm"
@@ -276,17 +276,12 @@ const AttendanceS = () => {
             </CardHeader>
             <CardContent className="p-4">
               {isLoading && (
-                <motion.div
-                  className="text-center py-12"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
+                <div className="text-center py-12">
                   <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-500" />
                   <p className="mt-2 text-gray-500">
                     Retreving attendance records...
                   </p>
-                </motion.div>
+                </div>
               )}
 
               {!isLoading && !records && (

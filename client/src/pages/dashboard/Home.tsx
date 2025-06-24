@@ -106,7 +106,7 @@ const Home: React.FC = () => {
               </div>
               <Link
                 to={"/dashboard/home"}
-                className="block text-2xl leading-tight font-bold text-gray-900 hover:text-indigo-600 transition-colors"
+                className="block text-xl leading-tight font-bold text-gray-900 hover:text-indigo-600 transition-colors"
               >
                 Smart Attendance Management
               </Link>

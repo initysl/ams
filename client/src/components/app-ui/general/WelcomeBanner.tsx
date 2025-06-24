@@ -80,7 +80,7 @@ const WelcomeBanner = () => {
       >
         {/* Decorative background elements */}
 
-        <div className="space-y-4 relative z-10">
+        <div className="space-y-4 relative z-10 ">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -122,10 +122,10 @@ const WelcomeBanner = () => {
             </motion.div>
 
             {/* Greeting text */}
-            <div className="space-y-1">
+            <div className="space-y-1 ">
               <motion.h1
                 className={`
-                  text-xl md:text-4xl 
+                  text-2xl md:text-3xl 
                   font-bold 
                   ${currentConfig.textColor}
                   leading-tight
