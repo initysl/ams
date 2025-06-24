@@ -300,7 +300,7 @@ const Profile = () => {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
-                className="text-ellipsis"
+                className="text-ellipsis "
                 {...register("password")}
                 placeholder="Leave blank to keep current password"
               />

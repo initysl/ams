@@ -430,6 +430,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
               <Input
                 placeholder="Search by name or matric number..."
                 value={searchTerm}
+                id="search"
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9 rounded-md bg-white"
               />

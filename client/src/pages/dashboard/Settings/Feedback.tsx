@@ -45,8 +45,12 @@ const Feedback = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Category */}
         <div>
-          <label className="block text-sm font-medium mb-1">Category</label>
+          <label htmlFor="category" className="block text-sm font-medium mb-1">
+            Category
+          </label>
           <select
+            id="category"
+            autoComplete="off"
             {...register("category", { required: "Please select a category" })}
             className="w-full p-2 border border-gray-300 rounded"
           >
@@ -65,8 +69,12 @@ const Feedback = () => {
 
         {/* Message */}
         <div>
-          <label className="block text-sm font-medium mb-1">Your Message</label>
+          <label htmlFor="message" className="block text-sm font-medium mb-1">
+            Your Message
+          </label>
           <textarea
+            id="message"
+            autoComplete="off"
             {...register("message", {
               required: "Message is required",
               minLength: {
@@ -87,11 +95,13 @@ const Feedback = () => {
 
         {/* Email */}
         <div>
-          <label className="block text-sm font-medium mb-1">
+          <label htmlFor="email" className="block text-sm font-medium mb-1">
             Email (optional)
           </label>
           <input
             type="email"
+            id="email"
+            autoComplete="email"
             {...register("email", {
               pattern: {
                 value: /^[^@]+@[^@]+\.[^@]+$/,

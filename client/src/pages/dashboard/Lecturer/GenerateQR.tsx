@@ -679,13 +679,13 @@ const GenerateQR = () => {
             <CardContent>
               <div className="space-y-6">
                 <motion.div className="space-y-2" variants={itemVariants}>
-                  <Label htmlFor="courseTitle">Course Title</Label>
+                  <Label htmlFor="course-title">Course Title</Label>
                   <motion.div
                     whileFocus={{ scale: 1.02 }}
                     transition={{ duration: 0.2 }}
                   >
                     <Input
-                      id="courseTitle"
+                      id="course-title"
                       type="text"
                       placeholder="Enter course title"
                       {...register("courseTitle")}
@@ -710,99 +710,128 @@ const GenerateQR = () => {
                   className="grid grid-cols-1 md:grid-cols-3 gap-4"
                   variants={itemVariants}
                 >
-                  {[
-                    {
-                      id: "courseCode",
-                      label: "Course Code",
-                      placeholder: "Enter course code",
-                      error: errors.courseCode,
-                      register: register("courseCode"),
-                    },
-                    {
-                      id: "level",
-                      label: "Course Level",
-                      isSelect: true,
-                      error: errors.level,
-                    },
-                    {
-                      id: "duration",
-                      label: "Duration (minutes)",
-                      type: "number",
-                      min: 1,
-                      max: 60,
-                      placeholder: "20",
-                      error: errors.duration,
-                      register: register("duration", { valueAsNumber: true }),
-                    },
-                  ].map((field, index) => (
+                  <motion.div
+                    className="space-y-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0 * 0.1 }}
+                  >
+                    <Label htmlFor="course-code">Course Code</Label>
                     <motion.div
-                      key={field.id}
-                      className="space-y-2"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
+                      whileFocus={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
                     >
-                      <Label htmlFor={field.id}>{field.label}</Label>
-                      {field.isSelect ? (
-                        <Controller
-                          name="level"
-                          control={control}
-                          render={({ field: controllerField }) => (
-                            <Select
-                              onValueChange={controllerField.onChange}
-                              value={controllerField.value}
-                            >
-                              <SelectTrigger className="w-full bg-gray-100 border border-gray-300 rounded-md">
-                                <SelectValue placeholder="Choose level" />
-                              </SelectTrigger>
-                              <SelectContent className="bg-white border border-gray-300 rounded-md">
-                                <SelectGroup>
-                                  {["100", "200", "300", "400", "500"].map(
-                                    (level) => (
-                                      <SelectItem
-                                        key={level}
-                                        value={level}
-                                        className="hover:bg-gray-200"
-                                      >
-                                        {level}
-                                      </SelectItem>
-                                    )
-                                  )}
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
-                          )}
-                        />
-                      ) : (
-                        <motion.div
-                          whileFocus={{ scale: 1.02 }}
+                      <Input
+                        id="course-code"
+                        type="text"
+                        placeholder="Enter course code"
+                        {...register("courseCode")}
+                      />
+                    </motion.div>
+                    <AnimatePresence>
+                      {errors.courseCode && (
+                        <motion.p
+                          className="text-red-500 text-sm mt-1"
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.2 }}
                         >
-                          <Input
-                            id={field.id}
-                            type={field.type || "text"}
-                            min={field.min}
-                            max={field.max}
-                            placeholder={field.placeholder}
-                            {...field.register}
-                          />
-                        </motion.div>
+                          {errors.courseCode.message}
+                        </motion.p>
                       )}
-                      <AnimatePresence>
-                        {field.error && (
-                          <motion.p
-                            className="text-red-500 text-sm mt-1"
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.2 }}
+                    </AnimatePresence>
+                  </motion.div>
+
+                  <motion.div
+                    className="space-y-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 1 * 0.1 }}
+                  >
+                    <Label htmlFor="level">Course Level</Label>
+                    <Controller
+                      name="level"
+                      control={control}
+                      render={({ field: controllerField }) => (
+                        <Select
+                          onValueChange={controllerField.onChange}
+                          value={controllerField.value}
+                          name="level"
+                        >
+                          <SelectTrigger
+                            id="level"
+                            className="w-full bg-gray-100 border border-gray-300 rounded-md"
                           >
-                            {field.error.message}
-                          </motion.p>
-                        )}
-                      </AnimatePresence>
+                            <SelectValue placeholder="Choose level" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border border-gray-300 rounded-md">
+                            <SelectGroup>
+                              {["100", "200", "300", "400", "500"].map(
+                                (level) => (
+                                  <SelectItem
+                                    key={level}
+                                    value={level}
+                                    className="hover:bg-gray-200"
+                                  >
+                                    {level}
+                                  </SelectItem>
+                                )
+                              )}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    <AnimatePresence>
+                      {errors.level && (
+                        <motion.p
+                          className="text-red-500 text-sm mt-1"
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {errors.level.message}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+
+                  <motion.div
+                    className="space-y-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 2 * 0.1 }}
+                  >
+                    <Label htmlFor="duration">Duration (minutes)</Label>
+                    <motion.div
+                      whileFocus={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Input
+                        id="duration"
+                        type="number"
+                        min={1}
+                        max={60}
+                        placeholder="20"
+                        {...register("duration", { valueAsNumber: true })}
+                      />
                     </motion.div>
-                  ))}
+                    <AnimatePresence>
+                      {errors.duration && (
+                        <motion.p
+                          className="text-red-500 text-sm mt-1"
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {errors.duration.message}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
                 </motion.div>
               </div>
             </CardContent>

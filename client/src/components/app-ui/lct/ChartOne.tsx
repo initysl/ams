@@ -186,6 +186,7 @@ const ChartOne = () => {
             </CardTitle>
             <div className="flex space-x-3">
               <select
+                id="select-course"
                 value={selectedCourse}
                 onChange={handleCourseChange}
                 disabled={fetchAttendanceMutation.isPending}
@@ -199,6 +200,7 @@ const ChartOne = () => {
                 ))}
               </select>
               <select
+                id="time-range"
                 value={timeRange}
                 onChange={handleTimeRangeChange}
                 disabled={fetchAttendanceMutation.isPending}

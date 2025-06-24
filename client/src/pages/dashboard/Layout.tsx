@@ -46,19 +46,37 @@ const Layout: React.FC = () => {
     const pathSegments = location.pathname.split("/").filter(Boolean);
     const breadcrumbs = [];
 
-    // Start with Dashboard
-    breadcrumbs.push({ label: "Dashboard", path: "/dashboard/home" });
+    // Only add Dashboard if we're not already on the home page
+    if (location.pathname !== "/dashboard/home") {
+      breadcrumbs.push({ label: "Dashboard", path: "/dashboard/home" });
+    }
 
     // Add subsequent segments
     let currentPath = "";
     pathSegments.slice(1).forEach((segment) => {
       currentPath += `/${segment}`;
       const label = segment.charAt(0).toUpperCase() + segment.slice(1);
-      breadcrumbs.push({
-        label: label.replace("-", " "),
-        path: `/dashboard${currentPath}`,
-      });
+      const fullPath = `/dashboard${currentPath}`;
+
+      // Only add if it's not already the dashboard home path
+      if (fullPath !== "/dashboard/home") {
+        breadcrumbs.push({
+          label: label.replace("-", " "),
+          path: fullPath,
+        });
+      } else if (location.pathname === "/dashboard/home") {
+        // If we're on home page, add it as "Home" instead of "Dashboard"
+        breadcrumbs.push({
+          label: "Home",
+          path: "/dashboard/home",
+        });
+      }
     });
+
+    // If we're on dashboard home and no breadcrumbs were added, add Home
+    if (breadcrumbs.length === 0 && location.pathname === "/dashboard/home") {
+      breadcrumbs.push({ label: "Home", path: "/dashboard/home" });
+    }
 
     return breadcrumbs;
   };
@@ -98,7 +116,10 @@ const Layout: React.FC = () => {
                   const isClickable = !isCurrentPage;
 
                   return (
-                    <div key={crumb.path} className="flex items-center">
+                    <div
+                      key={`${crumb.path}-${index}`}
+                      className="flex items-center"
+                    >
                       {index > 0 && (
                         <ChevronRight
                           size={14}
