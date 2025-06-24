@@ -193,6 +193,7 @@ const AttendanceS = () => {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
           <Input
             type="text"
+            id="search-courses"
             placeholder="Search courses..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

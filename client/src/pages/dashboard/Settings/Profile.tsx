@@ -204,9 +204,13 @@ const Profile = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium mb-1">Name</label>
+            <label htmlFor="name" className="block text-sm font-medium mb-1">
+              Name
+            </label>
             <Input
               type="text"
+              id="name"
+              autoComplete="name"
               {...register("name")}
               placeholder="Your full name"
             />
@@ -217,9 +221,13 @@ const Profile = () => {
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label htmlFor="email" className="block text-sm font-medium mb-1">
+              Email
+            </label>
             <Input
               type="email"
+              id="email"
+              autoComplete="email"
               className="text-ellipsis"
               {...register("email")}
               placeholder="you@example.com"
@@ -234,9 +242,17 @@ const Profile = () => {
 
           {/* Department */}
           <div>
-            <label className="block text-sm font-medium mb-1">Department</label>
+            <label
+              htmlFor="department"
+              className="block text-sm font-medium mb-1"
+            >
+              Department
+            </label>
             <Input
               type="text"
+              id="department"
+              autoComplete="organization"
+              className="text-ellipsis"
               {...register("department")}
               placeholder="e.g., Computer Science"
             />
@@ -250,11 +266,16 @@ const Profile = () => {
           {/* Matric Number (Only for students) */}
           {user?.role === "student" && (
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label
+                htmlFor="matricNumber"
+                className="block text-sm font-medium mb-1"
+              >
                 Matric Number
               </label>
               <Input
                 type="text"
+                id="matricNumber"
+                autoComplete="off"
                 {...register("matricNumber")}
                 placeholder="e.g., 2021/12345"
               />
@@ -268,7 +289,10 @@ const Profile = () => {
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium mb-1"
+            >
               New Password
             </label>
             <div className="relative">
@@ -284,6 +308,7 @@ const Profile = () => {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-2 top-2 text-gray-500"
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff /> : <EyeIcon />}
               </button>
