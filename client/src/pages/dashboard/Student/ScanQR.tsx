@@ -181,7 +181,7 @@ const QRScanner: React.FC = () => {
           handleQRCodeScanned(decodedText);
         },
         (errorMessage: string) => {
-          // console.warn("QR Scan Error:", errorMessage);
+          toast.error(`QR Scan Error: ${errorMessage}`);
         }
       );
       setIsScanning(true);

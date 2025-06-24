@@ -137,7 +137,7 @@ const GenerateQR = () => {
       toast.success("QR code generated successfully");
     },
     onError: (error) => {
-      toast.error("Error generating QR code");
+      toast.error(`Error generating QR code ${error}`);
       // console.error("Error generating QR code:", error);
     },
   });

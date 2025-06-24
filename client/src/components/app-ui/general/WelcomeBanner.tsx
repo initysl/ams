@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Smile, Sun, Cloud, Moon } from "lucide-react";
+import { Smile, Sun, Moon } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 type CardProps = {
@@ -9,7 +9,7 @@ type CardProps = {
 };
 
 const Card = ({ children, className }: CardProps) => (
-  <div className={`rounded-lg shadow-lg ${className}`}>{children}</div>
+  <div className={`rounded-3xl  ${className}`}>{children}</div>
 );
 
 const WelcomeBanner = () => {
@@ -75,7 +75,7 @@ const WelcomeBanner = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <div
+      <Card
         className={`${currentConfig.cardBg} ${currentConfig.shadowColor} shadow-lg border ${currentConfig.borderColor} p-6 flex flex-row items-center justify-between relative overflow-hidden rounded-3xl`}
       >
         {/* Decorative background elements */}
@@ -201,7 +201,7 @@ const WelcomeBanner = () => {
             />
           </div>
         </motion.div>
-      </div>
+      </Card>
     </motion.div>
   );
 };
