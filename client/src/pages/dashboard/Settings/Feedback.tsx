@@ -29,7 +29,7 @@ const Feedback = () => {
       reset();
     },
     onError: (error: any) => {
-      toast.error("Failed to submit feedback. Please try again.");
+      toast.error(`Failed to submit feedback: ${error}`);
       // console.error(error);
     },
   });

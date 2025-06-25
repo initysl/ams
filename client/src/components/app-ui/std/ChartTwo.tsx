@@ -14,6 +14,7 @@ import {
 import { Loader2, Calendar, TrendingUp } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
+import { toast } from "sonner";
 
 interface AttendanceRecord {
   sessionId: string;
@@ -65,7 +66,7 @@ const ChartTwo: React.FC = () => {
       setAttendanceData(data);
     },
     onError: (error: any) => {
-      // console.error("Error fetching attendance data:", error);
+      toast.error(`Error fetching attendance data: ${error}`);
       setAttendanceData([]);
     },
   });

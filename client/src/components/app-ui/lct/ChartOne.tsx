@@ -15,6 +15,7 @@ import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { TooltipProps as RechartsTooltipProps } from "recharts";
 import { Loader2, TrendingUp, BarChart3 } from "lucide-react";
+import { toast } from "sonner";
 
 interface AttendanceRecord {
   sessionDate: string;
@@ -96,7 +97,7 @@ const ChartOne = () => {
       setChartData(formattedData);
     },
     onError: (error: any) => {
-      // console.error("Error fetching attendance trend:", error);
+      toast.error(`Error fetching attendance trend: ${error}`);
       setChartData([]);
       setCourses([]);
       setAverageAttendance(0);

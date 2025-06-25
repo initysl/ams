@@ -116,7 +116,7 @@ const Activity = () => {
       activities.push({
         id: `session-${session.courseCode}-${session.sessionDate}-${index}`,
         action: "Conducted Class",
-        subject: `${session.courseCode} - ${session.attendanceCount} students attended`,
+        subject: `${session.courseCode} - ${session.attendanceCount} students (${attendanceRate})`,
         time: getRelativeTime(session.sessionDate),
         icon: Users,
         color: getAttendanceColor(session.attendanceCount),
