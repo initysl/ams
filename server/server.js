@@ -31,10 +31,7 @@ app.use(
         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         imgSrc: ["'self'", "data:", "https:", "blob:"],
-        connectSrc: [
-          "'self'",
-          "https://your-api-domain.vercel.app", // Replace with your actual API domain
-        ],
+        connectSrc: ["'self'", process.env.CLIENT_URL],
         fontSrc: [
           "'self'",
           "https://fonts.googleapis.com",
