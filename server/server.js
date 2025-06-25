@@ -23,27 +23,27 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(morgan("dev"));
-// app.use(
-//   helmet({
-//     contentSecurityPolicy: {
-//       directives: {
-//         defaultSrc: ["'self'"],
-//         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-//         styleSrc: ["'self'", "'unsafe-inline'"],
-//         imgSrc: ["'self'", "data:", "https:", "blob:"],
-//         connectSrc: ["'self'", process.env.CLIENT_URL],
-//         fontSrc: [
-//           "'self'",
-//           "https://fonts.googleapis.com",
-//           "https://fonts.gstatic.com", // Google Fonts assets
-//         ],
-//         objectSrc: ["'none'"], // Prevents Flash, Java applets, etc. (security best practice)
-//         frameSrc: ["'none'"],
-//         baseUri: ["'self'"],
-//       },
-//     },
-//   })
-// );
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:", "blob:"],
+        connectSrc: ["'self'", process.env.CLIENT_URL],
+        fontSrc: [
+          "'self'",
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com", // Google Fonts assets
+        ],
+        objectSrc: ["'none'"], // Prevents Flash, Java applets, etc. (security best practice)
+        frameSrc: ["'none'"],
+        baseUri: ["'self'"],
+      },
+    },
+  })
+);
 
 // Connect to Database
 connectDB();
