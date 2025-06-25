@@ -105,7 +105,7 @@ export function AppSidebar() {
         <SidebarGroup>
           {/* Logo Section */}
           <div className="mb-12 flex flex-col items-center justify-center">
-            <SidebarGroupLabel className="text-2xl font-semibold text-slate-800 mb-2 tracking-wider">
+            <SidebarGroupLabel className="text-2xl font-semibold text-slate-800 my-1 tracking-wider">
               AttendEase
             </SidebarGroupLabel>
             <div className="w-12 h-0.5 bg-slate-300 rounded-full"></div>
