@@ -206,7 +206,7 @@ export function AppSidebar() {
         {/* Footer Text */}
         <div className="px-3">
           <div className="text-sm text-slate-400 text-center font-medium mb-3">
-            © {new Date().getFullYear()} AttendEase
+            © {new Date().getFullYear()} TheFirst Studio
           </div>
 
           {/* Social Links */}
