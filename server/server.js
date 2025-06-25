@@ -28,11 +28,21 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "https://apis.google.com"],
-        styleSrc: ["'self'"],
-        imgSrc: ["'self'", "https://yourcdn.com"],
-        connectSrc: ["'self'"],
-        fontSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:", "blob:"],
+        connectSrc: [
+          "'self'",
+          "https://your-api-domain.vercel.app", // Replace with your actual API domain
+        ],
+        fontSrc: [
+          "'self'",
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com", // Google Fonts assets
+        ],
+        objectSrc: ["'none'"], // Prevents Flash, Java applets, etc. (security best practice)
+        frameSrc: ["'none'"],
+        baseUri: ["'self'"],
       },
     },
   })
