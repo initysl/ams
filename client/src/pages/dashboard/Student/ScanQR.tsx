@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import {
   CheckSquare,
   Loader,
-  // Clipboard,
   Upload,
   Scan,
   QrCode,
@@ -180,9 +179,17 @@ const QRScanner: React.FC = () => {
           setIsLoading(false);
           handleQRCodeScanned(decodedText);
         },
-        (errorMessage: string) => {
-          toast.error(`QR Scan Error: ${errorMessage}`);
-        }
+        // Debounce error toast to avoid rapid firing
+        (() => {
+          let lastToastTime = 0;
+          return () => {
+            const now = Date.now();
+            if (now - lastToastTime > 10000) {
+              toast.error("QR code not detected");
+              lastToastTime = now;
+            }
+          };
+        })()
       );
       setIsScanning(true);
       setScannerActive(true);
@@ -382,7 +389,7 @@ const QRScanner: React.FC = () => {
                       disabled={isLoading}
                       className={`h-12 font-medium transition-all duration-300 w-full ${
                         isScanning
-                          ? "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 shadow-lg shadow-red-500/25"
+                          ? "bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/25"
                           : "bg-teal-500 hover:bg-white hover:border-2 hover:border-gray-200"
                       }`}
                     >

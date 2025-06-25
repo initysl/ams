@@ -687,7 +687,7 @@ const GenerateQR = () => {
                     <Input
                       id="course-title"
                       type="text"
-                      placeholder="Enter course title"
+                      placeholder="Organization of Programming Languages"
                       {...register("courseTitle")}
                     />
                   </motion.div>
@@ -724,7 +724,7 @@ const GenerateQR = () => {
                       <Input
                         id="course-code"
                         type="text"
-                        placeholder="Enter course code"
+                        placeholder="Csc 406"
                         {...register("courseCode")}
                       />
                     </motion.div>
