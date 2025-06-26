@@ -14,9 +14,8 @@ import img2 from "@/assets/images/card/qrw.png";
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import Activity from "@/components/app-ui/lct/Activity";
-import Achievement from "@/components/app-ui/std/Achievement";
 import WelcomeBanner from "@/components/app-ui/general/WelcomeBanner";
+import ActivityFeed from "./ActivityFeed";
 
 const cardData = {
   cards: [
@@ -253,7 +252,7 @@ const Home: React.FC = () => {
         </div>
         <div className="bg-white rounded-3xl shadow-xl p-6 space-y-5">
           <Status />
-          {user?.role === "lecturer" ? <Activity /> : <Achievement />}
+          <ActivityFeed />
         </div>
       </motion.div>
     </div>

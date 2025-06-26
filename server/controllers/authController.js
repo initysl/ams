@@ -169,9 +169,10 @@ const login = asyncHandler(async (req, res) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: true, // HTTPS required in production
+    sameSite: "none", // Allow cross-origin cookies
     maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
+    path: "/",
   });
 
   res.status(200).json({

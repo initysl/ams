@@ -72,7 +72,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setUser(null);
       toast.success("Signed out successfully.");
     } catch (error) {
-      toast.error("Signed failed.");
+      toast.error("Sign out failed.");
       console.error("Signed out error:", error);
     } finally {
       setIsLoading(false);
@@ -80,6 +80,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const fetchUser = async () => {
+    // Check if auth cookie exists before making request
+    const hasAuthCookie = document.cookie.includes("token");
+
+    if (!hasAuthCookie) {
+      setUser(null);
+      setIsLoading(false);
+      setIsInitialized(true);
+      return;
+    }
+
     try {
       setIsLoading(true);
       const response = await api.get("user/profile/me", {
@@ -88,15 +98,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       if (response.data.user) {
         setUser(response.data.user);
-        // console.log("User authenticated from session:", response.data.user);
       } else {
         setUser(null);
       }
     } catch (error: any) {
       setUser(null);
-      // Only show toast error if it's not a 401 (unauthorized) during initial load
       if (isInitialized && error?.response?.status !== 401) {
-        toast.error("Session expired or unauthorized.");
+        toast.error("Unauthorized.");
       }
     } finally {
       setIsLoading(false);
