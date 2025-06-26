@@ -80,37 +80,35 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const fetchUser = async () => {
-    // Check if auth cookie exists before making request
-    const hasAuthCookie = document.cookie.includes("token");
+  try {
+    setIsLoading(true);
+    const response = await api.get("user/profile/me", {
+      withCredentials: true,
+    });
 
-    if (!hasAuthCookie) {
+    if (response.data.user) {
+      setUser(response.data.user);
+    } else {
       setUser(null);
-      setIsLoading(false);
-      setIsInitialized(true);
-      return;
     }
-
-    try {
-      setIsLoading(true);
-      const response = await api.get("user/profile/me", {
-        withCredentials: true,
-      });
-
-      if (response.data.user) {
-        setUser(response.data.user);
-      } else {
-        setUser(null);
+  } catch (error: any) {
+    setUser(null);
+    
+    // Don't show error for 401 (user not authenticated) or 403 (forbidden)
+    // These are expected when user is not logged in
+    const status = error?.response?.status;
+    if (isInitialized && status !== 401 && status !== 403) {
+      console.error("Auth check failed:", error);
+      // Only show toast for unexpected errors (500, network issues, etc.)
+      if (status >= 500 || !status) {
+        toast.error("Failed to verify authentication.");
       }
-    } catch (error: any) {
-      setUser(null);
-      if (isInitialized && error?.response?.status !== 401) {
-        toast.error("Unauthorized.");
-      }
-    } finally {
-      setIsLoading(false);
-      setIsInitialized(true);
     }
-  };
+  } finally {
+    setIsLoading(false);
+    setIsInitialized(true);
+  }
+};
 
   const refetchUser = async () => {
     try {
