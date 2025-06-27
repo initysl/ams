@@ -95,7 +95,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 min-h-screen lg:min-h-0">
+    <div className="flex flex-col md:flex-row gap-4 lg:gap-6 min-h-screen lg:min-h-0">
       {/* Sidebar with motion */}
       <motion.div
         variants={cardVariants}

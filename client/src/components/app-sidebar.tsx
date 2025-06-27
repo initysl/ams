@@ -31,7 +31,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 
 export function AppSidebar() {
-  const { logout, user } = useAuth();
+  const { user, logout } = useAuth();
   const [imageKey, setImageKey] = useState(Date.now());
 
   // Reset image cache when user data changes
