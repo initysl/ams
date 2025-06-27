@@ -95,7 +95,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 lg:gap-6 min-h-screen lg:min-h-0">
+    <div className="flex flex-col md:flex-row gap-4 md:gap-6 min-h-screen md:min-h-0">
       {/* Sidebar with motion */}
       <motion.div
         variants={cardVariants}
@@ -111,7 +111,7 @@ const Settings = () => {
           <div
             className={`
               flex flex-col items-center 
-              ${isMobile ? "flex-1 justify-center py-8" : "py-5"}
+              ${isMobile ? "flex-1 justify-center py-2" : "py-4"}
             `}
           >
             {/* Profile Image */}
@@ -144,8 +144,8 @@ const Settings = () => {
             </motion.div>
 
             {/* User Info */}
-            <div className={`text-center ${isMobile ? "mt-6 mb-8" : "mt-4"}`}>
-              <div className="space-y-2">
+            <div className={`text-center ${isMobile ? "mt-6 mb-4" : "mt-4"}`}>
+              <div className="space-y-1">
                 <h3
                   className={`
                     font-bold text-gray-900 leading-tight

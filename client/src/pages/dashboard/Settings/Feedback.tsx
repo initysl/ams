@@ -4,11 +4,13 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 
 type FeedbackFormInputs = {
   category: string;
   message: string;
-  email?: string;
+  email: string;
 };
 
 const Feedback = () => {
@@ -16,8 +18,18 @@ const Feedback = () => {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<FeedbackFormInputs>();
+
+  const { user } = useAuth();
+
+  // Auto-populate email when component mounts or user changes
+  useEffect(() => {
+    if (user?.email) {
+      setValue("email", user.email);
+    }
+  }, [user, setValue]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: FeedbackFormInputs) => {
@@ -27,6 +39,10 @@ const Feedback = () => {
     onSuccess: () => {
       toast.success("Feedback submitted successfully!");
       reset();
+      // Re-populate email after reset
+      if (user?.email) {
+        setValue("email", user.email);
+      }
     },
     onError: (error: any) => {
       toast.error(`Failed to submit feedback: ${error}`);
@@ -93,23 +109,18 @@ const Feedback = () => {
           )}
         </div>
 
-        {/* Email */}
+        {/* Email - Auto-populated and read-only */}
         <div>
           <label htmlFor="email" className="block text-sm font-medium mb-1">
-            Email (optional)
+            Email
           </label>
           <input
             type="email"
             id="email"
-            autoComplete="email"
-            {...register("email", {
-              pattern: {
-                value: /^[^@]+@[^@]+\.[^@]+$/,
-                message: "Invalid email format",
-              },
-            })}
-            className="w-full p-2 border border-gray-300 rounded"
-            placeholder="Your email for follow-up"
+            {...register("email", { required: "Email is required" })}
+            readOnly
+            className="w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-not-allowed"
+            placeholder="Your email"
           />
           {errors.email && (
             <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>

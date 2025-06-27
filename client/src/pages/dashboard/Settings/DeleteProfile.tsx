@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash2, Loader, AlertTriangle } from "lucide-react";
+import {  Loader, AlertTriangle } from "lucide-react";
 import api from "@/lib/axios";
 import { toast } from "sonner";
 
@@ -99,7 +99,6 @@ const DeleteProfile = ({ className = "" }: DeleteProfileProps) => {
           className={`px-4 py-2 bg-red-500 hover:bg-red-600 text-white ${className}`}
           onClick={() => setIsOpen(true)}
         >
-          <Trash2 className="h-4 w-4 mr-2" />
           Delete Account
         </Button>
       </AlertDialogTrigger>

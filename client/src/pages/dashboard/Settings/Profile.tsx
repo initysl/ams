@@ -189,9 +189,8 @@ const Profile = () => {
   };
 
   return (
-    <div className="p-2 md:p-4 max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-center">Update Profile</h2>
-
+    <div className="p-4 ">
+      <h2 className="text-2xl font-bold  text-center">Update Profile</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="w-fit">
           <Profilebox
@@ -323,7 +322,7 @@ const Profile = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-center gap-4 pt-4">
+        <div className="flex justify-center gap-4">
           <Button
             type="submit"
             disabled={updateMutation.isPending}

@@ -23,7 +23,8 @@ const About = () => {
         <div>
           <h3 className="text-lg font-medium">Developer</h3>
           <p className="text-gray-600">
-            Developed by Yusuf Lawal @ TheFirstStudio
+            Developed by{" "}
+            <span className="font-semibold"> Yusuf Lawal @ TheFirstStudio</span>
           </p>
         </div>
 
@@ -33,7 +34,7 @@ const About = () => {
             For support or inquiries, please contact:{" "}
             <a
               href="mailto:lawalyusufimp@gmail.com"
-              className="text-blue-600 hover:underline"
+              className="text-blue-600 hover:underline font-semibold"
             >
               lawalyusufimp@gmail.com
             </a>
