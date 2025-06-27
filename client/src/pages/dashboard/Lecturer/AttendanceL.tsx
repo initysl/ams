@@ -136,10 +136,10 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
       setSelectedSession("");
       // Refetch sessions
       refetchSessions();
-      toast.success("Cache cleared successfully");
+      toast.success("Cleared successfully");
     },
     onError: () => {
-      toast.error("Failed to clear cache");
+      toast.error("Failed to clear");
     },
   });
 
@@ -380,7 +380,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
                 onClick={() => clearCacheMutation.mutate()}
                 disabled={clearCacheMutation.isPending}
                 variant="outline"
-                className="w-full bg-red-600 hover:bg-red-700 text-white"
+                className="bg-red-50 border-red-300 text-red-700 hover:bg-red-600 hover:text-white hover:border-red-600 transition-colors"
               >
                 {clearCacheMutation.isPending ? (
                   <Loader2 className="animate-spin w-4 h-4 mr-2" />

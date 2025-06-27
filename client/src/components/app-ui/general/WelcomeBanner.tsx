@@ -148,7 +148,7 @@ const WelcomeBanner = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                {user?.name || user?.matricNumber}
+                {user?.matricNumber || user?.name}
               </motion.p>
             </div>
           </motion.div>

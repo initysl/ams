@@ -20,7 +20,6 @@ import {
   BarChart3,
   Award,
   Clock,
-  Trash2,
   Search,
   ListFilter,
 } from "lucide-react";
@@ -210,67 +209,69 @@ const AttendanceS = () => {
           className="md:col-span-2 backdrop-blur-sm shadow-xl"
         >
           <Card className="bg-white shadow-sm">
-            <CardHeader className="card-header pb-2">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 w-full items-center">
-                <div className="flex items-center gap-2">
-                  {/* <Input
-                      type="text"
-                      value={matricNumber}
-                      readOnly
-                      className="cursor-not-allowed bg-gray-100 w-36 font-semibold  "
-                    /> */}
-                  <Button
-                    onClick={handleFetchAttendance}
-                    className="bg-blue-500 hover:bg-blue-600 text-white"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <Loader2 className="animate-spin w-4 h-4 mr-2" />
-                    ) : null}
-                    {isLoading ? "Loading..." : "Get Records"}
-                  </Button>
+            <CardHeader className="card-header">
+              <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-2 w-full">
+                {/* Top row: Primary Action + Filter Controls */}
+                <div className="flex items-center flex-wrap gap-2 flex-1">
+                  {/* Primary Action */}
+                  <div>
+                    <Button
+                      onClick={handleFetchAttendance}
+                      className="bg-blue-500 hover:bg-blue-600 text-white"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <Loader2 className="animate-spin w-4 h-4 mr-2" />
+                      ) : null}
+                      {isLoading ? "Loading..." : "Get Records"}
+                    </Button>
+                  </div>
+
+                  {/* Filter Controls */}
+                  <div>
+                    {records && records.length > 0 && (
+                      <div className="inline-flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                        <Button
+                          variant={selectedView === "all" ? "default" : "ghost"}
+                          size="sm"
+                          onClick={() => setSelectedView("all")}
+                          className={
+                            selectedView === "all"
+                              ? "bg-yellow-500 text-white hover:bg-yellow-600 shadow-sm"
+                              : "hover:bg-gray-200"
+                          }
+                        >
+                          All Records
+                        </Button>
+                        <Button
+                          variant={
+                            selectedView === "recent" ? "default" : "ghost"
+                          }
+                          size="sm"
+                          onClick={() => setSelectedView("recent")}
+                          className={
+                            selectedView === "recent"
+                              ? "bg-teal-500 text-white hover:bg-teal-600 shadow-sm"
+                              : "hover:bg-gray-200"
+                          }
+                        >
+                          Recent 5
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Destructive Action - Full width on mobile, inline on larger screens */}
+                <div className="w-full sm:w-auto">
                   {records && (
                     <Button
-                      className="bg-red-500 hover:bg-red-600 text-white"
                       onClick={clearRecords}
                       variant="outline"
-                      size="icon"
+                      className="w-full sm:w-auto bg-red-50 border-red-300 text-red-700 hover:bg-red-600 hover:text-white hover:border-red-600 transition-colors"
                     >
-                      <span className="sr-only">Clear</span>
-                      <Trash2 />
+                      Clear Records
                     </Button>
-                  )}
-
-                  {/* View selection buttons */}
-                  {records && records.length > 0 && (
-                    <div className="flex items-center gap-2 text-sm ">
-                      <Button
-                        variant={selectedView === "all" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedView("all")}
-                        className={
-                          selectedView === "all"
-                            ? "bg-yellow-500 text-white hover:bg-yellow-600"
-                            : ""
-                        }
-                      >
-                        All Records
-                      </Button>
-                      <Button
-                        variant={
-                          selectedView === "recent" ? "default" : "outline"
-                        }
-                        size="sm"
-                        onClick={() => setSelectedView("recent")}
-                        className={
-                          selectedView === "recent"
-                            ? "bg-teal-500 text-white hover:bg-teal-600"
-                            : ""
-                        }
-                      >
-                        Recent 5
-                      </Button>
-                    </div>
                   )}
                 </div>
               </div>
@@ -535,7 +536,7 @@ const AttendanceS = () => {
                                     {course}
                                   </span>
                                   <span className="font-medium text-blue-700">
-                                    {count} class(es)
+                                    {count} class
                                   </span>
                                 </motion.li>
                               ))}
