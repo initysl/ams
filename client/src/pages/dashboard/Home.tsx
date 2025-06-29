@@ -61,6 +61,7 @@ const cardData = {
 const Home: React.FC = () => {
   const { user } = useAuth();
   const [isFlipped, setIsFlipped] = useState(false);
+  const MotionLink = motion(Link);
 
   return (
     <div className="space-y-8 min-h-screen">
@@ -124,7 +125,13 @@ const Home: React.FC = () => {
             Quick Actions
           </h3>
           <div className="space-y-4">
-            <motion.button
+            {/* Generate/Scan QR Code Card */}
+            <MotionLink
+              to={
+                user?.role === "lecturer"
+                  ? "/dashboard/generate"
+                  : "/dashboard/scan"
+              }
               className="w-full flex items-center space-x-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl hover:from-green-100 hover:to-emerald-100 transition-all"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -133,27 +140,18 @@ const Home: React.FC = () => {
                 <CheckCircle className="h-5 w-5 text-white" />
               </div>
               <div className="text-left">
-                {user?.role === "lecturer" ? (
-                  <Link to={"/dashboard/generate"}>
-                    <p className="font-semibold text-gray-800">
-                      Easy Attendance
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Get started and generate QR code
-                    </p>
-                  </Link>
-                ) : (
-                  <Link to={"/dashboard/scan"}>
-                    <p className="font-semibold text-gray-800">
-                      Easy Attendance
-                    </p>
-                    <p className="text-sm text-gray-600">Scan QR code</p>
-                  </Link>
-                )}
+                <p className="font-semibold text-gray-800">Easy Attendance</p>
+                <p className="text-sm text-gray-600">
+                  {user?.role === "lecturer"
+                    ? "Get started and generate QR code"
+                    : "Scan QR code"}
+                </p>
               </div>
-            </motion.button>
+            </MotionLink>
 
-            <motion.button
+            {/* View Reports Card */}
+            <MotionLink
+              to="/dashboard/attendance"
               className="w-full flex items-center space-x-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl hover:from-purple-100 hover:to-pink-100 transition-all"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -162,14 +160,15 @@ const Home: React.FC = () => {
                 <FileBarChart className="h-5 w-5 text-white" />
               </div>
               <div className="text-left">
-                <Link to={"/dashboard/attendance"}>
-                  <p className="font-semibold text-gray-800">View Reports</p>
-                  <p className="text-sm text-gray-600">Attendance stats</p>
-                </Link>
+                <p className="font-semibold text-gray-800">View Reports</p>
+                <p className="text-sm text-gray-600">Attendance stats</p>
               </div>
-            </motion.button>
+            </MotionLink>
 
-            <motion.button
+            {/* Settings Card */}
+
+            <MotionLink
+              to="/dashboard/settings"
               className="w-full flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl hover:from-blue-100 hover:to-indigo-100 transition-all"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -178,12 +177,10 @@ const Home: React.FC = () => {
                 <Settings2 className="h-5 w-5 text-white" />
               </div>
               <div className="text-left">
-                <Link to={"/dashboard/settings"}>
-                  <p className="font-semibold text-gray-800">Settings</p>
-                  <p className="text-sm text-gray-600">Quick Settings</p>
-                </Link>
+                <p className="font-semibold text-gray-800">Settings</p>
+                <p className="text-sm text-gray-600">Quick Settings</p>
               </div>
-            </motion.button>
+            </MotionLink>
           </div>
         </div>
       </motion.div>

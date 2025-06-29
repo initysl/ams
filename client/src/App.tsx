@@ -20,6 +20,7 @@ import ProtectedRoute, { RoleProtectedRoute } from "./context/ProtectedRoutes";
 import Feedback from "./pages/dashboard/Settings/Feedback";
 import About from "./pages/dashboard/Settings/About";
 import Profile from "./pages/dashboard/Settings/Profile";
+import ScrollToTop from "./components/app-ui/general/ScrollToTop";
 import { useEffect } from "react";
 
 // Unauthorized component for users without proper roles
@@ -38,6 +39,7 @@ function App() {
   return (
     <div className="bg-gray-100">
       <Router>
+        <ScrollToTop />
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<SplashScreen />} />
