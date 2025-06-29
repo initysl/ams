@@ -464,7 +464,8 @@ const Settings = () => {
       {/* Mobile full-screen dialog */}
       {isMobile && (
         <Dialog open={showMobileDialog} onOpenChange={setShowMobileDialog}>
-          <DialogContent className="w-full h-full max-w-none max-h-none m-0 p-0 overflow-y-auto bg-white border-none rounded-none">
+          {/* Readd h-full if continue overlapping */}
+          <DialogContent className="w-full  max-w-none max-h-none m-0 p-0 overflow-y-auto bg-white border-none rounded-none">
             <div className={`${isSmallMobile ? "p-3" : "p-4"}`}>
               <Outlet />
             </div>
