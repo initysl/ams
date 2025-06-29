@@ -17,6 +17,7 @@ import { motion } from "framer-motion";
 const Settings = () => {
   const { user, logout } = useAuth();
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const isSmallMobile = useMediaQuery("(max-width: 480px)");
   const [showMobileDialog, setShowMobileDialog] = useState(false);
   const [imageKey, setImageKey] = useState(Date.now());
   const location = useLocation();
@@ -95,7 +96,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 md:gap-6 min-h-screen md:min-h-0">
+    <div className="flex flex-col md:flex-row gap-2 md:gap-6 md:min-h-0 p-2 md:p-0">
       {/* Sidebar with motion */}
       <motion.div
         variants={cardVariants}
@@ -103,29 +104,42 @@ const Settings = () => {
         animate="visible"
         className={`
           bg-white backdrop-blur-sm shadow-xl rounded-xl
-          ${isMobile ? "w-full h-screen" : "md:max-w-xs w-full"}
+          ${
+            isMobile
+              ? "w-full min-h-[600px] flex flex-col"
+              : "md:max-w-xs w-full"
+          }
         `}
       >
         {/* Sidebar Profile */}
-        <CardContent className={isMobile ? "h-full w-full flex flex-col" : ""}>
+        <CardContent
+          className={`${
+            isMobile ? "p-4 flex-1 flex flex-col justify-center" : "p-6"
+          }`}
+        >
           <div
-            className={`
-              flex flex-col items-center 
-              ${isMobile ? "flex-1 justify-center py-2" : "py-4"}
-            `}
+            className={`flex flex-col items-center ${
+              isMobile ? "h-full justify-center" : ""
+            }`}
           >
             {/* Profile Image */}
             <motion.div
               variants={profileImageVariants}
               whileHover="hover"
-              className="relative"
+              className={`relative ${isMobile ? "mb-6" : "mb-3"}`}
             >
               <img
                 key={imageKey}
                 src={getImageUrl(user?.profilePicture)}
                 className={`
                   rounded-full object-cover ring-4 ring-white shadow-lg
-                  ${isMobile ? "w-32 h-32 sm:w-36 sm:h-36" : "w-32 h-32"}
+                  ${
+                    isSmallMobile
+                      ? "w-28 h-28"
+                      : isMobile
+                      ? "w-32 h-32"
+                      : "w-32 h-32"
+                  }
                 `}
                 alt="Profile picture"
                 crossOrigin="use-credentials"
@@ -140,26 +154,43 @@ const Settings = () => {
                 }}
               />
               {/* Online indicator */}
-              <div className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 rounded-full ring-2 ring-white"></div>
+              <div
+                className={`
+                absolute bottom-0 right-0 bg-green-500 rounded-full ring-2 ring-white
+                ${isSmallMobile ? "w-5 h-5" : "w-6 h-6"}
+              `}
+              ></div>
             </motion.div>
 
             {/* User Info */}
-            <div className={`text-center ${isMobile ? "mt-6 mb-4" : "mt-4"}`}>
+            <div className={`text-center ${isMobile ? "mb-8" : "mb-4"}`}>
               <div className="space-y-1">
                 <h3
                   className={`
-                    font-bold text-gray-900 leading-tight
-                    ${isMobile ? "text-2xl" : "text-xl"}
-                  `}
+                  font-bold text-gray-900 leading-tight
+                  ${
+                    isSmallMobile
+                      ? "text-xl"
+                      : isMobile
+                      ? "text-2xl"
+                      : "text-xl"
+                  }
+                `}
                 >
                   {user?.name}
                 </h3>
 
                 <p
                   className={`
-                    text-gray-600 font-medium
-                    ${isMobile ? "text-lg" : "text-base"}
-                  `}
+                  text-gray-600 font-medium
+                  ${
+                    isSmallMobile
+                      ? "text-sm"
+                      : isMobile
+                      ? "text-base"
+                      : "text-base"
+                  }
+                `}
                 >
                   {user?.role === "lecturer" ? (
                     <span className="capitalize">{user.role}</span>
@@ -172,9 +203,15 @@ const Settings = () => {
 
                 <p
                   className={`
-                    text-gray-500 break-all
-                    ${isMobile ? "text-base px-4" : "text-sm"}
-                  `}
+                  text-gray-500 break-all
+                  ${
+                    isSmallMobile
+                      ? "text-sm px-2"
+                      : isMobile
+                      ? "text-base px-2"
+                      : "text-sm"
+                  }
+                `}
                 >
                   {user?.email}
                 </p>
@@ -182,22 +219,20 @@ const Settings = () => {
             </div>
 
             <Separator
-              className={`bg-gray-200 ${isMobile ? "w-full mb-8" : "mt-5"}`}
+              className={`bg-gray-200 w-full ${isMobile ? "mb-6" : "mb-4"}`}
             />
 
             {/* Navigation Menu */}
-            <nav className={`w-full ${isMobile ? "flex-1" : "mt-4"}`}>
+            <nav className="w-full">
               <div
-                className={`
-                  ${isMobile ? "space-y-4 flex flex-col h-full" : "space-y-2"}
-                `}
+                className={`space-y-2 ${isMobile ? "space-y-3" : "space-y-1"}`}
               >
                 <motion.div variants={navItemVariants} whileHover="hover">
                   <NavLink
                     to="/dashboard/settings/profile"
                     className={({ isActive }) =>
                       `flex items-center justify-between w-full rounded-lg transition-all duration-200 ${
-                        isMobile ? "p-4 text-lg" : "p-3"
+                        isSmallMobile ? "p-3" : isMobile ? "p-4" : "p-3"
                       } ${
                         isActive
                           ? "bg-blue-50 text-blue-700 border-l-4 border-blue-500"
@@ -205,18 +240,45 @@ const Settings = () => {
                       }`
                     }
                   >
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3">
                       <UserPen
-                        className={`text-green-500 ${
-                          isMobile ? "w-6 h-6" : "w-5 h-5"
-                        }`}
+                        className={`
+                        text-green-500 flex-shrink-0
+                        ${
+                          isSmallMobile
+                            ? "w-5 h-5"
+                            : isMobile
+                            ? "w-6 h-6"
+                            : "w-5 h-5"
+                        }
+                      `}
                       />
-                      <span className="font-medium">Profile</span>
+                      <span
+                        className={`
+                        font-medium
+                        ${
+                          isSmallMobile
+                            ? "text-base"
+                            : isMobile
+                            ? "text-lg"
+                            : "text-base"
+                        }
+                      `}
+                      >
+                        Profile
+                      </span>
                     </div>
                     <ChevronRight
-                      className={`text-gray-400 ${
-                        isMobile ? "w-5 h-5" : "w-5 h-5"
-                      }`}
+                      className={`
+                      text-gray-400 flex-shrink-0
+                      ${
+                        isSmallMobile
+                          ? "w-5 h-5"
+                          : isMobile
+                          ? "w-5 h-5"
+                          : "w-4 h-4"
+                      }
+                    `}
                     />
                   </NavLink>
                 </motion.div>
@@ -226,7 +288,7 @@ const Settings = () => {
                     to="/dashboard/settings/about"
                     className={({ isActive }) =>
                       `flex items-center justify-between w-full rounded-lg transition-all duration-200 ${
-                        isMobile ? "p-4 text-lg" : "p-3"
+                        isSmallMobile ? "p-3" : isMobile ? "p-4" : "p-3"
                       } ${
                         isActive
                           ? "bg-blue-50 text-blue-700 border-l-4 border-blue-500"
@@ -234,18 +296,45 @@ const Settings = () => {
                       }`
                     }
                   >
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3">
                       <BadgeHelp
-                        className={`text-blue-500 ${
-                          isMobile ? "w-6 h-6" : "w-5 h-5"
-                        }`}
+                        className={`
+                        text-blue-500 flex-shrink-0
+                        ${
+                          isSmallMobile
+                            ? "w-5 h-5"
+                            : isMobile
+                            ? "w-6 h-6"
+                            : "w-5 h-5"
+                        }
+                      `}
                       />
-                      <span className="font-medium">About</span>
+                      <span
+                        className={`
+                        font-medium
+                        ${
+                          isSmallMobile
+                            ? "text-base"
+                            : isMobile
+                            ? "text-lg"
+                            : "text-base"
+                        }
+                      `}
+                      >
+                        About
+                      </span>
                     </div>
                     <ChevronRight
-                      className={`text-gray-400 ${
-                        isMobile ? "w-5 h-5" : "w-5 h-5"
-                      }`}
+                      className={`
+                      text-gray-400 flex-shrink-0
+                      ${
+                        isSmallMobile
+                          ? "w-5 h-5"
+                          : isMobile
+                          ? "w-5 h-5"
+                          : "w-4 h-4"
+                      }
+                    `}
                     />
                   </NavLink>
                 </motion.div>
@@ -255,7 +344,7 @@ const Settings = () => {
                     to="/dashboard/settings/feedback"
                     className={({ isActive }) =>
                       `flex items-center justify-between w-full rounded-lg transition-all duration-200 ${
-                        isMobile ? "p-4 text-lg" : "p-3"
+                        isSmallMobile ? "p-3" : isMobile ? "p-4" : "p-3"
                       } ${
                         isActive
                           ? "bg-blue-50 text-blue-700 border-l-4 border-blue-500"
@@ -263,23 +352,52 @@ const Settings = () => {
                       }`
                     }
                   >
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3">
                       <MessageCircleQuestion
-                        className={`text-yellow-500 ${
-                          isMobile ? "w-6 h-6" : "w-5 h-5"
-                        }`}
+                        className={`
+                        text-yellow-500 flex-shrink-0
+                        ${
+                          isSmallMobile
+                            ? "w-5 h-5"
+                            : isMobile
+                            ? "w-6 h-6"
+                            : "w-5 h-5"
+                        }
+                      `}
                       />
-                      <span className="font-medium">Feedback</span>
+                      <span
+                        className={`
+                        font-medium
+                        ${
+                          isSmallMobile
+                            ? "text-base"
+                            : isMobile
+                            ? "text-lg"
+                            : "text-base"
+                        }
+                      `}
+                      >
+                        Feedback
+                      </span>
                     </div>
                     <ChevronRight
-                      className={`text-gray-400 ${
-                        isMobile ? "w-5 h-5" : "w-5 h-5"
-                      }`}
+                      className={`
+                      text-gray-400 flex-shrink-0
+                      ${
+                        isSmallMobile
+                          ? "w-5 h-5"
+                          : isMobile
+                          ? "w-5 h-5"
+                          : "w-4 h-4"
+                      }
+                    `}
                     />
                   </NavLink>
                 </motion.div>
 
-                <Separator className="bg-gray-200 my-2" />
+                <Separator
+                  className={`bg-gray-200 ${isMobile ? "my-4" : "my-2"}`}
+                />
 
                 <motion.div variants={navItemVariants} whileHover="hover">
                   <button
@@ -288,16 +406,36 @@ const Settings = () => {
                     className={`
                       flex items-center w-full rounded-lg transition-all duration-200
                       hover:bg-red-50 text-gray-700 hover:text-red-600
-                      ${isMobile ? "p-4 text-lg" : "p-3"}
+                      ${isSmallMobile ? "p-3" : isMobile ? "p-4" : "p-3"}
                     `}
                   >
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3">
                       <LogOut
-                        className={`text-red-500 ${
-                          isMobile ? "w-6 h-6" : "w-5 h-5"
-                        }`}
+                        className={`
+                        text-red-500 flex-shrink-0
+                        ${
+                          isSmallMobile
+                            ? "w-5 h-5"
+                            : isMobile
+                            ? "w-6 h-6"
+                            : "w-5 h-5"
+                        }
+                      `}
                       />
-                      <span className="font-medium">Sign Out</span>
+                      <span
+                        className={`
+                        font-medium
+                        ${
+                          isSmallMobile
+                            ? "text-base"
+                            : isMobile
+                            ? "text-lg"
+                            : "text-base"
+                        }
+                      `}
+                      >
+                        Sign Out
+                      </span>
                     </div>
                   </button>
                 </motion.div>
@@ -316,7 +454,7 @@ const Settings = () => {
           animate="visible"
         >
           <Card className="bg-white backdrop-blur-sm shadow-xl h-full">
-            <CardContent className="h-full">
+            <CardContent className="h-full p-6">
               <Outlet />
             </CardContent>
           </Card>
@@ -327,7 +465,7 @@ const Settings = () => {
       {isMobile && (
         <Dialog open={showMobileDialog} onOpenChange={setShowMobileDialog}>
           <DialogContent className="w-full h-full max-w-none max-h-none m-0 p-0 overflow-y-auto bg-white border-none rounded-none">
-            <div className="p-4">
+            <div className={`${isSmallMobile ? "p-3" : "p-4"}`}>
               <Outlet />
             </div>
           </DialogContent>

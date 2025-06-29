@@ -60,12 +60,12 @@ const AttendanceS = () => {
     onSuccess: (data) => {
       setRecords(data);
       sessionStorage.setItem("attendanceRecords", JSON.stringify(data));
-      toast.success("Attendance records generated successfully");
+      toast.success("Attendance records retrieved successfully");
     },
     onError: (error: any) => {
       toast.error(
         error?.response?.data?.error ||
-          "An error occurred while generating attendance records"
+          "An error occurred while retrieving attendance records"
       );
     },
   });
@@ -375,7 +375,7 @@ const AttendanceS = () => {
                               </TableHead>
                             </TableRow>
                           </TableHeader>
-                          <TableBody className="table-body font-bold">
+                          <TableBody className="table-body font-semibold">
                             {displayedRecords.map((record, index) => (
                               <motion.tr
                                 key={index}
@@ -390,7 +390,7 @@ const AttendanceS = () => {
                                 whileHover={{ backgroundColor: "#f9fafb" }}
                               >
                                 <TableCell
-                                  className="max-w-[200px] truncate font-medium"
+                                  className="max-w-[200px] truncate font-semibold"
                                   title={record.courseTitle}
                                 >
                                   {record.courseTitle}

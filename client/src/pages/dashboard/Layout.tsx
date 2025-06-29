@@ -205,11 +205,8 @@ const Layout: React.FC = () => {
                     </Tooltip>
                   </div>
                   <div className="hidden md:block text-left">
-                    <div className="text-sm font-medium text-slate-500">
-                      {user?.email}
-                    </div>
-                    <div className="text-xs text-slate-500 capitalize">
-                      {user?.matricNumber}
+                    <div className="text-sm  text-slate-500 ">
+                      {user?.matricNumber || user?.email}
                     </div>
                   </div>
                 </div>

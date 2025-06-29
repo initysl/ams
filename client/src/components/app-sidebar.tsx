@@ -29,6 +29,7 @@ import { Link, NavLink } from "react-router-dom";
 import { Separator } from "./ui/separator";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
+import logo from "/at.svg";
 
 export function AppSidebar() {
   const { user, logout } = useAuth();
@@ -101,14 +102,27 @@ export function AppSidebar() {
       collapsible="offcanvas"
       className="border-r border-slate-200 bg-white min-h-screen w-64"
     >
-      <SidebarContent className=" py-3">
+      <SidebarContent className=" py-2">
         <SidebarGroup>
           {/* Logo Section */}
-          <div className="mb-12 flex flex-col items-center justify-center">
-            <SidebarGroupLabel className="text-2xl font-semibold text-slate-800 my-1 tracking-wider">
-              AttendEase
+          <div className="mb-12 flex flex-col items-center text-left space-y-3">
+            <SidebarGroupLabel className="text-2xl font-semibold text-slate-800 tracking-wider">
+              <div className="sidebar-gl font-semibold tracking-widest flex items-center gap-2 group">
+                <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-lg border border-slate-500 transition-transform duration-200 group-hover:scale-105">
+                  <img
+                    src={logo}
+                    alt="AttendEase Logo"
+                    className="w-8 h-8 object-contain"
+                  />
+                </div>
+                <span className="bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                  AttendEase
+                </span>
+              </div>
             </SidebarGroupLabel>
-            <div className="w-12 h-0.5 bg-slate-300 rounded-full"></div>
+
+            {/* Decorative divider with gradient */}
+            <div className="w-16 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
           </div>
 
           {/* Navigation Menu */}
