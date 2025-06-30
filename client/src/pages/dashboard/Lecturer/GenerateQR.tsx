@@ -528,7 +528,9 @@ const GenerateQR = () => {
                           },
                           {
                             label: "Expires at",
-                            value: new Date(expiryTime).toLocaleTimeString(),
+                            value: new Date(expiryTime).toLocaleTimeString(
+                              "en-US"
+                            ),
                           },
                         ].map((item, index) => (
                           <motion.div

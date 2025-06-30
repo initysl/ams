@@ -212,7 +212,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
 
     if (cachedReport) {
       setReport(JSON.parse(cachedReport));
-      toast.success("Loaded cached attendance report");
+      toast.success("Loaded attendance report");
       return;
     }
 
@@ -341,8 +341,8 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
                 <SelectContent className="bg-gray-100">
                   {sessionsLoading && (
                     <div className="flex items-center justify-center py-2 text-gray-500">
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
                       Loading sessions...
+                      <Loader2 className="h-4 w-4 animate-spin ml-2" />
                     </div>
                   )}
                   {!sessionsLoading && sessions.length === 0 && (
@@ -352,9 +352,15 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
                   )}
                   {(sessions as LectureSession[]).map(
                     (session: LectureSession) => (
-                      <SelectItem key={session._id} value={session._id}>
-                        {session.courseCode} - {session.courseTitle} (
-                        {new Date(session.date).toLocaleDateString()})
+                      <SelectItem
+                        className="w-80 md:w-full hover:bg-blue-200 h-10 overflow-x-auto flex items-center"
+                        key={session._id}
+                        value={session._id}
+                      >
+                        <div className="whitespace-nowrap min-w-0 flex-shrink-0">
+                          {session.courseCode} - {session.courseTitle} (
+                          {new Date(session.date).toLocaleDateString()})
+                        </div>
                       </SelectItem>
                     )
                   )}
@@ -521,7 +527,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
                 <tr>
                   <td colSpan={5} className="px-6 py-8 text-center">
                     <AlertCircle className="mx-auto h-8 w-8 text-gray-300 mb-2" />
-                    <p className="text-gray-500">No matching records found</p>
+                    <p className="text-gray-500">No report generated</p>
                   </td>
                 </tr>
               ) : (
@@ -562,7 +568,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
           {filteredReport.length === 0 ? (
             <div className="text-center py-8">
               <AlertCircle className="mx-auto h-8 w-8 text-gray-300 mb-2" />
-              <p className="text-gray-500">No matching records found</p>
+              <p className="text-gray-500">No report generated</p>
             </div>
           ) : (
             <div className="max-h-[60vh] overflow-y-auto divide-y divide-gray-200 relative">
@@ -720,7 +726,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
           <div className="bg-white shadow-xl rounded-lg p-12 text-center">
             <FileSpreadsheet className="h-12 w-12 mx-auto text-gray-300 mb-4" />
             <h3 className="text-lg font-medium text-gray-800 mb-2">
-              No Report Generated Yet / No Report Found
+              No report found
             </h3>
             <p className="text-gray-500 mb-6">
               Select a lecture session and click "Generate Report" to view

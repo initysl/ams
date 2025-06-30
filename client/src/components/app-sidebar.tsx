@@ -105,9 +105,9 @@ export function AppSidebar() {
       <SidebarContent className=" py-2">
         <SidebarGroup>
           {/* Logo Section */}
-          <div className="mb-12 flex flex-col items-center text-left space-y-3">
-            <SidebarGroupLabel className="text-2xl font-semibold text-slate-800 tracking-wider">
-              <div className="sidebar-gl font-semibold tracking-widest flex items-center gap-2 group">
+          <div className="mb-12 flex flex-col items-center space-y-3">
+            <SidebarGroupLabel className="text-2xl font-semibold text-slate-800 tracking-widest">
+              <div className="sidebar-gl font-semibold flex items-center gap-2 group">
                 <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-lg border border-slate-500 transition-transform duration-200 group-hover:scale-105">
                   <img
                     src={logo}
@@ -151,7 +151,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       {/* Footer Section */}
-      <SidebarFooter className="px-4 pb-6 mt-auto">
+      <SidebarFooter className="pb-6 mt-auto">
         {/* User Profile Section */}
         <div className="mb-6">
           <DropdownMenu>
@@ -194,7 +194,7 @@ export function AppSidebar() {
             <DropdownMenuContent
               side="top"
               align="start"
-              className="w-56 bg-white border border-slate-200 shadow-lg rounded-lg p-1"
+              className="w-[var(--radix-dropdown-menu-trigger-width)] bg-white border border-slate-200 shadow-lg rounded-lg p-1"
             >
               <DropdownMenuItem className="focus:bg-slate-100 rounded-md">
                 <Link
