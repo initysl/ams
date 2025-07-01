@@ -375,7 +375,6 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
               >
                 {generateReportMutation.isPending ? (
                   <>
-                    Loading...
                     <Loader2 className="animate-spin w-4 h-4 ml-2" />
                   </>
                 ) : (

@@ -19,15 +19,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import qrplaceholder from "../../../assets/images/qr-placeholder.svg";
-import {
-  AlertCircle,
-  Clock,
-  ListRestart,
-  Loader2,
-  Printer,
-  Save,
-  X,
-} from "lucide-react";
+import { AlertCircle, Clock, Loader2, Printer, Save, X } from "lucide-react";
 
 const qrSchema = z.object({
   courseTitle: z.string().min(5, "Course title is required"),
@@ -541,7 +533,7 @@ const GenerateQR = () => {
                             transition={{ delay: index * 0.1 }}
                           >
                             <span className="text-gray-500">{item.label}:</span>
-                            <span className="font-medium">{item.value}</span>
+                            <span className="">{item.value}</span>
                           </motion.div>
                         ))}
                       </motion.div>
@@ -893,7 +885,7 @@ const GenerateQR = () => {
                     variant="outline"
                     className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md font-medium transition-colors flex items-center justify-center gap-2"
                   >
-                    Reset <ListRestart size={16} />
+                    Reset
                   </Button>
                 </motion.div>
               </motion.div>

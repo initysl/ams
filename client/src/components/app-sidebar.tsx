@@ -71,7 +71,7 @@ export function AppSidebar() {
       ? [
           {
             icon: QrCodeIcon,
-            label: "Generate QR",
+            label: "Generate",
             path: "/dashboard/generate",
           },
         ]
@@ -80,7 +80,7 @@ export function AppSidebar() {
       ? [
           {
             icon: ScanQrCode,
-            label: "Scan QR",
+            label: "Scan",
             path: "/dashboard/scan",
           },
         ]
