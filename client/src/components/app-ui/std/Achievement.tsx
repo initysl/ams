@@ -221,7 +221,7 @@ const Achievement = () => {
         ) : (
           <div className="text-center py-8 text-gray-500">
             <Trophy className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-            <p>Keep attending classes to unlock achievements!</p>
+            <p>Keep attending lectures to unlock achievements!</p>
           </div>
         )}
       </motion.div>
