@@ -36,9 +36,9 @@ const cardData = {
     },
     {
       id: 2,
-      title: "Smart Recognition",
+      title: "Instance Recognition",
       description: "Fast QR detection",
-      value: "99.9% Accuracy",
+      value: "Stable Accuracy",
       icon: <Target className="w-5 h-5" />,
       gradient: "from-purple-500 to-pink-400",
     },
