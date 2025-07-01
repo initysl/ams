@@ -9,9 +9,10 @@ const asyncHandler = require("express-async-handler");
 const {
   sendVerificationEmail,
   sendResetPasswordEmail,
+  sendWelcomeEmail, // Add this if you want to send welcome emails
 } = require("../utils/sendEmail");
 
-// Registration - FIXED
+// Register - Updated with better validation and error handling
 const register = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -76,14 +77,16 @@ const register = asyncHandler(async (req, res) => {
   }
 
   const token = jwt.sign({ id: newUser._id }, SECRET_KEY, {
-    expiresIn: "1h",
+    expiresIn: "24h",
   });
 
   try {
-    await sendVerificationEmail(newUser.email, token);
+    // Pass the user's name as the third parameter
+    await sendVerificationEmail(newUser.email, token, newUser.name);
 
     res.status(201).json({
-      message: "Registration successfull! Please verify your email",
+      message:
+        "Registration successful! Please check your email to verify your account.",
     });
 
     logger.info(
@@ -100,7 +103,7 @@ const register = asyncHandler(async (req, res) => {
   }
 });
 
-// Login - FIXED minor issues
+// Login - Updated with better verification email handling
 const login = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -128,14 +131,15 @@ const login = asyncHandler(async (req, res) => {
 
   if (!user.isVerified) {
     const token = jwt.sign({ id: user._id }, SECRET_KEY, {
-      expiresIn: "1h",
+      expiresIn: "24h",
     });
 
     try {
-      await sendVerificationEmail(user.email, token);
+      // Pass the user's name to personalize the email
+      await sendVerificationEmail(user.email, token, user.name);
       return res.status(400).json({
         message:
-          "Verification email sent. Please verify your email before logging in.",
+          "Account not verified. A new verification email has been sent to your email address.",
       });
     } catch (emailError) {
       logger.error(`Failed to send verification email: ${emailError.message}`);
@@ -191,7 +195,7 @@ const login = asyncHandler(async (req, res) => {
   logger.info(`User signed in: ${user.email}`);
 });
 
-// Verify Email Address - FIXED
+// Verify Email Address - Updated with welcome email option
 const verifyEmail = asyncHandler(async (req, res) => {
   const { token } = req.query;
 
@@ -236,15 +240,24 @@ const verifyEmail = asyncHandler(async (req, res) => {
   user.isVerified = true;
   await user.save();
 
+  // Optional: Send welcome email after successful verification
+  try {
+    await sendWelcomeEmail(user.email, user.name);
+    logger.info(`Welcome email sent to: ${user.email}`);
+  } catch (emailError) {
+    // Don't fail the verification if welcome email fails
+    logger.error(`Failed to send welcome email: ${emailError.message}`);
+  }
+
   res.status(200).json({
     success: true,
-    message: "Email verified successfully!",
+    message: "Email verified successfully! Welcome to our platform.",
   });
 
   logger.info(`Email verified for user: ${user.email}`);
 });
 
-// Forget Password - FIXED
+// Forget Password - Updated with username
 const forgotPassword = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -267,7 +280,8 @@ const forgotPassword = asyncHandler(async (req, res) => {
   const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
 
   try {
-    await sendResetPasswordEmail(user.email, token);
+    // Pass the user's name to personalize the email
+    await sendResetPasswordEmail(user.email, token, user.name);
     res.status(200).json({
       message: "Password reset link sent to your email",
     });
@@ -280,7 +294,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   }
 });
 
-// Reset Password - FIXED
+// Reset Password - No changes needed
 const resetPassword = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -353,7 +367,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   logger.info(`Password reset successfully for user: ${user.email}`);
 });
 
-// Logout - FIXED
+// Logout - No changes needed
 const logout = asyncHandler(async (req, res) => {
   res.cookie("token", "", {
     httpOnly: true,

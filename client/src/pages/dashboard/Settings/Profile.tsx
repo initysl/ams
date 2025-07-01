@@ -145,7 +145,7 @@ const Profile = () => {
       if (data.message && data.message.includes("Verification email sent")) {
         toast.success(data.message);
       } else {
-        toast.success("Profile updated successfully!");
+        toast.success("Profile updated!");
 
         // Wait a moment for the server to process the image
         await new Promise((resolve) => setTimeout(resolve, 1000));

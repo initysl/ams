@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {  Loader, AlertTriangle } from "lucide-react";
+import { Loader, AlertTriangle } from "lucide-react";
 import api from "@/lib/axios";
 import { toast } from "sonner";
 
@@ -99,7 +99,7 @@ const DeleteProfile = ({ className = "" }: DeleteProfileProps) => {
           className={`px-4 py-2 bg-red-500 hover:bg-red-600 text-white ${className}`}
           onClick={() => setIsOpen(true)}
         >
-          Delete Account
+          Delete Profile
         </Button>
       </AlertDialogTrigger>
 
@@ -123,7 +123,7 @@ const DeleteProfile = ({ className = "" }: DeleteProfileProps) => {
           {step === "initial" && (
             <div className="space-y-3">
               <p>
-                You are about to permanently delete your account. This action
+                You are about to permanently delete your profile. This action
                 cannot be undone.
               </p>
               <div className="bg-red-50 p-3 rounded-md border-l-4 border-red-400">
@@ -133,7 +133,7 @@ const DeleteProfile = ({ className = "" }: DeleteProfileProps) => {
                 <ul className="mt-2 text-red-700 text-sm space-y-1">
                   <li>Your profile information</li>
                   <li>All associated data</li>
-                  <li>Access to your account</li>
+                  <li>Access to your profile</li>
                 </ul>
               </div>
             </div>
@@ -142,7 +142,7 @@ const DeleteProfile = ({ className = "" }: DeleteProfileProps) => {
           {step === "confirm" && (
             <div className="space-y-3">
               <p>
-                This will permanently delete the account for{" "}
+                This will permanently delete the profile for{" "}
                 <strong>{user?.email}</strong> and all associated data.
               </p>
               <p className="font-medium text-red-800">
