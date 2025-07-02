@@ -9,7 +9,7 @@ const asyncHandler = require("express-async-handler");
 const {
   sendVerificationEmail,
   sendResetPasswordEmail,
-  sendWelcomeEmail, // Add this if you want to send welcome emails
+  sendWelcomeEmail,
 } = require("../utils/sendEmail");
 
 // Register - Updated with better validation and error handling
@@ -367,7 +367,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   logger.info(`Password reset successfully for user: ${user.email}`);
 });
 
-// Logout - No changes needed
+// Logout
 const logout = asyncHandler(async (req, res) => {
   res.cookie("token", "", {
     httpOnly: true,
