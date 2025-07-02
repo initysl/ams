@@ -23,6 +23,7 @@ import { AlertCircle, Clock, Loader2, Printer, Save, X } from "lucide-react";
 
 const qrSchema = z.object({
   courseTitle: z.string().min(5, "Course title is required"),
+  totalCourseStudents: z.number().min(1, "At least one student is required"),
   courseCode: z.string().min(5, "Course code is required"),
   level: z.enum(["100", "200", "300", "400", "500"], {
     required_error: "Course level is required",
@@ -83,8 +84,9 @@ const GenerateQR = () => {
   const [sessionId, setSessionId] = useState("");
   const [expiryTime, setExpiryTime] = useState("");
   const [courseDetails, setCourseDetails] = useState<{
-    courseCode: string;
     courseTitle: string;
+    totalCourseStudents: number;
+    courseCode: string;
     level: string;
     duration: number;
   } | null>(null);
@@ -104,6 +106,7 @@ const GenerateQR = () => {
     resolver: zodResolver(qrSchema),
     defaultValues: {
       courseTitle: "",
+      totalCourseStudents: 30,
       courseCode: "",
       level: "400",
       duration: 20,
@@ -510,6 +513,10 @@ const GenerateQR = () => {
                             value: courseDetails.courseTitle,
                           },
                           {
+                            label: "Total Students",
+                            value: `${courseDetails.totalCourseStudents} students`,
+                          },
+                          {
                             label: "Course Code",
                             value: courseDetails.courseCode,
                           },
@@ -672,32 +679,79 @@ const GenerateQR = () => {
           <Card className="bg-white shadow-xl">
             <CardContent>
               <div className="space-y-6">
-                <motion.div className="space-y-2" variants={itemVariants}>
-                  <Label htmlFor="course-title">Course Title</Label>
+                <motion.div
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+                  variants={itemVariants}
+                >
                   <motion.div
-                    whileFocus={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
+                    className="space-y-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0 * 0.1 }}
                   >
-                    <Input
-                      id="course-title"
-                      type="text"
-                      placeholder="Organization of Programming Languages"
-                      {...register("courseTitle")}
-                    />
+                    <Label htmlFor="course-title">Course Title</Label>
+                    <motion.div
+                      whileFocus={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Input
+                        id="course-title"
+                        type="text"
+                        placeholder="Organization of Programming Languages"
+                        {...register("courseTitle")}
+                      />
+                    </motion.div>
+                    <AnimatePresence>
+                      {errors.courseTitle && (
+                        <motion.p
+                          className="text-red-500 text-sm mt-1"
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {errors.courseTitle.message}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
-                  <AnimatePresence>
-                    {errors.courseTitle && (
-                      <motion.p
-                        className="text-red-500 text-sm mt-1"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        {errors.courseTitle.message}
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
+
+                  <motion.div
+                    className="space-y-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 1 * 0.1 }}
+                  >
+                    <Label htmlFor="total-students">Total Students</Label>
+                    <motion.div
+                      whileFocus={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Input
+                        id="total-students"
+                        type="number"
+                        min={1}
+                        max={500}
+                        placeholder="30"
+                        {...register("totalCourseStudents", {
+                          valueAsNumber: true,
+                        })}
+                      />
+                    </motion.div>
+                    <AnimatePresence>
+                      {errors.totalCourseStudents && (
+                        <motion.p
+                          className="text-red-500 text-sm mt-1"
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {errors.totalCourseStudents.message}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
                 </motion.div>
 
                 <motion.div
