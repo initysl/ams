@@ -65,8 +65,8 @@ const ChartTwo: React.FC = () => {
     onSuccess: (data) => {
       setAttendanceData(data);
     },
-    onError: (error: any) => {
-      toast.error(`Error fetching attendance data: ${error}`);
+    onError: () => {
+      toast.error("Error fetching attendance data");
       setAttendanceData([]);
     },
   });
@@ -78,7 +78,8 @@ const ChartTwo: React.FC = () => {
   // Check if it's a 404 error (no records found)
   const isNoRecordsFound =
     fetchAttendanceMutation.isError &&
-    fetchAttendanceMutation.error?.response?.status === 404;
+    // Narrow error type to AxiosError for response property
+    (fetchAttendanceMutation.error as any)?.response?.status === 404;
 
   // Check if it's a different error
   const hasError = fetchAttendanceMutation.isError && !isNoRecordsFound;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { QrCode, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AnimatePresence, motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
@@ -69,9 +69,9 @@ const MarkPopover: React.FC<MarkPopoverProps> = ({
         <motion.div
           {...popoverAnimation}
           transition={{ duration: 0.3 }}
-          className="w-96 bg-white border border-gray-200 rounded-xl shadow-lg relative"
+          className="max-w-4xl bg-white border border-gray-200 rounded-xl shadow-lg relative"
           role="dialog"
-          exit={{ opacity: 0 }} // scale: 0.95
+          exit={{ opacity: 0 }}
           aria-labelledby="popover-title"
           aria-describedby="popover-description"
         >
@@ -86,25 +86,17 @@ const MarkPopover: React.FC<MarkPopoverProps> = ({
 
           {!isConfirmed ? (
             <div className="space-y-6 p-4">
-              <div className="flex justify-center pt-2">
-                <QrCode
-                  size={72}
-                  aria-hidden="true"
-                  className="text-teal-600"
-                />
-              </div>
+              <div className="flex justify-center pt-2"></div>
 
               <div className="space-y-3">
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm text-gray-500">Course Code</p>
-                    <span className="font-semibold">
-                      {courseData.courseCode}
-                    </span>
+                    <span className="font-medium">{courseData.courseCode}</span>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Time</p>
-                    <span className="font-semibold">
+                    <span className="font-medium">
                       {courseData.sessionTime}
                     </span>
                   </div>
@@ -114,7 +106,7 @@ const MarkPopover: React.FC<MarkPopoverProps> = ({
                   <p className="text-sm text-gray-500">Course Title</p>
                   <span
                     id="popover-title"
-                    className="font-semibold uppercase block"
+                    className="font-medium uppercase block"
                   >
                     {courseData.courseTitle}
                   </span>
@@ -122,12 +114,12 @@ const MarkPopover: React.FC<MarkPopoverProps> = ({
 
                 <div>
                   <p className="text-sm text-gray-500">Level</p>
-                  <span className="font-semibold">{courseData.level}</span>
+                  <span className="font-medium">{courseData.level}</span>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500">Duration</p>
-                  <span className="font-semibold text-orange-600">
+                  <span className="font-medium text-orange-600">
                     {courseData.duration}
                   </span>
                 </div>
