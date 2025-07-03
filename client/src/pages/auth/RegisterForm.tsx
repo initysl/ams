@@ -132,7 +132,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             className="absolute right-2 top-2 text-gray-500"
             tabIndex={-1}
           >
-            {showPassword ? <EyeOff /> : <EyeIcon />}
+            {showPassword ? <EyeOff /> : <EyeIcon size={20} />}
           </button>
           {errors.password && (
             <p className="text-red-500 text-sm mt-1">
@@ -156,7 +156,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             className="absolute right-2 top-2 text-gray-500"
             tabIndex={-1}
           >
-            {showConfirmPassword ? <EyeOff /> : <EyeIcon />}
+            {showConfirmPassword ? <EyeOff /> : <EyeIcon size={20} />}
           </button>
           {errors.confirmPassword && (
             <p className="text-red-500 text-sm mt-1">

@@ -108,7 +108,7 @@ const ResetPass: React.FC = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-2 top-2 text-gray-500"
                 >
-                  {showPassword ? <EyeOff /> : <EyeIcon />}
+                  {showPassword ? <EyeOff /> : <EyeIcon size={20} />}
                 </button>
                 {resetPassErrors.newPassword && (
                   <p className="text-red-500 text-sm">
@@ -130,7 +130,7 @@ const ResetPass: React.FC = () => {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-2 top-2 text-gray-500"
                 >
-                  {showConfirmPassword ? <EyeOff /> : <EyeIcon />}
+                  {showConfirmPassword ? <EyeOff /> : <EyeIcon size={20} />}
                 </button>
                 {resetPassErrors.confirmPassword && (
                   <p className="text-red-500 text-sm">

@@ -45,8 +45,8 @@ const ForgetPass: React.FC = () => {
     onSuccess: (data, variables) => {
       setSubmittedEmail(variables.email);
       setIsSuccess(true);
-      toast.success(`Reset link sent successfully! ${data}`);
-      // toast.success("Reset link sent successfully!");
+      // toast.success(`Reset link sent successfully! ${data}`);
+      toast.success("Reset link sent successfully!");
     },
     onError: (error) => {
       const errorMessage = (error as any)?.response?.data?.message;
@@ -107,11 +107,12 @@ const ForgetPass: React.FC = () => {
               </span>
             </CardDescription>
 
-            <div className="bg-blue-50 p-4 rounded-lg text-sm text-blue-800">
+            <div className="flex flex-col items-center bg-blue-50 p-4 rounded-lg text-sm text-blue-800">
               <div className="flex items-start space-x-2">
-                <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium">Didn't receive the email?</p>
+                  <p className="font-medium text-orange-600">
+                    Didn't receive the email?
+                  </p>
                   <ul className="mt-1 space-y-1 text-xs">
                     <li>Check your spam/junk folder</li>
                     <li>Make sure the email address is correct</li>
@@ -222,7 +223,7 @@ const ForgetPass: React.FC = () => {
           <p className="text-sm text-gray-600">
             Remember your password?{" "}
             <Link
-              to="/login"
+              to="/auth"
               className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
             >
               Sign in
@@ -233,7 +234,6 @@ const ForgetPass: React.FC = () => {
         <div className="mt-6 pt-6 border-t">
           <div className="flex items-center justify-center text-xs text-gray-500">
             <Shield className="w-3 h-3 mr-1" />
-            Your security is our priority
           </div>
         </div>
       </Card>

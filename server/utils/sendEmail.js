@@ -148,9 +148,7 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
           <p>This email was sent from ${
             process.env.APP_NAME || "AttendEase"
           }</p>
-          <p>&copy; ${new Date().getFullYear()} ${
-    process.env.APP_NAME || "TheFirst Studio"
-  }. All rights reserved.</p>
+          <p>&copy; ${new Date().getFullYear()} TheFirst Studio. All rights reserved.</p>
         </div>
       </div>
     </body>
@@ -179,7 +177,7 @@ const sendVerificationEmail = async (email, token, userName = null) => {
       address: process.env.EMAIL_USER,
     },
     to: email,
-    subject: `Verify your ${process.env.APP_NAME || "account"} email address`,
+    subject: "Verify your account",
     html: getEmailTemplate(
       "Verify Your Email Address",
       content,
@@ -198,7 +196,7 @@ const sendVerificationEmail = async (email, token, userName = null) => {
       If you didn't request this, please ignore this email.
       
       Best regards,
-      ${process.env.APP_NAME || "AttendEase"} Team
+      ${process.env.ORG_NAME || "TheFirst Studio"} Team
     `,
     priority: "high",
     headers: {
@@ -210,10 +208,10 @@ const sendVerificationEmail = async (email, token, userName = null) => {
 
   try {
     const info = transporter.sendMail(mailOptions);
-    console.log("Verification email sent successfully:", info.messageId);
+    // console.log("Verification email sent successfully:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("Error sending verification email:", error);
+    // console.error("Error sending verification email:", error);
     throw new Error("Failed to send verification email");
   }
 };
@@ -221,7 +219,7 @@ const sendVerificationEmail = async (email, token, userName = null) => {
 const sendResetPasswordEmail = async (email, token, userName = null) => {
   const transporter = createTransporter();
 
-  const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
+  const resetUrl = `${process.env.CLIENT_URL}/reset?token=${token}`;
 
   const content = `
     <p>Hello${userName ? ` ${userName}` : ""},</p>
@@ -229,7 +227,7 @@ const sendResetPasswordEmail = async (email, token, userName = null) => {
     <p>If you made this request, click the button below to reset your password:</p>
     
     <div class="expiry-notice">
-      <strong>Important:</strong> This password reset link will expire in 1 hour for security reasons.
+      <strong>Important:</strong> This password reset link will expire in 5 minutes.
     </div>
     
     <div class="security-note">
@@ -242,11 +240,11 @@ const sendResetPasswordEmail = async (email, token, userName = null) => {
 
   const mailOptions = {
     from: {
-      name: process.env.APP_NAME || "Your App",
+      name: process.env.APP_NAME || "AttendEase",
       address: process.env.EMAIL_USER,
     },
     to: email,
-    subject: `Reset your ${process.env.APP_NAME || "account"} password`,
+    subject: "Reset your account password",
     html: getEmailTemplate(
       "Reset Your Password",
       content,
@@ -260,12 +258,12 @@ const sendResetPasswordEmail = async (email, token, userName = null) => {
       We received a request to reset your password. If you made this request, visit this link:
       ${resetUrl}
       
-      This link will expire in 1 hour for security reasons.
+      This link will expire in 5 minutes.
       
       If you didn't request this password reset, please ignore this email.
       
       Best regards,
-      ${process.env.APP_NAME || "Your App"} Team
+      ${process.env.ORG_NAME || "TheFirst Studio"} Team
     `,
     priority: "high",
     headers: {
@@ -277,10 +275,10 @@ const sendResetPasswordEmail = async (email, token, userName = null) => {
 
   try {
     const info = transporter.sendMail(mailOptions);
-    console.log("Password reset email sent successfully:", info.messageId);
+    // console.log("Password reset email sent successfully:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("Error sending password reset email:", error);
+    // console.error("Error sending password reset email:", error);
     throw new Error("Failed to send password reset email");
   }
 };
@@ -309,9 +307,9 @@ const sendWelcomeEmail = async (email, userName) => {
       address: process.env.EMAIL_USER,
     },
     to: email,
-    subject: `Welcome to ${process.env.APP_NAME || "our platform"}!`,
+    subject: `Welcome to ${process.env.APP_NAME || "AttendEase"}!`,
     html: getEmailTemplate(
-      `Welcome to ${process.env.APP_NAME || "our platform"}!`,
+      `Welcome to ${process.env.APP_NAME || "AttendEase"}!`,
       content,
       "Get Started",
       process.env.CLIENT_URL || "#"
@@ -332,10 +330,10 @@ const sendWelcomeEmail = async (email, userName) => {
 
   try {
     const info = transporter.sendMail(mailOptions);
-    console.log("Welcome email sent successfully:", info.messageId);
+    // console.log("Welcome email sent successfully:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("Error sending welcome email:", error);
+    // console.error("Error sending welcome email:", error);
     throw new Error("Failed to send welcome email");
   }
 };
