@@ -73,7 +73,7 @@ const AdaptiveInput = forwardRef<HTMLInputElement, AdaptiveInputProps>(
             "focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent",
             // Handle autofill styling
             "autofill:bg-white autofill:text-gray-900",
-            error ? "border-red-500 focus:ring-red-600" : "border-gray-500",
+            error ? "border-red-500 focus:ring-red-600" : "border-slate-400",
             className
           )}
           style={{

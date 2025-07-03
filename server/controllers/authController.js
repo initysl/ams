@@ -277,7 +277,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     });
   }
 
-  const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
+  const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "5m" });
 
   try {
     // Pass the user's name to personalize the email

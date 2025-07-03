@@ -113,9 +113,9 @@ const ForgetPass: React.FC = () => {
                 <div>
                   <p className="font-medium">Didn't receive the email?</p>
                   <ul className="mt-1 space-y-1 text-xs">
-                    <li>• Check your spam/junk folder</li>
-                    <li>• Make sure the email address is correct</li>
-                    <li>• The link will expire in 15 minutes</li>
+                    <li>Check your spam/junk folder</li>
+                    <li>Make sure the email address is correct</li>
+                    <li>The link will expire in 5 minutes</li>
                   </ul>
                 </div>
               </div>
