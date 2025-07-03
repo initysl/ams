@@ -223,7 +223,7 @@ const ForgetPass: React.FC = () => {
             Remember your password?{" "}
             <Link
               to="/login"
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
             >
               Sign in
             </Link>
