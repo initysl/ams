@@ -110,7 +110,7 @@ const AuthForm: React.FC = () => {
 
   return (
     <div className="flex justify-center items-center min-h-svh p-2">
-      <div className="bg-white p-8 rounded-tr-xl rounded-bl-xl shadow-2xl max-w-2xl transition-all duration-500">
+      <div className="bg-white p-8 rounded-xl rounded-bl-xl shadow-2xl max-w-2xl transition-all duration-500">
         <div className="text-center space-y-2 mb-10">
           <h1 className="text-4xl font-extrabold text-gray-800">
             Welcome to <span className="text-green-600">AttendEase</span>
@@ -146,7 +146,7 @@ const AuthForm: React.FC = () => {
           <Button
             type="submit"
             form={isSignIn ? "login-form" : "register-form"}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg cursor-pointer "
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg cursor-pointer"
             disabled={loginMutation.isPending || registerMutation.isPending}
           >
             {loginMutation.isPending || registerMutation.isPending ? (

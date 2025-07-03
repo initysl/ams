@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "react-router-dom";
 import { EyeIcon, EyeOff } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { AdaptiveInput } from "@/components/app-ui/adaptive-input";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -22,55 +22,62 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFields>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
   return (
     <form
       id="login-form"
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-6"
+      className="space-y-5"
     >
-      <div>
-        <Input
-          id="email"
-          type="email"
-          autoComplete="email"
-          {...register("email")}
-          placeholder="Email address"
-          className="w-full p-2 bg-gray-100 rounded-sm focus:ring-2 focus:ring-slate-400 focus:outline-none"
-        />
-        {errors.email && (
-          <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+      <Controller
+        name="email"
+        control={control}
+        render={({ field }) => (
+          <AdaptiveInput
+            label="Email Address"
+            type="email"
+            autoComplete="email"
+            error={errors.email?.message}
+            {...field}
+          />
         )}
-      </div>
+      />
+
       <div className="relative">
-        <Input
-          id="password"
-          type={showPassword ? "text" : "password"}
-          autoComplete="current-password"
-          {...register("password")}
-          placeholder="Password"
-          className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
+        <Controller
+          name="password"
+          control={control}
+          render={({ field }) => (
+            <AdaptiveInput
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              error={errors.password?.message}
+              {...field}
+            />
+          )}
         />
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-2 top-2 text-gray-500"
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10"
         >
-          {showPassword ? <EyeOff /> : <EyeIcon />}
+          {showPassword ? <EyeOff size={20} /> : <EyeIcon size={20} />}
         </button>
-        {errors.password && (
-          <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-        )}
       </div>
 
-      <div className="text-right">
-        <Link to="/recover" className="text-blue-500 hover:underline">
+      <div className="text-right text-sm">
+        <Link to="/recover" className="text-blue-600 hover:underline">
           Forgot Password?
         </Link>
       </div>
