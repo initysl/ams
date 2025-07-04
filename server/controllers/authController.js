@@ -257,7 +257,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
   logger.info(`Email verified for user: ${user.email}`);
 });
 
-// Forget Password - Updated with username
+// Forgot Password - Updated with rate limiting and better error handling
 const forgotPassword = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -277,16 +277,59 @@ const forgotPassword = asyncHandler(async (req, res) => {
     });
   }
 
+  // Check rate limiting
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  // Initialize reset attempts if not exists or if it's a new day
+  if (
+    !user.passwordResetAttempts ||
+    !user.lastResetAttemptDate ||
+    user.lastResetAttemptDate < today
+  ) {
+    user.passwordResetAttempts = 0;
+    user.lastResetAttemptDate = today;
+  }
+
+  // Check if user has exceeded daily limit
+  if (user.passwordResetAttempts >= 5) {
+    const hoursUntilReset = Math.ceil(
+      24 - (now.getHours() + now.getMinutes() / 60)
+    );
+    return res.status(429).json({
+      message: "Limit exceeded. Please try again tomorrow.",
+      retryAfter: hoursUntilReset,
+      nextAttemptTime: new Date(
+        today.getTime() + 24 * 60 * 60 * 1000
+      ).toISOString(),
+    });
+  }
+
+  // Increment attempt counter
+  user.passwordResetAttempts += 1;
+  await user.save();
+
   const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "5m" });
 
   try {
     // Pass the user's name to personalize the email
     await sendResetPasswordEmail(user.email, token, user.name);
+
+    const remainingAttempts = 5 - user.passwordResetAttempts;
     res.status(200).json({
       message: "Password reset link sent to your email",
+      remainingAttempts: remainingAttempts,
+      attemptsUsed: user.passwordResetAttempts,
     });
-    logger.info(`Password reset link sent to: ${user.email}`);
+
+    logger.info(
+      `Password reset link sent to: ${user.email} (${user.passwordResetAttempts}/5 attempts used)`
+    );
   } catch (emailError) {
+    // Rollback the attempt counter if email fails
+    user.passwordResetAttempts -= 1;
+    await user.save();
+
     logger.error(`Failed to send reset email: ${emailError.message}`);
     res.status(500).json({
       message: "Failed to send reset email. Please try again later.",
@@ -294,7 +337,53 @@ const forgotPassword = asyncHandler(async (req, res) => {
   }
 });
 
-// Reset Password - No changes needed
+//
+// Validate Reset Token
+const validateResetToken = asyncHandler(async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).json({
+      valid: false,
+      code: "MISSING_TOKEN",
+      message: "Reset token is required.",
+    });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, SECRET_KEY);
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(400).json({
+        valid: false,
+        code: "TOKEN_EXPIRED",
+        message: "Reset link has expired.",
+      });
+    }
+    return res.status(400).json({
+      valid: false,
+      code: "INVALID_TOKEN",
+      message: "Invalid reset link.",
+    });
+  }
+
+  const user = await User.findById(decoded.id);
+  if (!user) {
+    return res.status(400).json({
+      valid: false,
+      code: "USER_NOT_FOUND",
+      message: "User does not exist.",
+    });
+  }
+
+  res.status(200).json({
+    valid: true,
+    message: "Reset token is valid.",
+  });
+});
+
+// Reset Password
 const resetPassword = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -324,12 +413,12 @@ const resetPassword = asyncHandler(async (req, res) => {
     if (error.name === "TokenExpiredError") {
       return res.status(400).json({
         success: false,
-        message: "Reset token has expired. Please request a new one.",
+        message: "Link expired.",
       });
     }
     return res.status(400).json({
       success: false,
-      message: "Invalid reset token.",
+      message: "Invalid link.",
     });
   }
 
@@ -337,7 +426,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(400).json({
       success: false,
-      message: "User not found.",
+      message: "User does not exist.",
     });
   }
 
@@ -346,7 +435,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   if (isSamePassword) {
     return res.status(400).json({
       success: false,
-      message: "New password cannot be the same as your current password.",
+      message: "New password cannot be the same as current password.",
     });
   }
 
@@ -390,6 +479,7 @@ module.exports = {
   login,
   verifyEmail,
   forgotPassword,
+  validateResetToken,
   resetPassword,
   logout,
 };

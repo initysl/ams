@@ -45,6 +45,14 @@ const userSchema = new mongoose.Schema(
     lockUntil: {
       type: Number,
     },
+    passwordResetAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lastResetAttemptDate: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

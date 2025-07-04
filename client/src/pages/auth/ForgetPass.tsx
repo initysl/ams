@@ -6,7 +6,15 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader, ArrowLeft, Mail, Shield, CheckCircle } from "lucide-react";
+import {
+  Loader,
+  ArrowLeft,
+  Mail,
+  Shield,
+  CheckCircle,
+  Clock,
+  AlertTriangle,
+} from "lucide-react";
 import { AdaptiveInput } from "@/components/app-ui/adaptive-input";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -19,7 +27,16 @@ type RecoverForm = z.infer<typeof recoverSchema>;
 
 const ForgetPass: React.FC = () => {
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isRateLimited, setIsRateLimited] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState("");
+  const [rateLimitInfo, setRateLimitInfo] = useState<{
+    nextAttemptTime?: string;
+    retryAfter?: number;
+  }>({});
+  const [attemptInfo, setAttemptInfo] = useState<{
+    remainingAttempts?: number;
+    attemptsUsed?: number;
+  }>({});
 
   const {
     control,
@@ -45,13 +62,35 @@ const ForgetPass: React.FC = () => {
     onSuccess: (data, variables) => {
       setSubmittedEmail(variables.email);
       setIsSuccess(true);
-      // toast.success(`Reset link sent successfully! ${data}`);
+      setIsRateLimited(false);
+
+      // Store attempt information
+      if (data.remainingAttempts !== undefined) {
+        setAttemptInfo({
+          remainingAttempts: data.remainingAttempts,
+          attemptsUsed: data.attemptsUsed,
+        });
+      }
+
       toast.success("Reset link sent successfully!");
     },
     onError: (error) => {
-      const errorMessage = (error as any)?.response?.data?.message;
+      const errorResponse = (error as any)?.response;
+      const errorMessage = errorResponse?.data?.message;
+      const status = errorResponse?.status;
 
-      // Handle different error scenarios
+      // Handle rate limiting (429 status)
+      if (status === 429) {
+        setIsRateLimited(true);
+        setRateLimitInfo({
+          nextAttemptTime: errorResponse.data.nextAttemptTime,
+          retryAfter: errorResponse.data.retryAfter,
+        });
+
+        return;
+      }
+
+      // Handle other error scenarios
       if (
         errorMessage?.includes("not found") ||
         errorMessage?.includes("does not exist")
@@ -76,7 +115,10 @@ const ForgetPass: React.FC = () => {
 
   const handleTryAgain = () => {
     setIsSuccess(false);
+    setIsRateLimited(false);
     setSubmittedEmail("");
+    setRateLimitInfo({});
+    setAttemptInfo({});
     reset();
   };
 
@@ -85,6 +127,57 @@ const ForgetPass: React.FC = () => {
       recoverMutation.mutate({ email: submittedEmail });
     }
   };
+
+  // Rate limited state
+  if (isRateLimited) {
+    return (
+      <div className="flex justify-center items-center min-h-svh p-3">
+        <Card className="w-full max-w-md p-6 rounded-xl bg-white shadow-lg">
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
+              <AlertTriangle className="w-8 h-8 text-red-600" />
+            </div>
+
+            <CardTitle className="text-2xl text-gray-900">
+              Daily limit reached
+            </CardTitle>
+
+            <CardDescription className="text-gray-600">
+              You've reached the maximum number of password reset attempts for
+              today.
+            </CardDescription>
+
+            <div className="bg-red-50 p-4 rounded-lg text-sm">
+              <div className="flex items-center justify-center space-x-2">
+                <Clock className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+                <div className="text-red-800">
+                  <p className="font-medium">Try again tomorrow</p>
+                </div>
+              </div>
+            </div>
+
+            <Button
+              onClick={handleTryAgain}
+              variant="outline"
+              className="w-full"
+            >
+              Try a different email
+            </Button>
+
+            <div className="pt-4 border-t">
+              <Link
+                to="/auth"
+                className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
+              >
+                <ArrowLeft className="w-4 h-4 mr-1" />
+                Back to login
+              </Link>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   // Success state
   if (isSuccess) {
@@ -107,6 +200,16 @@ const ForgetPass: React.FC = () => {
               </span>
             </CardDescription>
 
+            {attemptInfo.remainingAttempts !== undefined && (
+              <div className="bg-amber-50 p-3 rounded-lg text-sm">
+                <p className="text-amber-800">
+                  <span className="font-medium">
+                    {attemptInfo.remainingAttempts} attempts remaining
+                  </span>
+                </p>
+              </div>
+            )}
+
             <div className="flex flex-col items-center bg-blue-50 p-4 rounded-lg text-sm text-blue-800">
               <div className="flex items-start space-x-2">
                 <div>
@@ -127,14 +230,19 @@ const ForgetPass: React.FC = () => {
                 onClick={resendLink}
                 variant="outline"
                 className="w-full"
-                disabled={recoverMutation.isPending}
+                disabled={
+                  recoverMutation.isPending ||
+                  attemptInfo.remainingAttempts === 0
+                }
               >
                 {recoverMutation.isPending ? (
                   <Loader className="h-4 w-4 animate-spin mr-2" />
                 ) : (
                   <Mail className="h-4 w-4 mr-2" />
                 )}
-                Resend email
+                {attemptInfo.remainingAttempts === 0
+                  ? "No attempts left"
+                  : "Resend email"}
               </Button>
 
               <Button
