@@ -258,19 +258,23 @@ const ResetPass: React.FC = () => {
               </p>
             </div>
 
-            <div className="space-y-3">
-              <Link to="/auth/forgot-password">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                  Get New Reset Link
-                </Button>
-              </Link>
+            <div className="space-y-5">
+              <div>
+                <Link to="/auth/recover">
+                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+                    Request New
+                  </Button>
+                </Link>
+              </div>
 
-              <Link to="/auth">
-                <Button variant="outline" className="w-full">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Login
-                </Button>
-              </Link>
+              <div>
+                <Link to="/auth">
+                  <Button variant="outline" className="w-full">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Login
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </Card>
@@ -283,8 +287,8 @@ const ResetPass: React.FC = () => {
     <div className="flex justify-center items-center min-h-svh p-3">
       <Card className="w-full max-w-md p-6 rounded-xl bg-white shadow-lg">
         <div className="text-center mb-6">
-          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Lock className="w-6 h-6 text-blue-600" />
+          <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-6 h-6 text-green-600" />
           </div>
 
           <CardTitle className="text-2xl text-gray-900 mb-2">
@@ -311,11 +315,10 @@ const ResetPass: React.FC = () => {
                       id="newPassword"
                       label="New Password"
                       autoComplete="new-password"
-                      placeholder="Enter new password"
                       className={`w-full pr-12 ${
                         resetPassErrors.newPassword
                           ? "border-red-500 focus:ring-red-500"
-                          : "focus:ring-blue-500"
+                          : ""
                       }`}
                     />
                   )}
@@ -350,11 +353,10 @@ const ResetPass: React.FC = () => {
                       type={showConfirmPassword ? "text" : "password"}
                       id="confirmPassword"
                       autoComplete="new-password"
-                      placeholder="Confirm new password"
                       className={`w-full pr-12 ${
                         resetPassErrors.confirmPassword
                           ? "border-red-500 focus:ring-red-500"
-                          : "focus:ring-blue-500"
+                          : ""
                       }`}
                     />
                   )}
@@ -383,7 +385,7 @@ const ResetPass: React.FC = () => {
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 shadow-sm"
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 shadow-sm"
               disabled={resetPassMutation.isPending}
             >
               {resetPassMutation.isPending ? (
@@ -392,10 +394,7 @@ const ResetPass: React.FC = () => {
                   <Loader className="h-4 w-4 animate-spin ml-2" />
                 </>
               ) : (
-                <>
-                  <Shield className="h-4 w-4 mr-2" />
-                  Reset Password
-                </>
+                <>Reset Password</>
               )}
             </Button>
           </form>
@@ -414,7 +413,6 @@ const ResetPass: React.FC = () => {
         <div className="mt-4 pt-4 border-t">
           <div className="flex items-center justify-center text-xs text-gray-500">
             <Shield className="w-3 h-3 mr-1" />
-            <span>Secure password reset</span>
           </div>
         </div>
       </Card>

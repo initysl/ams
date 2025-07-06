@@ -337,7 +337,6 @@ const forgotPassword = asyncHandler(async (req, res) => {
   }
 });
 
-//
 // Validate Reset Token
 const validateResetToken = asyncHandler(async (req, res) => {
   const { token } = req.body;

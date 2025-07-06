@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { AdaptiveInput } from "@/components/app-ui/adaptive-input";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const recoverSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -37,6 +37,7 @@ const ForgetPass: React.FC = () => {
     remainingAttempts?: number;
     attemptsUsed?: number;
   }>({});
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
 
   const {
     control,
@@ -49,6 +50,40 @@ const ForgetPass: React.FC = () => {
       email: "",
     },
   });
+
+  // Update countdown timer for rate limit
+  useEffect(() => {
+    if (!isRateLimited || !rateLimitInfo.nextAttemptTime) return;
+
+    const updateTimer = () => {
+      const now = new Date();
+      const nextAttempt = new Date(rateLimitInfo.nextAttemptTime!);
+      const diff = nextAttempt.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        setTimeRemaining("");
+        setIsRateLimited(false);
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      if (hours > 0) {
+        setTimeRemaining(`${hours}h ${minutes}m ${seconds}s`);
+      } else if (minutes > 0) {
+        setTimeRemaining(`${minutes}m ${seconds}s`);
+      } else {
+        setTimeRemaining(`${seconds}s`);
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [isRateLimited, rateLimitInfo.nextAttemptTime]);
 
   const recoverMutation = useMutation({
     mutationFn: async (data: RecoverForm) => {
@@ -95,7 +130,7 @@ const ForgetPass: React.FC = () => {
         errorMessage?.includes("not found") ||
         errorMessage?.includes("does not exist")
       ) {
-        toast.error("No account found with this email address");
+        toast.error("User does not exist. Please check your email");
       } else if (
         errorMessage?.includes("rate limit") ||
         errorMessage?.includes("too many")
@@ -119,6 +154,7 @@ const ForgetPass: React.FC = () => {
     setSubmittedEmail("");
     setRateLimitInfo({});
     setAttemptInfo({});
+    setTimeRemaining("");
     reset();
   };
 
@@ -139,19 +175,27 @@ const ForgetPass: React.FC = () => {
             </div>
 
             <CardTitle className="text-2xl text-gray-900">
-              Daily limit reached
+              Too many attempts
             </CardTitle>
 
             <CardDescription className="text-gray-600">
-              You've reached the maximum number of password reset attempts for
-              today.
+              You've reached the maximum number of password reset attempts.
             </CardDescription>
 
             <div className="bg-red-50 p-4 rounded-lg text-sm">
               <div className="flex items-center justify-center space-x-2">
                 <Clock className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
                 <div className="text-red-800">
-                  <p className="font-medium">Try again tomorrow</p>
+                  {timeRemaining ? (
+                    <p className="font-medium">Try again in {timeRemaining}</p>
+                  ) : rateLimitInfo.retryAfter ? (
+                    <p className="font-medium">
+                      Try again in {Math.ceil(rateLimitInfo.retryAfter / 60)}{" "}
+                      minutes
+                    </p>
+                  ) : (
+                    <p className="font-medium">Try again later</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -319,10 +363,7 @@ const ForgetPass: React.FC = () => {
                 <Loader className="h-4 w-4 animate-spin ml-2" />
               </>
             ) : (
-              <>
-                <Mail className="h-4 w-4 mr-2" />
-                Send reset link
-              </>
+              <>Send reset link</>
             )}
           </Button>
         </form>
