@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { EyeIcon, EyeOff } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import Profilebox from "@/components/ui/Profilebox";
+import { AdaptiveInput } from "@/components/app-ui/adaptive-input";
 
 const registerSchema = z
   .object({
@@ -42,11 +42,20 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFields>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      department: "",
+      matricNumber: "",
+      password: "",
+      confirmPassword: "",
+      profilePicture: null,
+    },
   });
 
   return (
@@ -55,115 +64,120 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       onSubmit={handleSubmit(onSubmit)}
       autoComplete="on"
     >
-      <div className="mb-4 w-fit ">
+      <div className="mb-4 w-fit">
         <Profilebox profilePicture={previewURL} onImageChange={onImageChange} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <Input
-            id="name"
-            autoComplete="name"
-            {...register("name")}
-            placeholder="Full Name"
-            className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-          />
-          {errors.name && (
-            <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+        <Controller
+          name="name"
+          control={control}
+          render={({ field }) => (
+            <AdaptiveInput
+              label="Full Name"
+              type="text"
+              autoComplete="name"
+              error={errors.name?.message}
+              {...field}
+            />
           )}
-        </div>
+        />
 
-        <div>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            {...register("email")}
-            placeholder="Email"
-            className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+        <Controller
+          name="email"
+          control={control}
+          render={({ field }) => (
+            <AdaptiveInput
+              label="Email Address"
+              type="email"
+              autoComplete="email"
+              error={errors.email?.message}
+              {...field}
+            />
           )}
-        </div>
+        />
 
-        <div>
-          <Input
-            id="department"
-            autoComplete="organization-title"
-            {...register("department")}
-            placeholder="Department"
-            className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-          />
-          {errors.department && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.department.message}
-            </p>
+        <Controller
+          name="department"
+          control={control}
+          render={({ field }) => (
+            <AdaptiveInput
+              label="Department"
+              type="text"
+              autoComplete="organization-title"
+              error={errors.department?.message}
+              {...field}
+            />
           )}
-        </div>
+        />
 
-        <div>
-          <Input
-            id="matricNumber"
-            autoComplete="off"
-            {...register("matricNumber")}
-            placeholder="Matric No for students. e.g 2021/36000"
-            className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-          />
-          {errors.matricNumber && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.matricNumber.message}
-            </p>
+        <Controller
+          name="matricNumber"
+          control={control}
+          render={({ field }) => (
+            <AdaptiveInput
+              label="Matric Number (Optional)"
+              type="text"
+              autoComplete="off"
+              error={errors.matricNumber?.message}
+              {...field}
+            />
           )}
-        </div>
+        />
 
-        <div className="relative">
-          <Input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            autoComplete="new-password"
-            {...register("password")}
-            placeholder="Password"
-            className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
-            tabIndex={-1}
-          >
-            {showPassword ? <EyeOff /> : <EyeIcon size={20} />}
-          </button>
-          {errors.password && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.password.message}
-            </p>
+        <Controller
+          name="password"
+          control={control}
+          render={({ field }) => (
+            <div className="relative">
+              <AdaptiveInput
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                error={errors.password?.message}
+                {...field}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500  hover:text-gray-700"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={20} /> : <EyeIcon size={20} />}
+              </button>
+            </div>
           )}
-        </div>
+        />
 
-        <div className="relative">
-          <Input
-            id="confirmPassword"
-            type={showConfirmPassword ? "text" : "password"}
-            autoComplete="new-password"
-            {...register("confirmPassword")}
-            placeholder="Confirm Password"
-            className="w-full p-2 bg-gray-100 rounded-sm border border-gray-200 focus:ring-2 focus:ring-slate-400 focus:outline-none"
-          />
-          <button
-            type="button"
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
-            tabIndex={-1}
-          >
-            {showConfirmPassword ? <EyeOff /> : <EyeIcon size={20} />}
-          </button>
-          {errors.confirmPassword && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.confirmPassword.message}
-            </p>
+        <Controller
+          name="confirmPassword"
+          control={control}
+          render={({ field }) => (
+            <div className="relative">
+              <AdaptiveInput
+                label="Confirm Password"
+                type={showConfirmPassword ? "text" : "password"}
+                autoComplete="new-password"
+                error={errors.confirmPassword?.message}
+                {...field}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500  hover:text-gray-700"
+                aria-label={
+                  showConfirmPassword ? "Hide password" : "Show password"
+                }
+              >
+                {showConfirmPassword ? (
+                  <EyeOff size={20} />
+                ) : (
+                  <EyeIcon size={20} />
+                )}
+              </button>
+            </div>
           )}
-        </div>
+        />
       </div>
     </form>
   );

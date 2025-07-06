@@ -69,7 +69,7 @@ const AdaptiveInput = forwardRef<HTMLInputElement, AdaptiveInputProps>(
           onFocus={handleFocus}
           onBlur={handleBlur}
           className={cn(
-            "w-full px-4 pt-6 pb-2 text-base text-gray-900 bg-white border rounded-lg transition-all duration-200",
+            "w-full px-3 pt-5 pb-1.5 text-sm text-gray-900 bg-white border rounded-lg transition-all duration-200",
             "focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent",
             // Handle autofill styling
             "autofill:bg-white autofill:text-gray-900",
@@ -86,10 +86,10 @@ const AdaptiveInput = forwardRef<HTMLInputElement, AdaptiveInputProps>(
         />
         <label
           className={cn(
-            "absolute left-4 text-gray-500 transition-all duration-200 pointer-events-none",
+            "absolute left-3 text-gray-500 transition-all duration-200 pointer-events-none",
             shouldFloatLabel
-              ? "top-2 text-xs"
-              : "top-1/2 text-base transform -translate-y-1/2"
+              ? "top-1 text-xs"
+              : "top-1/2 text-sm transform -translate-y-1/2"
           )}
         >
           {label}
