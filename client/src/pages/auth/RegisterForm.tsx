@@ -116,7 +116,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           control={control}
           render={({ field }) => (
             <AdaptiveInput
-              label="Matric Number (Optional)"
+              label="Matric Number (Students Only)"
               type="text"
               autoComplete="off"
               error={errors.matricNumber?.message}

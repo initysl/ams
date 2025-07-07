@@ -65,7 +65,6 @@ const Layout: React.FC = () => {
           path: fullPath,
         });
       } else if (location.pathname === "/dashboard/home") {
-        // If we're on home page, add it as "Home" instead of "Dashboard"
         breadcrumbs.push({
           label: "Home",
           path: "/dashboard/home",

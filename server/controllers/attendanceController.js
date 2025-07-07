@@ -307,12 +307,35 @@ const getAttendanceReport = asyncHandler(async (req, res) => {
       status: record.status,
     }));
 
+    // Calculate correct attendance rate
+    const presentCount = report.filter(
+      (r) => r.status.toLowerCase() === "present"
+    ).length;
+
+    const totalCourseStudents = lectureSession.totalCourseStudents || 0;
+    const attendanceRate =
+      totalCourseStudents > 0
+        ? Math.round((presentCount / totalCourseStudents) * 100)
+        : 0;
+
     logger.info(
       `Attendance report generated for lecture session: ${sessionId}`
     );
-    return res.status(200).json({ report });
+
+    // Return both report and session data
+    return res.status(200).json({
+      report,
+      sessionData: {
+        totalCourseStudents,
+        attendanceRate,
+        courseCode: lectureSession.courseCode,
+        courseTitle: lectureSession.courseTitle,
+        level: lectureSession.level,
+        sessionStart: lectureSession.sessionStart,
+        sessionEnd: lectureSession.sessionEnd,
+      },
+    });
   } catch (error) {
-    // console.error("Error generating attendance report:", error);
     res.status(500).json({ error: "Error generating attendance report" });
   }
 });

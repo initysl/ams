@@ -55,11 +55,23 @@ type AttendanceRecord = {
 
 type AttendanceReportResponse = {
   report: AttendanceRecord[];
+  sessionData: {
+    totalCourseStudents: number;
+    attendanceRate: number;
+    courseCode: string;
+    courseTitle: string;
+    level: string;
+    sessionStart: string;
+    sessionEnd: string;
+  };
 };
 
 const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
   const [selectedSession, setSelectedSession] = useState<string>("");
   const [report, setReport] = useState<AttendanceRecord[]>([]);
+  const [sessionData, setSessionData] = useState<
+    AttendanceReportResponse["sessionData"] | null
+  >(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const { updateTotalStudents } = useAttendance();
@@ -94,16 +106,19 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     },
     onSuccess: (data) => {
       setReport(data.report);
-      // Cache the report for this session
+      setSessionData(data.sessionData); // Store session data
+
+      // Cache both report and session data
       if (selectedSession) {
-        const cachedReportKey = `report_${selectedSession}`;
-        sessionStorage.setItem(cachedReportKey, JSON.stringify(data.report));
+        const cachedDataKey = `reportData_${selectedSession}`;
+        sessionStorage.setItem(cachedDataKey, JSON.stringify(data));
       }
       toast.success("Attendance report generated successfully");
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.error || "Failed to generate report");
       setReport([]);
+      setSessionData(null);
     },
   });
 
@@ -144,13 +159,23 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
   });
 
   // Statistics
-  const totalStudents = report.length;
+  // Updated statistics calculation:
+  const studentsWhoMarkedAttendance = report.length;
   const presentCount = report.filter(
     (r) => r.status.toLowerCase() === "present"
   ).length;
-  const attendanceRate =
-    totalStudents > 0 ? Math.round((presentCount / totalStudents) * 100) : 0;
 
+  // Use totalCourseStudents from sessionData, fallback to report length if not available
+  const totalCourseStudents =
+    sessionData?.totalCourseStudents || studentsWhoMarkedAttendance;
+  const attendanceRate =
+    sessionData?.attendanceRate ||
+    (totalCourseStudents > 0
+      ? Math.round((presentCount / totalCourseStudents) * 100)
+      : 0);
+
+  // Calculate absent count correctly
+  const absentCount = totalCourseStudents - presentCount;
   // Get unique levels in the report
   const levels = [...new Set(report.map((r) => r.level))].sort();
   const levelCounts = levels.reduce((acc, level) => {
@@ -176,12 +201,12 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
 
   // Update total students count whenever report changes
   useEffect(() => {
-    updateTotalStudents(totalStudents);
+    updateTotalStudents(totalCourseStudents);
     // update via props
     if (onUpdateRecord) {
-      onUpdateRecord(totalStudents);
+      onUpdateRecord(totalCourseStudents);
     }
-  }, [totalStudents, onUpdateRecord, updateTotalStudents]);
+  }, [totalCourseStudents, onUpdateRecord, updateTotalStudents]);
 
   // Handle session selection change
   const handleSessionChange = (value: string) => {
@@ -617,9 +642,9 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-sm text-gray-500">Total Students</p>
+                    <p className="text-sm text-gray-500">Total Registered</p>
                     <p className="text-2xl font-bold text-gray-800">
-                      {totalStudents}
+                      {totalCourseStudents}
                     </p>
                   </div>
                   <div className="p-3 bg-blue-100 rounded-lg">
@@ -651,7 +676,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
                   <div>
                     <p className="text-sm text-gray-500">Absent</p>
                     <p className="text-2xl font-bold text-red-600">
-                      {totalStudents - presentCount}
+                      {absentCount}
                     </p>
                   </div>
                   <div className="p-3 bg-red-100 rounded-lg">
@@ -683,6 +708,42 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Add additional info card
+          <Card className="bg-blue-50 shadow-xl mb-6">
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-sm text-gray-500">
+                    Students Who Marked Attendance
+                  </p>
+                  <p className="text-xl font-semibold text-blue-600">
+                    {studentsWhoMarkedAttendance}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">
+                    Did Not Mark Attendance
+                  </p>
+                  <p className="text-xl font-semibold text-orange-600">
+                    {totalCourseStudents - studentsWhoMarkedAttendance}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Response Rate</p>
+                  <p className="text-xl font-semibold text-purple-600">
+                    {totalCourseStudents > 0
+                      ? Math.round(
+                          (studentsWhoMarkedAttendance / totalCourseStudents) *
+                            100
+                        )
+                      : 0}
+                    %
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card> */}
 
           {/* Level Breakdown */}
           {levels.length > 0 && (

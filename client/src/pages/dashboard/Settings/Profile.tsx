@@ -12,7 +12,7 @@ import Profilebox from "@/components/ui/Profilebox";
 import DeleteProfile from "@/pages/dashboard/Settings/DeleteProfile";
 import { AdaptiveInput } from "@/components/app-ui/adaptive-input";
 
-// Create dynamic schema based on user role
+// Dynamic schema based on user role
 const createProfileSchema = (userRole: string | undefined) => {
   const baseSchema = {
     name: z.string().min(5, "Name must be at least 5 characters"),
