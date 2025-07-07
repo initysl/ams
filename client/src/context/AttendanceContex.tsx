@@ -6,8 +6,8 @@ interface AttendanceContextType {
   presentStudents: number;
   absentStudents: number;
   attendanceRate: number;
+
   updateAttendanceStats: (present: number, total: number) => void;
-  updateTotalStudents: (count: number) => void; // Backward compatibility
   resetAttendanceStats: () => void;
 }
 
@@ -27,13 +27,6 @@ export const AttendanceProvider = ({ children }: AttendanceProviderProps) => {
   const absentStudents = totalStudents - presentStudents;
   const attendanceRate =
     totalStudents > 0 ? Math.round((presentStudents / totalStudents) * 100) : 0;
-
-  // Function to update total students count (backward compatibility)
-  const updateTotalStudents = (count: number): void => {
-    setTotalStudents(count);
-    // Reset present students when total is updated this way
-    setPresentStudents(0);
-  };
 
   // Function to update attendance statistics
   const updateAttendanceStats = (present: number, total: number): void => {
@@ -55,7 +48,6 @@ export const AttendanceProvider = ({ children }: AttendanceProviderProps) => {
         absentStudents,
         attendanceRate,
         updateAttendanceStats,
-        updateTotalStudents, // Backward compatibility
         resetAttendanceStats,
       }}
     >

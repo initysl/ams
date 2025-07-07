@@ -74,7 +74,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
   >(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const { updateTotalStudents } = useAttendance();
+  const { updateAttendanceStats } = useAttendance();
 
   // Fetch lecture sessions
   const {
@@ -201,12 +201,12 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
 
   // Update total students count whenever report changes
   useEffect(() => {
-    updateTotalStudents(totalCourseStudents);
+    updateAttendanceStats(presentCount, totalCourseStudents);
     // update via props
     if (onUpdateRecord) {
       onUpdateRecord(totalCourseStudents);
     }
-  }, [totalCourseStudents, onUpdateRecord, updateTotalStudents]);
+  }, [totalCourseStudents, onUpdateRecord, updateAttendanceStats]);
 
   // Handle session selection change
   const handleSessionChange = (value: string) => {
