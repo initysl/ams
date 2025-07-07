@@ -212,9 +212,6 @@ const Profile = () => {
             onImageChange={handleImageChange}
           />
           <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Click to upload a new profile picture
-            </p>
             <p className="text-xs text-gray-500 mt-1">JPG, PNG up to 5MB</p>
           </div>
         </div>

@@ -106,11 +106,11 @@ const Layout: React.FC = () => {
         <header className="sticky top-0 z-40 border-b border-slate-200 backdrop-blur-sm bg-white/95">
           <div className="flex items-center justify-between py-4">
             {/* Left Section: Sidebar Trigger + Breadcrumbs */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <SidebarTrigger className="inline-flex items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 h-9 w-9 transition-colors duration-150" />
 
               {/* Navigable Breadcrumbs */}
-              <nav className="flex items-center space-x-1 text-sm text-slate-600">
+              <nav className="flex items-center text-sm text-slate-600 truncate w-62 md:w-full">
                 {breadcrumbs.map((crumb, index) => {
                   const isCurrentPage = index === breadcrumbs.length - 1;
                   const isClickable = !isCurrentPage;
