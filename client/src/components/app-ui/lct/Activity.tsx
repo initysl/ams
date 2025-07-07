@@ -302,7 +302,7 @@ const Activity = () => {
           description="You haven't conducted any classes yet. Your lecture activity will appear here once you start."
         />
       ) : recentActivities.length > 0 ? (
-        <div className="space-y-4 max-h-65 overflow-y-auto">
+        <div className="space-y-4 max-h-50 overflow-y-auto">
           {recentActivities.map((activity, index) => (
             <motion.div
               key={activity.id}

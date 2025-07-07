@@ -190,7 +190,7 @@ const markAttendance = asyncHandler(async (req, res) => {
       if (err.name === "TokenExpiredError") {
         return res.status(400).json({ error: "QR Code expired" });
       }
-      return res.status(400).json({ error: "Invalid token" });
+      return res.status(400).json({ error: "Invalid QR Code" });
     }
 
     const { sessionId, courseCode, courseTitle, level, expiryTime } = decoded;
