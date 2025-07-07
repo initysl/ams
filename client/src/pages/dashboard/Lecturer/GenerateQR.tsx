@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { AdaptiveInput } from "@/components/app-ui/adaptive-input";
 import {
   Select,
   SelectContent,
@@ -20,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import qrplaceholder from "../../../assets/images/qr-placeholder.svg";
 import { AlertCircle, Clock, Loader2, Printer, Save, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const qrSchema = z.object({
   courseTitle: z.string().min(5, "Course title is required"),
@@ -97,7 +97,6 @@ const GenerateQR = () => {
   const [isExpired, setIsExpired] = useState(false);
 
   const {
-    register,
     handleSubmit,
     control,
     formState: { errors },
@@ -689,31 +688,25 @@ const GenerateQR = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0 * 0.1 }}
                   >
-                    <Label htmlFor="course-title">Course Title</Label>
                     <motion.div
                       whileFocus={{ scale: 1.02 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Input
-                        id="course-title"
-                        type="text"
-                        placeholder="Organization of Programming Languages"
-                        {...register("courseTitle")}
+                      <Controller
+                        name="courseTitle"
+                        control={control}
+                        render={({ field }) => (
+                          <AdaptiveInput
+                            {...field}
+                            id="course-title"
+                            type="text"
+                            label="Course Title"
+                            error={errors.courseTitle?.message}
+                            className="w-full"
+                          />
+                        )}
                       />
                     </motion.div>
-                    <AnimatePresence>
-                      {errors.courseTitle && (
-                        <motion.p
-                          className="text-red-500 text-sm mt-1"
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          {errors.courseTitle.message}
-                        </motion.p>
-                      )}
-                    </AnimatePresence>
                   </motion.div>
 
                   <motion.div
@@ -722,35 +715,35 @@ const GenerateQR = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 1 * 0.1 }}
                   >
-                    <Label htmlFor="total-students">Total Students</Label>
                     <motion.div
                       whileFocus={{ scale: 1.02 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Input
-                        id="total-students"
-                        type="number"
-                        min={1}
-                        max={500}
-                        placeholder="30"
-                        {...register("totalCourseStudents", {
-                          valueAsNumber: true,
-                        })}
+                      <Controller
+                        name="totalCourseStudents"
+                        control={control}
+                        render={({
+                          field: { onChange, value, ...fieldProps },
+                        }) => (
+                          <AdaptiveInput
+                            {...fieldProps}
+                            id="total-students"
+                            type="number"
+                            min={1}
+                            max={500}
+                            label="Total Course Students"
+                            value={value || ""}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              onChange(val === "" ? undefined : Number(val));
+                            }}
+                            error={errors.totalCourseStudents?.message}
+                            helperText="Maximum 500 students allowed"
+                            className="w-full"
+                          />
+                        )}
                       />
                     </motion.div>
-                    <AnimatePresence>
-                      {errors.totalCourseStudents && (
-                        <motion.p
-                          className="text-red-500 text-sm mt-1"
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          {errors.totalCourseStudents.message}
-                        </motion.p>
-                      )}
-                    </AnimatePresence>
                   </motion.div>
                 </motion.div>
 
@@ -764,31 +757,25 @@ const GenerateQR = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0 * 0.1 }}
                   >
-                    <Label htmlFor="course-code">Course Code</Label>
                     <motion.div
                       whileFocus={{ scale: 1.02 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Input
-                        id="course-code"
-                        type="text"
-                        placeholder="Csc 406"
-                        {...register("courseCode")}
+                      <Controller
+                        name="courseCode"
+                        control={control}
+                        render={({ field }) => (
+                          <AdaptiveInput
+                            {...field}
+                            id="course-code"
+                            type="text"
+                            label="Course Code"
+                            error={errors.courseCode?.message}
+                            className="w-full"
+                          />
+                        )}
                       />
                     </motion.div>
-                    <AnimatePresence>
-                      {errors.courseCode && (
-                        <motion.p
-                          className="text-red-500 text-sm mt-1"
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          {errors.courseCode.message}
-                        </motion.p>
-                      )}
-                    </AnimatePresence>
                   </motion.div>
 
                   <motion.div
@@ -797,53 +784,66 @@ const GenerateQR = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 1 * 0.1 }}
                   >
-                    <Label htmlFor="level">Course Level</Label>
-                    <Controller
-                      name="level"
-                      control={control}
-                      render={({ field: controllerField }) => (
-                        <Select
-                          onValueChange={controllerField.onChange}
-                          value={controllerField.value}
+                    <div className="space-y-2">
+                      <motion.div
+                        whileFocus={{ scale: 1.02 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Controller
                           name="level"
-                        >
-                          <SelectTrigger
-                            id="level"
-                            className="w-full bg-gray-100 border border-gray-300 rounded-md"
+                          control={control}
+                          render={({ field: controllerField }) => (
+                            <Select
+                              onValueChange={controllerField.onChange}
+                              value={controllerField.value}
+                              name="level"
+                            >
+                              <SelectTrigger
+                                id="level"
+                                className={cn(
+                                  "w-full px-3  text-sm text-gray-900 bg-white border rounded-lg transition-all duration-200",
+                                  "focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent",
+                                  "min-h-[3rem]",
+                                  errors.level
+                                    ? "border-red-500 focus:ring-red-600"
+                                    : "border-slate-400"
+                                )}
+                              >
+                                <SelectValue placeholder="Choose level" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-white border border-gray-300 rounded-md">
+                                <SelectGroup>
+                                  {["100", "200", "300", "400", "500"].map(
+                                    (level) => (
+                                      <SelectItem
+                                        key={level}
+                                        value={level}
+                                        className="hover:bg-gray-100 focus:bg-gray-100"
+                                      >
+                                        Level {level}
+                                      </SelectItem>
+                                    )
+                                  )}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                      </motion.div>
+                      <AnimatePresence>
+                        {errors.level && (
+                          <motion.p
+                            className="text-red-500 text-sm mt-1"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.2 }}
                           >
-                            <SelectValue placeholder="Choose level" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white border border-gray-300 rounded-md">
-                            <SelectGroup>
-                              {["100", "200", "300", "400", "500"].map(
-                                (level) => (
-                                  <SelectItem
-                                    key={level}
-                                    value={level}
-                                    className="hover:bg-gray-200"
-                                  >
-                                    {level}
-                                  </SelectItem>
-                                )
-                              )}
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    <AnimatePresence>
-                      {errors.level && (
-                        <motion.p
-                          className="text-red-500 text-sm mt-1"
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          {errors.level.message}
-                        </motion.p>
-                      )}
-                    </AnimatePresence>
+                            {errors.level.message}
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </motion.div>
 
                   <motion.div
@@ -852,33 +852,36 @@ const GenerateQR = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 2 * 0.1 }}
                   >
-                    <Label htmlFor="duration">Duration (minutes)</Label>
                     <motion.div
                       whileFocus={{ scale: 1.02 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Input
-                        id="duration"
-                        type="number"
-                        min={1}
-                        max={60}
-                        placeholder="20"
-                        {...register("duration", { valueAsNumber: true })}
+                      <Controller
+                        name="duration"
+                        control={control}
+                        render={({
+                          field: { onChange, value, ...fieldProps },
+                        }) => (
+                          <AdaptiveInput
+                            {...fieldProps}
+                            id="duration"
+                            type="number"
+                            min={1}
+                            max={60}
+                            label="Duration (minutes)"
+                            placeholder="20"
+                            value={value || ""}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              onChange(val === "" ? undefined : Number(val));
+                            }}
+                            error={errors.duration?.message}
+                            helperText=" 1-60 minutes"
+                            className="w-full"
+                          />
+                        )}
                       />
                     </motion.div>
-                    <AnimatePresence>
-                      {errors.duration && (
-                        <motion.p
-                          className="text-red-500 text-sm mt-1"
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          {errors.duration.message}
-                        </motion.p>
-                      )}
-                    </AnimatePresence>
                   </motion.div>
                 </motion.div>
               </div>
