@@ -3,7 +3,12 @@ import { createContext, useContext, useState, ReactNode } from "react";
 // Define the shape of our context data
 interface AttendanceContextType {
   totalStudents: number;
-  updateTotalStudents: (count: number) => void;
+  presentStudents: number;
+  absentStudents: number;
+  attendanceRate: number;
+  updateAttendanceStats: (present: number, total: number) => void;
+  updateTotalStudents: (count: number) => void; // Backward compatibility
+  resetAttendanceStats: () => void;
 }
 
 const AttendanceContext = createContext<AttendanceContextType | undefined>(
@@ -16,17 +21,42 @@ interface AttendanceProviderProps {
 
 export const AttendanceProvider = ({ children }: AttendanceProviderProps) => {
   const [totalStudents, setTotalStudents] = useState<number>(0);
+  const [presentStudents, setPresentStudents] = useState<number>(0);
 
-  // Function to update total students count
+  // Calculated values
+  const absentStudents = totalStudents - presentStudents;
+  const attendanceRate =
+    totalStudents > 0 ? Math.round((presentStudents / totalStudents) * 100) : 0;
+
+  // Function to update total students count (backward compatibility)
   const updateTotalStudents = (count: number): void => {
     setTotalStudents(count);
+    // Reset present students when total is updated this way
+    setPresentStudents(0);
+  };
+
+  // Function to update attendance statistics
+  const updateAttendanceStats = (present: number, total: number): void => {
+    setPresentStudents(present);
+    setTotalStudents(total);
+  };
+
+  // Function to reset attendance statistics
+  const resetAttendanceStats = (): void => {
+    setPresentStudents(0);
+    setTotalStudents(0);
   };
 
   return (
     <AttendanceContext.Provider
       value={{
         totalStudents,
-        updateTotalStudents,
+        presentStudents,
+        absentStudents,
+        attendanceRate,
+        updateAttendanceStats,
+        updateTotalStudents, // Backward compatibility
+        resetAttendanceStats,
       }}
     >
       {children}

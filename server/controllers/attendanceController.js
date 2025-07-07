@@ -24,7 +24,8 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
       req.body;
     if (!courseCode || !courseTitle || !level || !duration) {
       return res.status(400).json({
-        error: "courseTitle, courseCode, level, and duration are required",
+        error:
+          "courseTitle, totalCourseStudents, courseCode, level, and duration are required",
       });
     }
 
@@ -435,6 +436,14 @@ const attendanceTrend = asyncHandler(async (req, res) => {
       courseCode: session.courseCode,
       sessionDate: session.sessionStart.toISOString().split("T")[0], // e.g., '2025-05-13'
       attendanceCount: session.attendanceRecords.length,
+      totalCourseStudents: session.totalCourseStudents || 0,
+      attendanceRate:
+        session.totalCourseStudents > 0
+          ? Math.round(
+              (session.attendanceRecords.length / session.totalCourseStudents) *
+                100
+            )
+          : 0,
     }));
 
     // Optional: sort by course and date

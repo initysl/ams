@@ -22,6 +22,8 @@ type SessionRecord = {
   courseCode: string;
   sessionDate: string;
   attendanceCount: number;
+  totalCourseStudents: number;
+  attendanceRate: number;
 };
 
 type LecturerActivity = {
@@ -92,6 +94,23 @@ const Activity = () => {
     }
   };
 
+  // Get attendance description based on attendance rate
+  const getAttendanceDescription = (attendanceRate: number): string => {
+    if (attendanceRate >= 80) return "Excellent turnout";
+    if (attendanceRate >= 60) return "Great attendance";
+    if (attendanceRate >= 40) return "Good attendance";
+    if (attendanceRate >= 20) return "Moderate attendance";
+    return "Low attendance";
+  };
+
+  // Get color based on attendance rate
+  const getAttendanceColor = (attendanceRate: number): string => {
+    if (attendanceRate >= 80) return "text-green-500";
+    if (attendanceRate >= 60) return "text-blue-500";
+    if (attendanceRate >= 40) return "text-yellow-500";
+    return "text-orange-500";
+  };
+
   // Process session data into lecturer activities
   const processLecturerActivities = (sessionData: SessionRecord[]): void => {
     if (!sessionData || sessionData.length === 0) {
@@ -111,15 +130,17 @@ const Activity = () => {
 
     // Add recent class sessions
     sortedData.forEach((session, index) => {
-      const attendanceRate = getAttendanceDescription(session.attendanceCount);
+      const attendanceDescription = getAttendanceDescription(
+        session.attendanceRate
+      );
 
       activities.push({
         id: `session-${session.courseCode}-${session.sessionDate}-${index}`,
         action: "Conducted Class",
-        subject: `${session.courseCode} - ${session.attendanceCount} students (${attendanceRate})`,
+        subject: `${session.courseCode} - ${session.attendanceCount}/${session.totalCourseStudents} students (${session.attendanceRate}% - ${attendanceDescription})`,
         time: getRelativeTime(session.sessionDate),
         icon: Users,
-        color: getAttendanceColor(session.attendanceCount),
+        color: getAttendanceColor(session.attendanceRate),
         metadata: {
           attendanceCount: session.attendanceCount,
           courseCode: session.courseCode,
@@ -135,42 +156,25 @@ const Activity = () => {
     setRecentActivities(activities.slice(0, 8));
   };
 
-  // Get attendance description based on count
-  const getAttendanceDescription = (count: number): string => {
-    if (count >= 50) return "Excellent turnout";
-    if (count >= 30) return "Great attendance";
-    if (count >= 20) return "Good attendance";
-    if (count >= 10) return "Moderate attendance";
-    return "Low attendance";
-  };
-
-  // Get color based on attendance count
-  const getAttendanceColor = (count: number): string => {
-    if (count >= 30) return "text-green-500";
-    if (count >= 20) return "text-blue-500";
-    if (count >= 10) return "text-yellow-500";
-    return "text-orange-500";
-  };
-
   // Calculate lecturer achievements
   const calculateLecturerAchievements = (
     sessions: SessionRecord[]
   ): LecturerActivity[] => {
     const achievements: LecturerActivity[] = [];
 
-    // Recent high attendance sessions
+    // Recent high attendance rate sessions (80%+ attendance)
     const recentHighAttendance = sessions.filter((session) => {
       const sessionDate = new Date(session.sessionDate);
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
-      return sessionDate >= weekAgo && session.attendanceCount >= 30;
+      return sessionDate >= weekAgo && session.attendanceRate >= 80;
     });
 
     if (recentHighAttendance.length >= 3) {
       achievements.push({
         id: "high-engagement-week",
         action: "High Engagement Week",
-        subject: `${recentHighAttendance.length} sessions with 30+ students`,
+        subject: `${recentHighAttendance.length} sessions with 80%+ attendance`,
         time: "This week",
         icon: Award,
         color: "text-purple-500",
@@ -216,7 +220,7 @@ const Activity = () => {
       }
     });
 
-    // Best attendance session recently
+    // Best attendance session recently (90%+ attendance rate)
     const bestRecentSession = sessions
       .filter((session) => {
         const sessionDate = new Date(session.sessionDate);
@@ -224,13 +228,13 @@ const Activity = () => {
         monthAgo.setDate(monthAgo.getDate() - 30);
         return sessionDate >= monthAgo;
       })
-      .sort((a, b) => b.attendanceCount - a.attendanceCount)[0];
+      .sort((a, b) => b.attendanceRate - a.attendanceRate)[0];
 
-    if (bestRecentSession && bestRecentSession.attendanceCount >= 40) {
+    if (bestRecentSession && bestRecentSession.attendanceRate >= 90) {
       achievements.push({
         id: "best-attendance",
         action: "Outstanding Turnout",
-        subject: `${bestRecentSession.courseCode} - ${bestRecentSession.attendanceCount} students`,
+        subject: `${bestRecentSession.courseCode} - ${bestRecentSession.attendanceRate}% attendance`,
         time: getRelativeTime(bestRecentSession.sessionDate),
         icon: TrendingUp,
         color: "text-green-500",
@@ -298,7 +302,7 @@ const Activity = () => {
           description="You haven't conducted any classes yet. Your lecture activity will appear here once you start."
         />
       ) : recentActivities.length > 0 ? (
-        <div className="space-y-4 max-h-50  overflow-y-auto">
+        <div className="space-y-4 max-h-65 overflow-y-auto">
           {recentActivities.map((activity, index) => (
             <motion.div
               key={activity.id}
@@ -313,7 +317,7 @@ const Activity = () => {
                 <activity.icon className="h-5 w-5" />
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-gray-800">{activity.action}</p>
+                <p className="font-medium text-gray-800">{activity.action}</p>
                 <p className="text-sm text-gray-600">{activity.subject}</p>
                 {activity.metadata?.achievementType && (
                   <p className="text-xs text-gray-500 bg-gray-200 rounded-full px-2 py-1 inline-block mt-1">
