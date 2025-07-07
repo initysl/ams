@@ -42,14 +42,25 @@ const AdaptiveInput = forwardRef<HTMLInputElement, AdaptiveInputProps>(
     // Also check when props.value changes
     useEffect(() => {
       const hasValue = props.value ? String(props.value).length > 0 : false;
-      if (hasValue) {
-        setHasAutofillValue(true);
-      }
+      setHasAutofillValue(hasValue);
     }, [props.value]);
 
-    const hasValue = props.value ? String(props.value).length > 0 : false;
-    const shouldFloatLabel =
-      isFocused || hasValue || hasAutofillValue || props.placeholder;
+    // Get current input value - check both controlled and uncontrolled scenarios
+    const getCurrentValue = () => {
+      if (props.value !== undefined) {
+        // Controlled component
+        return String(props.value).length > 0;
+      } else if (inputRef.current) {
+        // Uncontrolled component
+        return inputRef.current.value.length > 0;
+      }
+      return false;
+    };
+
+    const hasValue = getCurrentValue();
+
+    // Fixed logic: only float label when there's actual content or focus
+    const shouldFloatLabel = isFocused || hasValue || hasAutofillValue;
 
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
       setIsFocused(true);

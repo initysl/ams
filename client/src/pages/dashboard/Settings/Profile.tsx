@@ -1,9 +1,8 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { EyeIcon, EyeOff, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import api from "@/lib/axios";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -11,13 +10,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Profilebox from "@/components/ui/Profilebox";
 import DeleteProfile from "@/pages/dashboard/Settings/DeleteProfile";
+import { AdaptiveInput } from "@/components/app-ui/adaptive-input";
 
 // Create dynamic schema based on user role
 const createProfileSchema = (userRole: string | undefined) => {
   const baseSchema = {
-    name: z.string().min(5, "Name is required"),
-    email: z.string().email("Invalid email format"),
-    department: z.string().min(3, "Department is required"),
+    name: z.string().min(5, "Name must be at least 5 characters"),
+    email: z.string().email("Please enter a valid email address"),
+    department: z.string().min(3, "Department must be at least 3 characters"),
     password: z.string().optional(),
   };
 
@@ -29,7 +29,7 @@ const createProfileSchema = (userRole: string | undefined) => {
         .string()
         .min(10, "Matric number must be at least 10 characters")
         .regex(/^\d{4}\/\d+$/, {
-          message: "Invalid matric number format (e.g., 2021/12345)",
+          message: "Invalid format. Use format: 2021/12345",
         }),
     });
   }
@@ -60,21 +60,30 @@ const Profile = () => {
 
   const handleImageChange = (file: File) => {
     const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
     if (!validTypes.includes(file.type)) {
       toast.error("Only JPG, JPEG, and PNG files are allowed");
       return;
     }
+
+    if (file.size > maxSize) {
+      toast.error("File size must be less than 5MB");
+      return;
+    }
+
     setProfilePicture(file);
     setPreviewURL(URL.createObjectURL(file));
   };
 
   const {
-    register,
+    control,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<ProfileFields>({
     resolver: zodResolver(profileSchema),
+    mode: "onChange", // Validate on change for better UX
   });
 
   // Function to get image URL with cache busting
@@ -145,7 +154,7 @@ const Profile = () => {
       if (data.message && data.message.includes("Verification email sent")) {
         toast.success(data.message);
       } else {
-        toast.success("Profile updated!");
+        toast.success("Profile updated successfully!");
 
         // Wait a moment for the server to process the image
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -163,9 +172,8 @@ const Profile = () => {
       }
     },
     onError: (error: any) => {
-      // console.error("Update error:", error);
       // Handle validation errors array from backend
-      let message = "Profile update failed.";
+      let message = "Profile update failed. Please try again.";
 
       if (error?.response?.data?.message) {
         const errorData = error.response.data.message;
@@ -189,147 +197,156 @@ const Profile = () => {
   };
 
   return (
-    <div className="p-4 ">
-      <h2 className="text-2xl font-bold  text-center">Update Profile</h2>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="w-fit">
+    <div className="p-4">
+      <div>
+        <h2 className="text-3xl font-bold text-gray-900">Profile</h2>
+        <p className="text-gray-600">Update your profile information</p>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        {/* Profile Picture Section */}
+        <div className="flex flex-col items-center ">
           <Profilebox
             key={previewURL} // Force re-render when preview URL changes
             profilePicture={previewURL}
             onImageChange={handleImageChange}
           />
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Click to upload a new profile picture
+            </p>
+            <p className="text-xs text-gray-500 mt-1">JPG, PNG up to 5MB</p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Form Fields */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
           {/* Name */}
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium mb-1">
-              Name
-            </label>
-            <Input
-              type="text"
-              id="name"
-              autoComplete="name"
-              {...register("name")}
-              placeholder="Your full name"
+          <div className="space-y-1">
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => (
+                <AdaptiveInput
+                  {...field}
+                  label="Name"
+                  id="name"
+                  type="text"
+                  autoComplete="name"
+                  error={errors.name?.message}
+                  className="w-full"
+                />
+              )}
             />
-            {errors.name && (
-              <p className="text-red-500 text-sm">{errors.name.message}</p>
-            )}
           </div>
 
           {/* Email */}
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1">
-              Email
-            </label>
-            <Input
-              type="email"
-              id="email"
-              autoComplete="email"
-              className="text-ellipsis"
-              {...register("email")}
-              placeholder="you@example.com"
+          <div className="space-y-1">
+            <Controller
+              name="email"
+              control={control}
+              render={({ field }) => (
+                <AdaptiveInput
+                  {...field}
+                  label="Email"
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  error={errors.email?.message}
+                  className="w-full"
+                />
+              )}
             />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
-            )}
-            <p className="text-xs text-gray-500 mt-1">
-              Changing email will require verification
+            <p className="text-xs text-amber-600 flex items-center gap-1">
+              Changing your email will require verification
             </p>
           </div>
 
           {/* Department */}
-          <div>
-            <label
-              htmlFor="department"
-              className="block text-sm font-medium mb-1"
-            >
-              Department
-            </label>
-            <Input
-              type="text"
-              id="department"
-              autoComplete="organization"
-              className="text-ellipsis"
-              {...register("department")}
-              placeholder="e.g., Computer Science"
+          <div className="space-y-1">
+            <Controller
+              name="department"
+              control={control}
+              render={({ field }) => (
+                <AdaptiveInput
+                  {...field}
+                  label="Department"
+                  id="department"
+                  type="text"
+                  autoComplete="organization"
+                  error={errors.department?.message}
+                  className="w-full"
+                />
+              )}
             />
-            {errors.department && (
-              <p className="text-red-500 text-sm">
-                {errors.department.message}
-              </p>
-            )}
           </div>
 
           {/* Matric Number (Only for students) */}
           {user?.role === "student" && (
-            <div>
-              <label
-                htmlFor="matricNumber"
-                className="block text-sm font-medium mb-1"
-              >
-                Matric Number
-              </label>
-              <Input
-                type="text"
-                id="matricNumber"
-                autoComplete="off"
-                {...register("matricNumber")}
-                placeholder="e.g., 2021/12345"
+            <div className="space-y-1">
+              <Controller
+                name="matricNumber"
+                control={control}
+                render={({ field }) => (
+                  <AdaptiveInput
+                    {...field}
+                    label="Matric Number"
+                    id="matricNumber"
+                    type="text"
+                    autoComplete="off"
+                    error={errors.matricNumber?.message}
+                    className="w-full"
+                  />
+                )}
               />
-              {errors.matricNumber && (
-                <p className="text-red-500 text-sm">
-                  {errors.matricNumber.message}
-                </p>
-              )}
             </div>
           )}
 
           {/* Password */}
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium mb-1"
-            >
-              New Password
-            </label>
+          <div className="space-y-1 lg:col-span-2">
             <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                autoComplete="new-password"
-                className="text-ellipsis "
-                {...register("password")}
-                placeholder="Leave blank to keep current password"
+              <Controller
+                name="password"
+                control={control}
+                render={({ field }) => (
+                  <AdaptiveInput
+                    {...field}
+                    label="New Password"
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    error={errors.password?.message}
+                    className="w-full pr-10"
+                  />
+                )}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2 top-2 text-gray-500"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? <EyeOff /> : <EyeIcon />}
+                {showPassword ? <EyeOff size={20} /> : <EyeIcon size={20} />}
               </button>
             </div>
-            {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message}</p>
-            )}
-            <p className="text-xs text-gray-500 mt-1">
-              Must be different from current password
+            <p className="text-xs text-gray-500">
+              Leave blank to keep current password
             </p>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-2">
           <Button
             type="submit"
-            disabled={updateMutation.isPending}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+            disabled={updateMutation.isPending || isSubmitting || !isDirty}
+            className="w-full sm:w-auto px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            {updateMutation.isPending ? (
-              <Loader className="animate-spin h-5 w-5" />
+            {updateMutation.isPending || isSubmitting ? (
+              <>
+                Saving Changes...
+                <Loader className="animate-spin h-4 w-4" />
+              </>
             ) : (
               "Save Changes"
             )}
@@ -337,6 +354,15 @@ const Profile = () => {
 
           <DeleteProfile />
         </div>
+
+        {/* Dirty state indicator */}
+        {isDirty && (
+          <div className="text-center">
+            <p className="text-sm text-amber-600 font-medium">
+              You have unsaved changes
+            </p>
+          </div>
+        )}
       </form>
     </div>
   );
