@@ -31,7 +31,6 @@ const cardData = {
       id: 1,
       title: "Quick Scan",
       description: "Instant attendance marking",
-      value: "Point & Scan",
       icon: <Zap className="w-5 h-5" />,
       gradient: "from-blue-500 to-cyan-400",
     },
@@ -39,7 +38,6 @@ const cardData = {
       id: 2,
       title: "Instance Recognition",
       description: "Fast QR detection",
-      value: "Stable Accuracy",
       icon: <Target className="w-5 h-5" />,
       gradient: "from-purple-500 to-pink-400",
     },
@@ -47,7 +45,6 @@ const cardData = {
       id: 3,
       title: "Real-time Sync",
       description: "Instant attendance updates",
-      value: "Live Updates",
       icon: <Clock className="w-5 h-5" />,
       gradient: "from-emerald-500 to-teal-400",
     },
@@ -55,7 +52,6 @@ const cardData = {
       id: 4,
       title: "View Attendance Record",
       description: "View your attendance record with just a click",
-      value: "Smooth and swift",
       icon: <ListCheck className="w-5 h-5" />,
       gradient: "from-rose-500 to-pink-400",
     },
@@ -574,9 +570,6 @@ const QRScanner: React.FC = () => {
                 <p className="text-gray-600 group-hover:text-white/90 text-sm mb-3 transition-colors duration-300">
                   {card.description}
                 </p>
-                <div className="text-sm font-semibold text-gray-700 group-hover:text-white transition-colors duration-300">
-                  {card.value}
-                </div>
               </div>
             </motion.div>
           ))}
