@@ -273,7 +273,7 @@ const QRScanner: React.FC = () => {
 
   return (
     <div className="min-h-svh relative overflow-hidden">
-      <div className="container mx-auto py-8 relative z-10">
+      <div className="container py-8 relative z-10">
         {/* Main Scanner Section */}
         <motion.div
           className="max-w-4xl mx-auto mb-12"
@@ -281,7 +281,7 @@ const QRScanner: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
+          <div className="grid sm:grid-cols-2 gap-8 items-center">
             {/* Scanner Area */}
             <motion.div
               className="flex justify-center"
@@ -364,7 +364,7 @@ const QRScanner: React.FC = () => {
 
             {/* Controls Panel */}
             <motion.div
-              className="space-y-6 hidden md:flex"
+              className="space-y-6 hidden sm:flex"
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
@@ -447,7 +447,7 @@ const QRScanner: React.FC = () => {
           </div>
           {/* Cotrols Panel Mobile */}
           <motion.div
-            className="space-y-6 md:hidden fixed bottom-5 right-0 z-50"
+            className="space-y-6 sm:hidden fixed bottom-5 right-0 z-50"
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5, duration: 0.5 }}
