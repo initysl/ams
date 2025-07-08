@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 import Status from "@/components/app-ui/lct/Status";
 import Chart from "@/components/app-ui/general/Chart";
-import img1 from "@/assets/images/card/qrb.png";
-import img2 from "@/assets/images/card/qrw.png";
+import img1 from "@/assets/images/card/qrb.jpg";
+import img2 from "@/assets/images/card/qrw.jpg";
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
