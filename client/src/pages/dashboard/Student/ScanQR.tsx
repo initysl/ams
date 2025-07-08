@@ -43,7 +43,7 @@ const cardData = {
     },
     {
       id: 3,
-      title: "Real-time Sync",
+      title: "Real-time Update",
       description: "Instant attendance updates",
       icon: <Clock className="w-5 h-5" />,
       gradient: "from-emerald-500 to-teal-400",
