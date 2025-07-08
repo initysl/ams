@@ -17,6 +17,7 @@ import {
   Target,
   X,
   ListCheck,
+  Loader2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -367,7 +368,7 @@ const QRScanner: React.FC = () => {
 
             {/* Controls Panel */}
             <motion.div
-              className="space-y-6"
+              className="space-y-6 hidden md:flex"
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
@@ -448,6 +449,52 @@ const QRScanner: React.FC = () => {
               </Card>
             </motion.div>
           </div>
+          {/* Cotrols Panel Mobile */}
+          <motion.div
+            className="space-y-6 md:hidden fixed bottom-5 right-0 z-50"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            <div className="w-fit rounded-full bg-transparent backdrop-blur-sm border-t border-white/50 p-4 shadow-lg ">
+              <div className="flex flex-col gap-2">
+                <Button
+                  variant={isScanning ? "destructive" : "default"}
+                  onClick={isScanning ? stopScanner : startScanner}
+                  disabled={isLoading}
+                  className={`h-12 font-medium transition-all duration-300 w-full rounded-full ${
+                    isScanning
+                      ? "bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/25"
+                      : "bg-white rounded-full shadow-xl hover:shadow-lg shadow-gray-500/25 transition-all duration-300"
+                  }`}
+                >
+                  {isScanning ? (
+                    <>
+                      <X className="w-4 h-4 " />
+                    </>
+                  ) : (
+                    <>
+                      {isLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin " />
+                      ) : (
+                        <Camera className="w-4 h-4" />
+                      )}
+                    </>
+                  )}
+                </Button>
+                <Link to="/dashboard/attendance" className="block">
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Button className="w-full mt-3 h-12 bg-white rounded-full shadow-xl hover:shadow-lg shadow-gray-500/25 transition-all duration-300">
+                      <ListCheck className="w-4 h-4" />
+                    </Button>
+                  </motion.div>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
         </motion.div>
 
         {/* Scan Result */}
