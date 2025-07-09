@@ -100,7 +100,7 @@ export function AppSidebar() {
   return (
     <Sidebar
       collapsible="offcanvas"
-      className="border-r border-slate-200 bg-white min-h-screen w-56"
+      className="border-r border-slate-200 bg-white min-h-screen w-64"
     >
       <SidebarContent className="py-2">
         <SidebarGroup>

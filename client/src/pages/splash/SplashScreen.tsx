@@ -9,7 +9,7 @@ import {
   ListCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/images/at.png";
+import logo from "@/assets/images/at.jpg";
 import { useNavigate } from "react-router-dom";
 
 const SplashScreen = () => {
