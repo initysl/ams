@@ -8,9 +8,63 @@ type CardProps = {
   className?: string;
 };
 
+// Quick stats component
+type ConfigType = {
+  icon: React.ElementType;
+  iconBg: string;
+  iconColor: string;
+  cardBg: string;
+  textColor: string;
+  avatarBg: string;
+  shadowColor: string;
+  borderColor: string;
+};
+
 const Card = ({ children, className }: CardProps) => (
   <div className={`rounded-3xl  ${className}`}>{children}</div>
 );
+
+// Floating background elements component
+const FloatingElements = ({ config }: { config: ConfigType }) => {
+  const elements = [
+    { id: 1, size: "w-3 h-3", delay: 0, duration: 4 },
+    { id: 2, size: "w-2 h-2", delay: 1, duration: 5 },
+    { id: 3, size: "w-4 h-4", delay: 2, duration: 3 },
+    { id: 4, size: "w-2 h-2", delay: 0.5, duration: 6 },
+    { id: 5, size: "w-3 h-3", delay: 1.5, duration: 4 },
+  ];
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {elements.map((element, index) => (
+        <motion.div
+          key={element.id}
+          className={`
+            absolute rounded-full opacity-20
+            ${config.iconBg}
+            ${element.size}
+          `}
+          style={{
+            left: `${20 + index * 15}%`,
+            top: `${10 + index * 20}%`,
+          }}
+          animate={{
+            y: [-10, 10, -10],
+            x: [-5, 5, -5],
+            scale: [1, 1.2, 1],
+            opacity: [0.1, 0.3, 0.1],
+          }}
+          transition={{
+            duration: element.duration,
+            delay: element.delay,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+    </div>
+  );
+};
 
 const WelcomeBanner = () => {
   const { user } = useAuth();
@@ -78,14 +132,16 @@ const WelcomeBanner = () => {
       <Card
         className={`${currentConfig.cardBg} ${currentConfig.shadowColor} shadow-lg border ${currentConfig.borderColor} p-6 flex flex-row items-center justify-between relative overflow-hidden rounded-3xl`}
       >
-        {/* Decorative background elements */}
+        {/* Floating background elements */}
+        <FloatingElements config={currentConfig} />
 
-        <div className="space-y-4 relative z-10 ">
+        {/* Main content */}
+        <div className="space-y-4 relative z-10 flex-1">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="flex items-center gap-4 "
+            className="flex items-center gap-4"
           >
             {/* Time-based icon with proper styling */}
             <motion.div
@@ -122,7 +178,7 @@ const WelcomeBanner = () => {
             </motion.div>
 
             {/* Greeting text */}
-            <div className="space-y-1 ">
+            <div className="space-y-1">
               <motion.h1
                 className={`
                   text-2xl md:text-3xl 
@@ -148,11 +204,13 @@ const WelcomeBanner = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                {user?.matricNumber || user?.name}
+                {user?.matricNumber || user?.name || "Welcome User"}
               </motion.p>
             </div>
           </motion.div>
         </div>
+
+        {/* Quick stats - hidden on mobile, shown on large screens */}
 
         {/* Avatar with time-based styling */}
         <motion.div
