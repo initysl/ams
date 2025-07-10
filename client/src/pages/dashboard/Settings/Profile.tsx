@@ -86,6 +86,9 @@ const Profile = () => {
     mode: "onChange", // Validate on change for better UX
   });
 
+  // Custom dirty state that considers both form changes and profile picture changes
+  const hasUnsavedChanges = isDirty || profilePicture !== null;
+
   // Function to get image URL with cache busting
   const getImageUrl = (profilePicture: string | null | undefined) => {
     if (!profilePicture) return "";
@@ -336,7 +339,9 @@ const Profile = () => {
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-2">
           <Button
             type="submit"
-            disabled={updateMutation.isPending || isSubmitting || !isDirty}
+            disabled={
+              updateMutation.isPending || isSubmitting || !hasUnsavedChanges
+            }
             className="w-full sm:w-auto px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {updateMutation.isPending || isSubmitting ? (
@@ -353,7 +358,7 @@ const Profile = () => {
         </div>
 
         {/* Dirty state indicator */}
-        {isDirty && (
+        {hasUnsavedChanges && (
           <div className="text-center">
             <p className="text-sm text-amber-600 font-medium">
               You have unsaved changes

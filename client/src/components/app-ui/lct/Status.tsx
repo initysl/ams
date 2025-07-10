@@ -45,7 +45,7 @@ const Status = () => {
   return (
     <div>
       <Card className={`bg-gradient-to-r ${getCardGradient()} shadow-sm`}>
-        <CardContent className="pt-6">
+        <CardContent>
           <div className="flex justify-between items-start">
             <div className="flex-1">
               <CardTitle className="mb-4">
