@@ -17,6 +17,7 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 import {
@@ -34,6 +35,19 @@ import logo from "/at.svg";
 export function AppSidebar() {
   const { user, logout } = useAuth();
   const [imageKey, setImageKey] = useState(Date.now());
+  const [isMobile, setIsMobile] = useState(false);
+  const { setOpenMobile } = useSidebar();
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Reset image cache when user data changes
   useEffect(() => {
@@ -41,6 +55,13 @@ export function AppSidebar() {
       setImageKey(Date.now());
     }
   }, [user?.profilePicture]);
+
+  // Function to handle navigation click
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   // Function to get the correct image URL with cache busting
   const getImageUrl = (profilePicture: string | null | undefined) => {
@@ -132,6 +153,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={index}>
                   <NavLink
                     to={item.path}
+                    onClick={handleNavClick}
                     className={({ isActive }) =>
                       `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-150 ${
                         isActive
@@ -199,6 +221,7 @@ export function AppSidebar() {
               <DropdownMenuItem className="focus:bg-slate-100 rounded-md">
                 <Link
                   to="/dashboard/settings"
+                  onClick={handleNavClick}
                   className="flex items-center gap-3 w-full px-2 py-2 text-sm text-slate-700"
                 >
                   <User size={16} />
@@ -207,7 +230,12 @@ export function AppSidebar() {
               </DropdownMenuItem>
               <Separator className="my-1 bg-slate-200" />
               <DropdownMenuItem
-                onClick={logout}
+                onClick={() => {
+                  if (isMobile) {
+                    setOpenMobile(false);
+                  }
+                  logout();
+                }}
                 className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 focus:bg-red-50 rounded-md cursor-pointer"
               >
                 <LogOut size={16} />
