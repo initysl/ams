@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       if (response.data.user) {
         setUser(response.data.user);
-        toast.success("Signed in successful!");
+        toast.success("Signed in successfully!");
       } else {
         throw new Error(response.data.message || "Sign in failed");
       }

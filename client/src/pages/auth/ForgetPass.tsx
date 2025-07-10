@@ -368,7 +368,7 @@ const ForgetPass: React.FC = () => {
           </Button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="my-6 text-center">
           <p className="text-sm text-gray-600">
             Remember your password?{" "}
             <Link
@@ -378,12 +378,6 @@ const ForgetPass: React.FC = () => {
               Sign in
             </Link>
           </p>
-        </div>
-
-        <div className="mt-6 pt-6 border-t">
-          <div className="flex items-center justify-center text-xs text-gray-500">
-            <Shield className="w-3 h-3 mr-1" />
-          </div>
         </div>
       </Card>
     </div>

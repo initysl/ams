@@ -19,7 +19,6 @@ import {
   EyeOff,
   Loader,
   XCircle,
-  Shield,
   ArrowLeft,
   Clock,
   Lock,
@@ -203,7 +202,7 @@ const ResetPass: React.FC = () => {
               <p className="font-medium">What you can do:</p>
               <ul className="mt-2 space-y-1 text-xs">
                 <li>Request a new password reset link</li>
-                <li>Make sure you're using the correct email</li>
+                <li>Make sure you're using the correct email address</li>
               </ul>
             </div>
 
@@ -404,7 +403,7 @@ const ResetPass: React.FC = () => {
           </form>
         </CardContent>
 
-        <div className="mt-6 text-center">
+        <div className="my-6 text-center">
           <Link
             to="/auth"
             className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
@@ -412,12 +411,6 @@ const ResetPass: React.FC = () => {
             <ArrowLeft className="w-4 h-4 mr-1" />
             Back to login
           </Link>
-        </div>
-
-        <div className="mt-4 pt-4 border-t">
-          <div className="flex items-center justify-center text-xs text-gray-500">
-            <Shield className="w-3 h-3 mr-1" />
-          </div>
         </div>
       </Card>
     </div>

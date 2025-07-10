@@ -262,7 +262,7 @@ const ChartOne = () => {
     averageRate,
     totalSessions,
   }: QuickStatsProps) => (
-    <div className="flex mt-3 gap-3 text-sm flex-wrap">
+    <div className="grid grid-cols-2 sm:grid-cols-3  mt-3 gap-3 text-sm ">
       <div className="bg-blue-50 p-2 rounded-lg flex items-center gap-2 min-w-[120px]">
         <Users className="h-4 w-4 text-blue-600" />
         <div>

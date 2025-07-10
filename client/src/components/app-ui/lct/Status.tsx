@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
-import { FileText, Users, UserCheck, UserX, TrendingUp } from "lucide-react";
+import { FileText, UserCheck, UserX, TrendingUp } from "lucide-react";
 import { useAttendance } from "@/context/AttendanceContex";
 
 const Status = () => {
@@ -61,7 +61,7 @@ const Status = () => {
 
                 {/* Show detailed stats for lecturers when there's data */}
                 {user?.role === "lecturer" && totalStudents > 0 && (
-                  <div className="flex gap-4 mt-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-3 w-full max-w-md">
                     <div className="flex items-center gap-2 text-xs bg-white/60 px-3 py-2 rounded-lg">
                       <UserCheck className="h-4 w-4 text-green-600" />
                       <span className="font-medium">Present:</span>
@@ -91,7 +91,7 @@ const Status = () => {
               </div>
             </div>
 
-            <div
+            {/* <div
               className={`p-3 rounded-lg ${
                 totalStudents === 0
                   ? "bg-gray-100"
@@ -115,7 +115,7 @@ const Status = () => {
                   }`}
                 />
               )}
-            </div>
+            </div> */}
           </div>
         </CardContent>
       </Card>
