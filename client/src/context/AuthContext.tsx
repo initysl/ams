@@ -73,42 +73,42 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       toast.success("Signed out successfully.");
     } catch (error) {
       toast.error("Sign out failed.");
-      console.error("Signed out error:", error);
+      // console.error("Signed out error:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const fetchUser = async () => {
-  try {
-    setIsLoading(true);
-    const response = await api.get("user/profile/me", {
-      withCredentials: true,
-    });
+    try {
+      setIsLoading(true);
+      const response = await api.get("user/profile/me", {
+        withCredentials: true,
+      });
 
-    if (response.data.user) {
-      setUser(response.data.user);
-    } else {
-      setUser(null);
-    }
-  } catch (error: any) {
-    setUser(null);
-    
-    // Don't show error for 401 (user not authenticated) or 403 (forbidden)
-    // These are expected when user is not logged in
-    const status = error?.response?.status;
-    if (isInitialized && status !== 401 && status !== 403) {
-      console.error("Auth check failed:", error);
-      // Only show toast for unexpected errors (500, network issues, etc.)
-      if (status >= 500 || !status) {
-        toast.error("Failed to verify authentication.");
+      if (response.data.user) {
+        setUser(response.data.user);
+      } else {
+        setUser(null);
       }
+    } catch (error: any) {
+      setUser(null);
+
+      // Don't show error for 401 (user not authenticated) or 403 (forbidden)
+      // These are expected when user is not logged in
+      const status = error?.response?.status;
+      if (isInitialized && status !== 401 && status !== 403) {
+        console.error("Auth check failed:", error);
+        // Only show toast for unexpected errors (500, network issues, etc.)
+        if (status >= 500 || !status) {
+          toast.error("Failed to verify authentication.");
+        }
+      }
+    } finally {
+      setIsLoading(false);
+      setIsInitialized(true);
     }
-  } finally {
-    setIsLoading(false);
-    setIsInitialized(true);
-  }
-};
+  };
 
   const refetchUser = async () => {
     try {

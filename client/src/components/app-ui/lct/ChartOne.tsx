@@ -72,7 +72,7 @@ const ChartOne = () => {
       const month = (date.getMonth() + 1).toString().padStart(2, "0");
       return `${day} ${dayOfMonth}/${month}`;
     } catch (error) {
-      console.warn("Error formatting date:", error);
+      // console.warn("Error formatting date:", error);
       return dateString;
     }
   };
@@ -141,7 +141,7 @@ const ChartOne = () => {
       setChartData(formattedData);
     },
     onError: (error: any) => {
-      console.error("Error fetching attendance trend:", error);
+      // console.error("Error fetching attendance trend:", error);
       const errorMessage =
         error?.response?.data?.error || error?.message || "Unknown error";
       toast.error(`Error fetching attendance trend: ${errorMessage}`);
