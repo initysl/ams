@@ -279,7 +279,9 @@ const Activity = () => {
       viewport={{ once: true }}
     >
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-gray-800">Lecture Activity</h3>
+        <h2 className="text-lg font-semibold text-gray-800">
+          Lecture Activity
+        </h2>
         <div className="flex items-center space-x-2">
           <Users className="h-5 w-5 text-gray-400" />
         </div>

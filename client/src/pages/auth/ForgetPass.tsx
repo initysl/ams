@@ -369,7 +369,7 @@ const ForgetPass: React.FC = () => {
         </form>
 
         <div className="my-6 text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-gray-600">
             Remember your password?{" "}
             <Link
               to="/auth"
