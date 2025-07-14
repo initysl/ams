@@ -431,17 +431,17 @@ const QRScanner: React.FC = () => {
                   </motion.div>
                 </CardContent>
 
-                <Link to="/dashboard/attendance" className="block">
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Link to="/dashboard/attendance" className="block">
                     <Button className="w-full mt-3 h-12 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 hover:text-white shadow-lg shadow-emerald-500/25 transition-all duration-300">
                       <CheckSquare className="w-4 h-4 mr-2" />
                       View Attendance Records
                     </Button>
-                  </motion.div>
-                </Link>
+                  </Link>
+                </motion.div>
               </Card>
             </motion.div>
           </div>

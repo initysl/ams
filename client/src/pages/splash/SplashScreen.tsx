@@ -34,7 +34,7 @@ const SplashScreen = () => {
     },
     {
       title: "Say hello to accuracy and efficiency!",
-      description: "Your smart attendance solution starts here!",
+      description: "Your digital attendance solution starts here!",
       icon: <QrCode className="text-white" size={28} />,
       bgColor: "bg-green-500",
     },
@@ -159,7 +159,7 @@ const SplashScreen = () => {
 
               {currentScreen === 2 && (
                 <div className="relative w-full">
-                  <div className="flex flex-col items-start w-full max-w-xs mx-auto gap-3 sm:gap-4">
+                  <div className="flex flex-col items-start w-full max-w-xs mx-auto gap-3 sm:gap-4 text-sm  text-neutral-500">
                     <div className="w-full bg-neutral-100 rounded-xl p-3 flex items-center transform transition-all hover:scale-105 duration-300">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-green-500 flex items-center justify-center mr-3">
                         <QrCode size={18} className="text-white" />
@@ -168,7 +168,7 @@ const SplashScreen = () => {
                         <span>Generate dynamic QR Code</span>
                       </div>
                       <div
-                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${screens[currentScreen].bgColor} flex items-center justify-center ml-2 animate-pulse`}
+                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${screens[currentScreen].bgColor} flex items-center justify-center ml-2 `}
                       >
                         <Check size={14} className="text-white" />
                       </div>

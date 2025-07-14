@@ -96,7 +96,7 @@ const DeleteProfile = ({ className = "" }: DeleteProfileProps) => {
       <AlertDialogTrigger asChild>
         <Button
           variant="destructive"
-          className={`px-4 py-2 bg-red-500 hover:bg-red-600 text-white ${className}`}
+          className={`w-full sm:w-auto px-8 py-2.5 bg-red-500 hover:bg-red-600 text-white ${className}`}
           onClick={() => setIsOpen(true)}
         >
           Delete Profile

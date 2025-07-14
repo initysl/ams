@@ -273,13 +273,15 @@ const Activity = () => {
 
   return (
     <motion.div
-      className="bg-white rounded-3xl p-6 shadow-xl"
+      className="bg-white rounded-3xl p-6 shadow-sm"
       initial={{ opacity: 0, x: -30 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
     >
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-gray-800">Lecture Activity</h3>
+        <h2 className="text-lg font-semibold text-gray-800">
+          Lecture Activity
+        </h2>
         <div className="flex items-center space-x-2">
           <Users className="h-5 w-5 text-gray-400" />
         </div>
@@ -302,7 +304,7 @@ const Activity = () => {
           description="You haven't conducted any classes yet. Your lecture activity will appear here once you start."
         />
       ) : recentActivities.length > 0 ? (
-        <div className="space-y-4 max-h-50 overflow-y-auto">
+        <div className="space-y-4 max-h-70 overflow-y-auto">
           {recentActivities.map((activity, index) => (
             <motion.div
               key={activity.id}

@@ -140,11 +140,10 @@ const ChartOne = () => {
 
       setChartData(formattedData);
     },
-    onError: (error: any) => {
+    onError: () => {
       // console.error("Error fetching attendance trend:", error);
-      const errorMessage =
-        error?.response?.data?.error || error?.message || "Unknown error";
-      toast.error(`Error fetching attendance trend: ${errorMessage}`);
+      // const errorMessage = error?.response?.data?.error || error?.message || "Unknown error";
+      toast.error("Error fetching attendance trend");
 
       // Reset state on error
       setChartData([]);
@@ -165,7 +164,11 @@ const ChartOne = () => {
   // Error state helpers
   const isNoRecordsFound =
     fetchAttendanceMutation.isError &&
-    fetchAttendanceMutation.error?.response?.status === 404;
+    typeof fetchAttendanceMutation.error === "object" &&
+    fetchAttendanceMutation.error !== null &&
+    "response" in fetchAttendanceMutation.error &&
+    // @ts-expect-error: error may be AxiosError
+    fetchAttendanceMutation.error.response?.status === 404;
 
   const hasError = fetchAttendanceMutation.isError && !isNoRecordsFound;
 
