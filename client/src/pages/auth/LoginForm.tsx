@@ -60,6 +60,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
           render={({ field }) => (
             <AdaptiveInput
               label="Password"
+              id="password"
               type={showPassword ? "text" : "password"}
               autoComplete="current-password"
               error={errors.password?.message}

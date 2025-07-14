@@ -273,7 +273,7 @@ const Activity = () => {
 
   return (
     <motion.div
-      className="bg-white rounded-3xl p-6 shadow-xl"
+      className="bg-white rounded-3xl p-6 shadow-sm"
       initial={{ opacity: 0, x: -30 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
@@ -304,7 +304,7 @@ const Activity = () => {
           description="You haven't conducted any classes yet. Your lecture activity will appear here once you start."
         />
       ) : recentActivities.length > 0 ? (
-        <div className="space-y-4 max-h-50 overflow-y-auto">
+        <div className="space-y-4 max-h-70 overflow-y-auto">
           {recentActivities.map((activity, index) => (
             <motion.div
               key={activity.id}

@@ -24,7 +24,7 @@ const About = () => {
           <h3 className="text-lg font-medium">Developer</h3>
           <p className="text-gray-600">
             Developed by{" "}
-            <span className="font-semibold"> Yusuf Lawal @ TheFirstStudio</span>
+            <span className="font-semibold">Yusuf Lawal @TheFirstStudio</span>
           </p>
         </div>
 
