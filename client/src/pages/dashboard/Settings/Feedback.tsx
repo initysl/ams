@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import api from "@/lib/axios";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
+import { AdaptiveInput } from "@/components/app-ui/adaptive-input";
 
 type FeedbackFormInputs = {
   category: string;
@@ -15,7 +16,7 @@ type FeedbackFormInputs = {
 
 const Feedback = () => {
   const {
-    register,
+    control,
     handleSubmit,
     reset,
     setValue,
@@ -64,18 +65,25 @@ const Feedback = () => {
           <label htmlFor="category" className="block text-sm font-medium mb-1">
             Category
           </label>
-          <select
-            id="category"
-            autoComplete="off"
-            {...register("category", { required: "Please select a category" })}
-            className="w-full p-2 border border-gray-300 rounded"
-          >
-            <option value="">Select a category</option>
-            <option value="bug">Bug Report</option>
-            <option value="feature">Feature Request</option>
-            <option value="general">General Feedback</option>
-            <option value="other">Other</option>
-          </select>
+          <Controller
+            name="category"
+            control={control}
+            rules={{ required: "Please select a category" }}
+            render={({ field }) => (
+              <select
+                {...field}
+                id="category"
+                autoComplete="off"
+                className="w-full p-2 border border-gray-300 rounded"
+              >
+                <option value="">Select a category</option>
+                <option value="bug">Bug Report</option>
+                <option value="feature">Feature Request</option>
+                <option value="general">General Feedback</option>
+                <option value="other">Other</option>
+              </select>
+            )}
+          />
           {errors.category && (
             <p className="text-red-500 text-sm mt-1">
               {errors.category.message}
@@ -88,19 +96,26 @@ const Feedback = () => {
           <label htmlFor="message" className="block text-sm font-medium mb-1">
             Your Message
           </label>
-          <textarea
-            id="message"
-            autoComplete="off"
-            {...register("message", {
+          <Controller
+            name="message"
+            control={control}
+            rules={{
               required: "Message is required",
               minLength: {
                 value: 10,
                 message: "Minimum 10 characters required",
               },
-            })}
-            rows={5}
-            className="w-full p-2 border border-gray-300 rounded"
-            placeholder="Please describe your feedback in detail..."
+            }}
+            render={({ field }) => (
+              <textarea
+                {...field}
+                id="message"
+                autoComplete="off"
+                rows={5}
+                className="w-full p-2 border border-gray-300 rounded"
+                placeholder="Please describe your feedback in detail..."
+              />
+            )}
           />
           {errors.message && (
             <p className="text-red-500 text-sm mt-1">
@@ -110,21 +125,25 @@ const Feedback = () => {
         </div>
 
         {/* Email - Auto-populated and read-only */}
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium mb-1">
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            {...register("email", { required: "Email is required" })}
-            readOnly
-            className="w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-not-allowed"
-            placeholder="Your email"
+        <div className="space-y-1">
+          <Controller
+            name="email"
+            control={control}
+            rules={{ required: "Email is required" }}
+            render={({ field }) => (
+              <AdaptiveInput
+                {...field}
+                label="Email"
+                id="email"
+                type="email"
+                autoComplete="email"
+                error={errors.email?.message}
+                className="w-full cursor-not-allowed"
+                disabled
+                readOnly
+              />
+            )}
           />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-          )}
         </div>
 
         <Button

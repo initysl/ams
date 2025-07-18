@@ -9,11 +9,18 @@ export interface AdaptiveInputProps
 }
 
 const AdaptiveInput = forwardRef<HTMLInputElement, AdaptiveInputProps>(
-  ({ className, label, error, helperText, onFocus, onBlur, ...props }, ref) => {
+  (
+    { className, label, error, helperText, onFocus, onBlur, id, ...props },
+    ref
+  ) => {
     const [isFocused, setIsFocused] = useState(false);
     const [hasAutofillValue, setHasAutofillValue] = useState(false);
     const internalRef = useRef<HTMLInputElement>(null);
     const inputRef = (ref as React.RefObject<HTMLInputElement>) || internalRef;
+
+    // Generate a unique ID if none provided
+    const inputId =
+      id || `adaptive-input-${Math.random().toString(36).substr(2, 9)}`;
 
     // Check for autofill values
     useEffect(() => {
@@ -76,7 +83,9 @@ const AdaptiveInput = forwardRef<HTMLInputElement, AdaptiveInputProps>(
       <div className="relative">
         <input
           ref={inputRef}
+          id={inputId}
           {...props}
+          value={props.value ?? ""}
           onFocus={handleFocus}
           onBlur={handleBlur}
           className={cn(
@@ -96,6 +105,7 @@ const AdaptiveInput = forwardRef<HTMLInputElement, AdaptiveInputProps>(
           }}
         />
         <label
+          htmlFor={inputId}
           className={cn(
             "absolute left-3 text-gray-500 transition-all duration-200 pointer-events-none",
             shouldFloatLabel

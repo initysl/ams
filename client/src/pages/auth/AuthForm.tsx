@@ -94,9 +94,7 @@ const AuthForm: React.FC = () => {
       setIsSignIn(true);
     },
     onError: (err: ApiError) => {
-      toast.error(
-        `Registration failed: ${err.response?.data?.message || "Unknown error"}`
-      );
+      toast.error(`Registration failed: ${err.response?.data?.message}`);
     },
   });
 
@@ -112,7 +110,7 @@ const AuthForm: React.FC = () => {
     <div className="flex justify-center items-center min-h-svh p-2">
       <div className="bg-white p-8 rounded-xl rounded-bl-xl shadow-2xl max-w-2xl transition-all duration-500">
         <div className="text-center space-y-2 mb-10">
-          <h1 className="text-4xl font-extrabold text-gray-800">
+          <h1 className="text-4xl font-bold text-gray-800">
             Welcome to <span className="text-green-600">AttendEase</span>
           </h1>
           <p className="text-gray-500">

@@ -40,19 +40,25 @@ const Settings = () => {
 
   // Function to get the correct image URL with cache busting
   const getImageUrl = (profilePicture: string | null | undefined) => {
-    const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
-
     if (!profilePicture) {
-      const defaultUrl = `${baseUrl}/images/default.png?t=${imageKey}`;
-      return defaultUrl;
+      // Return default image from your server's public folder
+      const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
+      return `${baseUrl}/api/images/default.png?t=${imageKey}`;
     }
 
+    // If it's a Cloudinary URL (starts with https://res.cloudinary.com), return it directly
+    if (profilePicture.startsWith("https://res.cloudinary.com")) {
+      return profilePicture;
+    }
+
+    // If it's any other full URL, return it with cache buster
     if (profilePicture.startsWith("http")) {
       return `${profilePicture}?t=${imageKey}`;
     }
 
-    const fullUrl = `${baseUrl}${profilePicture}?t=${imageKey}`;
-    return fullUrl;
+    // For backward compatibility with old local files (if any exist)
+    const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
+    return `${baseUrl}${profilePicture}?t=${imageKey}`;
   };
 
   const cardVariants = {
@@ -96,7 +102,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-2 md:gap-6 md:min-h-0 p-2 md:p-0">
+    <div className="flex flex-col md:flex-row md:gap-6 md:min-h-0">
       {/* Sidebar with motion */}
       <motion.div
         variants={cardVariants}
@@ -164,7 +170,7 @@ const Settings = () => {
 
             {/* User Info */}
             <div className={`text-center ${isMobile ? "mb-8" : "mb-4"}`}>
-              <div className="space-y-1">
+              <div className="">
                 <h3
                   className={`
                   font-bold text-gray-900 leading-tight
@@ -182,7 +188,7 @@ const Settings = () => {
 
                 <p
                   className={`
-                  text-gray-600 font-medium
+                  text-gray-500 font-medium
                   ${
                     isSmallMobile
                       ? "text-sm"
@@ -465,7 +471,7 @@ const Settings = () => {
       {isMobile && (
         <Dialog open={showMobileDialog} onOpenChange={setShowMobileDialog}>
           {/* Readd h-full if continue overlapping */}
-          <DialogContent className="w-full  max-w-none max-h-none m-0 p-0 overflow-y-auto bg-white border-none rounded-none">
+          <DialogContent className="w-full space-y-8 m-0 p-0 overflow-y-auto bg-white border-none rounded-xl">
             <div className={`${isSmallMobile ? "p-3" : "p-4"}`}>
               <Outlet />
             </div>
