@@ -401,7 +401,7 @@ const GenerateQR = () => {
           ? isExpired
             ? "QR Code has expired"
             : "QR Code has been generated"
-          : "QR Code not processed yet"}
+          : "QR Code not generated yet"}
       </p>
       {generated && timeRemaining && (
         <div
@@ -924,7 +924,7 @@ const GenerateQR = () => {
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
                         >
-                          Generate QR Code
+                          Generate
                         </motion.div>
                       )}
                     </AnimatePresence>

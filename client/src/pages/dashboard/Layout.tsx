@@ -26,21 +26,26 @@ const Layout: React.FC = () => {
 
   // Function to get the correct image URL with cache busting
   const getImageUrl = (profilePicture: string | null | undefined) => {
-    const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
+  if (!profilePicture) {
+    // Return default image from your server's public folder
+    const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
+    return `${baseUrl}/api/images/default.png?t=${imageKey}`;
+  }
 
-    if (!profilePicture) {
-      const defaultUrl = `${baseUrl}/images/default.png?t=${imageKey}`;
-      return defaultUrl;
-    }
+  // If it's a Cloudinary URL (starts with https://res.cloudinary.com), return it directly
+  if (profilePicture.startsWith("https://res.cloudinary.com")) {
+    return profilePicture;
+  }
 
-    if (profilePicture.startsWith("http")) {
-      return `${profilePicture}?t=${imageKey}`;
-    }
+  // If it's any other full URL, return it with cache buster
+  if (profilePicture.startsWith("http")) {
+    return `${profilePicture}?t=${imageKey}`;
+  }
 
-    const fullUrl = `${baseUrl}${profilePicture}?t=${imageKey}`;
-    return fullUrl;
-  };
-
+  // For backward compatibility with old local files (if any exist)
+  const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
+  return `${baseUrl}${profilePicture}?t=${imageKey}`;
+};
   // Generate breadcrumbs from current path
   const generateBreadcrumbs = () => {
     const pathSegments = location.pathname.split("/").filter(Boolean);
@@ -109,7 +114,7 @@ const Layout: React.FC = () => {
               <SidebarTrigger className="inline-flex items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 h-9 w-9 transition-colors duration-150" />
 
               {/* Navigable Breadcrumbs */}
-              <nav className="flex items-center text-sm text-slate-600 truncate w-62 md:w-full">
+              <nav className="flex items-center text-sm text-slate-600">
                 {breadcrumbs.map((crumb, index) => {
                   const isCurrentPage = index === breadcrumbs.length - 1;
                   const isClickable = !isCurrentPage;
@@ -122,7 +127,7 @@ const Layout: React.FC = () => {
                       {index > 0 && (
                         <ChevronRight
                           size={14}
-                          className="mx-1 text-slate-400"
+                          className="md:mx-1 text-slate-400"
                         />
                       )}
                       <span

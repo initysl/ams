@@ -24,7 +24,9 @@ const About = () => {
           <h3 className="text-lg font-medium">Developer</h3>
           <p className="text-gray-600">
             Developed by{" "}
-            <span className="font-semibold">Yusuf Lawal @TheFirstStudio</span>
+            <span className="text-gray-700 hover:underline">
+              Yusuf Lawal @TheFirstStudio
+            </span>
           </p>
         </div>
 
@@ -34,7 +36,7 @@ const About = () => {
             For support or inquiries, please contact:{" "}
             <a
               href="mailto:lawalyusufimp@gmail.com"
-              className="text-blue-600 hover:underline font-semibold"
+              className="text-blue-600 hover:underline"
             >
               lawalyusufimp@gmail.com
             </a>
