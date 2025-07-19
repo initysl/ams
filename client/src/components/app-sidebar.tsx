@@ -65,25 +65,19 @@ export function AppSidebar() {
 
   // Function to get the correct image URL with cache busting
   const getImageUrl = (profilePicture: string | null | undefined) => {
+    const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
+
     if (!profilePicture) {
-      // Return default image from your server's public folder
-      const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
-      return `${baseUrl}/api/images/default.png?t=${imageKey}`;
+      const defaultUrl = `${baseUrl}/images/default.png?t=${imageKey}`;
+      return defaultUrl;
     }
 
-    // If it's a Cloudinary URL (starts with https://res.cloudinary.com), return it directly
-    if (profilePicture.startsWith("https://res.cloudinary.com")) {
-      return profilePicture;
-    }
-
-    // If it's any other full URL, return it with cache buster
     if (profilePicture.startsWith("http")) {
       return `${profilePicture}?t=${imageKey}`;
     }
 
-    // For backward compatibility with old local files (if any exist)
-    const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
-    return `${baseUrl}${profilePicture}?t=${imageKey}`;
+    const fullUrl = `${baseUrl}${profilePicture}?t=${imageKey}`;
+    return fullUrl;
   };
 
   if (!user) return null;
@@ -236,13 +230,15 @@ export function AppSidebar() {
               </DropdownMenuItem>
               <Separator className="my-1 bg-slate-200" />
               <DropdownMenuItem
+                className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 focus:bg-red-50 rounded-md cursor-pointer"
                 onClick={() => {
                   if (isMobile) {
                     setOpenMobile(false);
                   }
                   logout();
                 }}
-                className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 focus:bg-red-50 rounded-md cursor-pointer"
+                tabIndex={0}
+                role="button"
               >
                 <LogOut size={16} />
                 <span>Sign Out</span>

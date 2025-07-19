@@ -26,25 +26,19 @@ const Layout: React.FC = () => {
 
   // Function to get the correct image URL with cache busting
   const getImageUrl = (profilePicture: string | null | undefined) => {
+    const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
+
     if (!profilePicture) {
-      // Return default image from your server's public folder
-      const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
-      return `${baseUrl}/api/images/default.png?t=${imageKey}`;
+      const defaultUrl = `${baseUrl}/images/default.png?t=${imageKey}`;
+      return defaultUrl;
     }
 
-    // If it's a Cloudinary URL (starts with https://res.cloudinary.com), return it directly
-    if (profilePicture.startsWith("https://res.cloudinary.com")) {
-      return profilePicture;
-    }
-
-    // If it's any other full URL, return it with cache buster
     if (profilePicture.startsWith("http")) {
       return `${profilePicture}?t=${imageKey}`;
     }
 
-    // For backward compatibility with old local files (if any exist)
-    const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
-    return `${baseUrl}${profilePicture}?t=${imageKey}`;
+    const fullUrl = `${baseUrl}${profilePicture}?t=${imageKey}`;
+    return fullUrl;
   };
   // Generate breadcrumbs from current path
   const generateBreadcrumbs = () => {
