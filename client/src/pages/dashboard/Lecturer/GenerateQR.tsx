@@ -108,7 +108,7 @@ const GenerateQR = () => {
       totalCourseStudents: 30,
       courseCode: "",
       level: "400",
-      duration: 20,
+      duration: 10,
     },
   });
 
@@ -722,20 +722,19 @@ const GenerateQR = () => {
                       <Controller
                         name="totalCourseStudents"
                         control={control}
-                        render={({
-                          field: { onChange, value, ...fieldProps },
-                        }) => (
+                        defaultValue={30} // ← here
+                        render={({ field: { onChange, value, ...rest } }) => (
                           <AdaptiveInput
-                            {...fieldProps}
+                            {...rest}
                             id="total-students"
                             type="number"
                             min={1}
                             max={500}
                             label="Total Course Students"
-                            value={value || ""}
+                            value={value ?? ""} // safe fallback
                             onChange={(e) => {
-                              const val = e.target.value;
-                              onChange(val === "" ? undefined : Number(val));
+                              const v = e.target.value;
+                              onChange(v === "" ? "" : Number(v)); // keep empty as ""
                             }}
                             error={errors.totalCourseStudents?.message}
                             helperText="Maximum 500 students allowed"
@@ -859,21 +858,19 @@ const GenerateQR = () => {
                       <Controller
                         name="duration"
                         control={control}
-                        render={({
-                          field: { onChange, value, ...fieldProps },
-                        }) => (
+                        defaultValue={10}
+                        render={({ field: { onChange, value, ...rest } }) => (
                           <AdaptiveInput
-                            {...fieldProps}
+                            {...rest}
                             id="duration"
                             type="number"
                             min={1}
                             max={60}
                             label="Duration (minutes)"
-                            placeholder="20"
-                            value={value || ""}
+                            value={value ?? ""}
                             onChange={(e) => {
-                              const val = e.target.value;
-                              onChange(val === "" ? undefined : Number(val));
+                              const v = e.target.value;
+                              onChange(v === "" ? "" : Number(v));
                             }}
                             error={errors.duration?.message}
                             helperText=" 1-60 minutes"
