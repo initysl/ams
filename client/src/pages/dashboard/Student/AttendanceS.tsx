@@ -271,7 +271,7 @@ const AttendanceS = () => {
                       variant="outline"
                       className="w-full sm:w-auto bg-red-50 border-red-300 text-red-700 hover:bg-red-600 hover:text-white hover:border-red-600 transition-colors"
                     >
-                      Clear Records
+                      Clear
                     </Button>
                   )}
                 </div>

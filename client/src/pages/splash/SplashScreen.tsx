@@ -7,6 +7,8 @@ import {
   QrCode,
   Clock8,
   ListCheck,
+  ChartLine,
+  TabletSmartphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/images/at.jpg";
@@ -114,8 +116,8 @@ const SplashScreen = () => {
                   </div>
 
                   <div className="absolute -right-10 sm:-right-12 bottom-8">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-blue-100 flex items-center justify-center">
-                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-blue-400"></div>
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-blue-400 flex items-center justify-center">
+                      <TabletSmartphone size={32} className="text-white" />
                     </div>
                   </div>
                 </div>
@@ -132,18 +134,20 @@ const SplashScreen = () => {
                   <div className="h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-neutral-100 flex items-center justify-center">
                     <div className="w-28 h-28 sm:w-32 sm:h-32 rounded flex items-center justify-center">
                       <div className="flex items-center justify-center gap-1 sm:gap-2">
-                        <div className="h-16 w-12 sm:h-20 sm:w-16 bg-neutral-800 rounded-xl flex items-end justify-center pb-2">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-500 flex items-center justify-center animate-bounce">
+                        <div className="h-16 w-12 sm:h-20 sm:w-16 bg-neutral-800 rounded-xl flex items-end justify-center pb-2 ">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-500 flex items-center justify-center ">
                             <ListCheck size={32} className="text-white" />
                           </div>
                         </div>
                         <div className="h-16 w-12 sm:h-20 sm:w-16 bg-neutral-800 rounded-xl flex items-end justify-center pb-2">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-500 flex items-center justify-center">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-500 flex items-center justify-center mb-5">
                             <Clock8 size={32} className="text-white" />
                           </div>
                         </div>
                         <div className="h-16 w-12 sm:h-20 sm:w-16 bg-neutral-800 rounded-xl flex items-end justify-center pb-2">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-yellow-500"></div>
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-yellow-500 flex items-center justify-center animate-pulse">
+                            <ChartLine size={32} className="text-white" />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -160,7 +164,7 @@ const SplashScreen = () => {
               {currentScreen === 2 && (
                 <div className="relative w-full">
                   <div className="flex flex-col items-start w-full max-w-xs mx-auto gap-3 sm:gap-4 text-sm  text-neutral-500">
-                    <div className="w-full bg-neutral-100 rounded-xl p-3 flex items-center transform transition-all hover:scale-105 duration-300">
+                    <div className="w-full bg-neutral-100 text-neutral-500 rounded-xl p-3 flex items-center transform transition-all hover:scale-105 duration-300">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-green-500 flex items-center justify-center mr-3">
                         <QrCode size={18} className="text-white" />
                       </div>
@@ -174,7 +178,7 @@ const SplashScreen = () => {
                       </div>
                     </div>
 
-                    <div className="w-full bg-neutral-100 rounded-xl p-3 flex items-center transform transition-all hover:scale-105 duration-300">
+                    <div className="w-full bg-neutral-100 text-neutral-500 rounded-xl p-3 flex items-center transform transition-all hover:scale-105 duration-300">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-blue-500 flex items-center justify-center mr-3">
                         <Users size={18} className="text-white" />
                       </div>
@@ -188,7 +192,7 @@ const SplashScreen = () => {
                       </div>
                     </div>
 
-                    <div className="w-full bg-neutral-100 rounded-xl p-3 flex items-center transform transition-all hover:scale-105 duration-300">
+                    <div className="w-full bg-neutral-100 text-neutral-500 rounded-xl p-3 flex items-center transform transition-all hover:scale-105 duration-300">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-amber-600 flex items-center justify-center mr-3">
                         <Calendar size={32} className="text-white" />
                       </div>
