@@ -212,8 +212,8 @@ const DeleteProfile = ({ className = "" }: DeleteProfileProps) => {
             >
               {deleteMutation.isPending ? (
                 <>
-                  <Loader className="animate-spin h-4 w-4 mr-2" />
-                  Deleting...
+                  Deleting
+                  <Loader className="animate-spin h-4 w-4 ml-2" />
                 </>
               ) : (
                 "Delete Account"
