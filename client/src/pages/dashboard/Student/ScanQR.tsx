@@ -446,46 +446,52 @@ const QRScanner: React.FC = () => {
             </motion.div>
           </div>
           {/* Cotrols Panel Mobile */}
+
           <motion.div
-            className="space-y-6 sm:hidden fixed bottom-5 right-0 z-50"
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
+            className="space-y-5 sm:hidden fixed bottom-5 right-5 z-50"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5, duration: 0.5 }}
           >
-            <div className="w-fit rounded-full bg-transparent backdrop-blur-sm border-t border-white/50 p-4 shadow-lg ">
-              <div className="flex flex-col gap-2">
-                <Button
-                  variant={isScanning ? "destructive" : "default"}
-                  onClick={isScanning ? stopScanner : startScanner}
-                  disabled={isLoading}
-                  className={`h-12 font-medium transition-all duration-300 w-full rounded-full ${
-                    isScanning
-                      ? "bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/25"
-                      : "bg-white rounded-full shadow-xl hover:shadow-lg shadow-gray-500/25 transition-all duration-300"
-                  }`}
+            <div className="w-fit rounded-full bg-white/80 backdrop-blur-sm border border-white/50 p-4 shadow-lg">
+              <div className="flex flex-col gap-3">
+                {/* Scan/Stop Button */}
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  {isScanning ? (
-                    <>
-                      <X className="w-4 h-4 " />
-                    </>
-                  ) : (
-                    <>
-                      {isLoading ? (
-                        <Loader2 className="w-4 h-4 animate-spin " />
-                      ) : (
-                        <Camera className="w-4 h-4" />
-                      )}
-                    </>
-                  )}
-                </Button>
+                  <Button
+                    variant={isScanning ? "destructive" : "default"}
+                    onClick={isScanning ? stopScanner : startScanner}
+                    disabled={isLoading}
+                    className={`h-12 w-12 font-medium transition-all duration-300 rounded-full flex items-center justify-center ${
+                      isScanning
+                        ? "bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/25"
+                        : "bg-teal-500 hover:bg-teal-600 shadow-xl shadow-teal-500/25 text-white"
+                    }`}
+                  >
+                    {isScanning ? (
+                      <X className="w-5 h-5" />
+                    ) : (
+                      <>
+                        {isLoading ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <Camera className="w-5 h-5" />
+                        )}
+                      </>
+                    )}
+                  </Button>
+                </motion.div>
+
+                {/* Attendance Records Button */}
                 <Link to="/dashboard/attendance" className="block">
                   <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="h-12 w-12 bg-emerald-500 hover:bg-emerald-600 rounded-full shadow-xl hover:shadow-lg shadow-emerald-500/25 transition-all duration-300 flex items-center justify-center cursor-pointer text-white"
                   >
-                    <Button className="w-full mt-3 h-12 bg-white rounded-full shadow-xl hover:shadow-lg shadow-gray-500/25 transition-all duration-300">
-                      <ListCheck className="w-4 h-4" />
-                    </Button>
+                    <ListCheck className="w-5 h-5" />
                   </motion.div>
                 </Link>
               </div>
@@ -505,7 +511,7 @@ const QRScanner: React.FC = () => {
                 <div className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" />
                   <span className="text-emerald-800 font-medium">
-                    Processing...
+                    Processing
                   </span>
                 </div>
               </CardContent>
@@ -515,7 +521,7 @@ const QRScanner: React.FC = () => {
 
         {/* Confirmation Modal */}
         {showConfirmation && courseData && (
-          <div className="fixed inset-0 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <MarkPopover
               courseData={courseData}
               isOpen={showConfirmation}

@@ -466,7 +466,7 @@ const GenerateQR = () => {
                         }`}
                       >
                         <Save size={16} />
-                        Download QR
+                        Download
                       </Button>
                     </motion.div>
                     <motion.div
@@ -484,7 +484,7 @@ const GenerateQR = () => {
                         }`}
                       >
                         <Printer size={16} />
-                        Print QR
+                        Print
                       </Button>
                     </motion.div>
                   </motion.div>
@@ -573,8 +573,8 @@ const GenerateQR = () => {
                               exit={{ opacity: 0 }}
                               className="flex items-center gap-2"
                             >
-                              Processing...
-                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Processing
+                              <Loader2 className="h-4 w-4 ml-2 animate-spin" />
                             </motion.div>
                           ) : (
                             <motion.div
@@ -614,8 +614,8 @@ const GenerateQR = () => {
                               exit={{ opacity: 0 }}
                               className="flex items-center gap-2"
                             >
-                              Deleting...
-                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Deleting
+                              <Loader2 className="h-4 w-4 ml-2 animate-spin" />
                             </motion.div>
                           ) : (
                             <motion.div
@@ -637,7 +637,7 @@ const GenerateQR = () => {
                   </motion.div>
 
                   <motion.div
-                    className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
+                    className={`flex items-start gap-2 p-2 rounded-lg text-sm ${
                       isExpired
                         ? "bg-red-50 text-red-700"
                         : "bg-blue-50 text-blue-700"
@@ -650,7 +650,7 @@ const GenerateQR = () => {
                     <p>
                       {isExpired
                         ? "This QR code has expired and can no longer be used for attendance. You can delete this session and generate a new one."
-                        : "Students can scan this QR code to mark their attendance for this lecture session. This QR will persist even if you refresh the page."}
+                        : "Students can scan this QR code to mark their attendance for this lecture session."}
                     </p>
                   </motion.div>
                 </motion.div>
@@ -911,8 +911,8 @@ const GenerateQR = () => {
                           exit={{ opacity: 0 }}
                           className="flex items-center gap-2"
                         >
-                          Generating...{" "}
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Generating{" "}
+                          <Loader2 className="h-4 w-4 ml-2 animate-spin" />
                         </motion.div>
                       ) : (
                         <motion.div

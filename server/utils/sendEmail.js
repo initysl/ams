@@ -65,7 +65,7 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
         }
         .button {
           display: inline-block;
-          background-color: #60a5fa;
+          background-color: #329932;
           color: #fff;
           padding: 10px 20px;
           text-decoration: none;

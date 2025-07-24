@@ -35,10 +35,10 @@ const About = () => {
           <p className="text-gray-600">
             For support or inquiries, please contact:{" "}
             <a
-              href="mailto:lawalyusufimp@gmail.com"
+              href="mailto:lawalyusuf356@gmail.com"
               className="text-blue-600 hover:underline"
             >
-              lawalyusufimp@gmail.com
+              lawalyusuf356@gmail.com
             </a>
           </p>
         </div>
