@@ -21,7 +21,7 @@ const cardData = {
   cards: [
     {
       id: 1,
-      title: "Smart Attendance Management System",
+      title: "Smart Attendance Management",
       value: "Instant Digital Check-ins",
       description:
         "Generate dynamic QR codes instantly for students to mark attendance effortlessly.",
@@ -108,7 +108,7 @@ const Home: React.FC = () => {
                 to={"/dashboard/home"}
                 className="block text-xl leading-tight font-bold text-gray-900 hover:text-indigo-600 transition-colors"
               >
-                Smart Attendance Management
+                Automated Attendance Management System
               </Link>
               <p className="text-gray-600 leading-relaxed">
                 Experience seamless attendance tracking with our advanced
@@ -247,7 +247,7 @@ const Home: React.FC = () => {
         <div className="bg-white rounded-3xl shadow-xl p-6 h-full">
           <Chart />
         </div>
-        <div className="bg-white rounded-3xl shadow-xl p-6 space-y-5">
+        <div className="bg-white rounded-3xl shadow-xl p-6 space-y-5 w-auto">
           <Status />
           <ActivityFeed />
         </div>

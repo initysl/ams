@@ -20,7 +20,8 @@ interface EmptyStateProps {
 
 type SessionRecord = {
   courseCode: string;
-  sessionDate: string;
+  sessionDate: string; // Keep for backward compatibility
+  sessionDateTime?: string; // Add optional full datetime
   attendanceCount: number;
   totalCourseStudents: number;
   attendanceRate: number;
@@ -68,16 +69,18 @@ const Activity = () => {
   // Check if it's a different error
   const hasError = lecturerSessionsMutation.isError && !isNoSessionsFound;
 
-  // Helper function to format relative time
-  const getRelativeTime = (dateString: string): string => {
+  // Format time
+  const getRelativeTime = (dateTimeString: string): string => {
+    const sessionDate = new Date(dateTimeString);
     const now = new Date();
-    const sessionDate = new Date(dateString);
+
     const diffInMinutes = Math.floor(
       (now.getTime() - sessionDate.getTime()) / (1000 * 60)
     );
 
+    if (diffInMinutes < 1) return "Just now";
     if (diffInMinutes < 60) {
-      return `${diffInMinutes} minutes ago`;
+      return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
     } else if (diffInMinutes < 1440) {
       const hours = Math.floor(diffInMinutes / 60);
       return `${hours} hour${hours > 1 ? "s" : ""} ago`;
@@ -118,12 +121,13 @@ const Activity = () => {
       return;
     }
 
-    // Sort by date (most recent first)
+    // Sort by date (most recent first) - use full datetime if available
     const sortedData = sessionData
-      .sort(
-        (a, b) =>
-          new Date(b.sessionDate).getTime() - new Date(a.sessionDate).getTime()
-      )
+      .sort((a, b) => {
+        const dateA = new Date(a.sessionDateTime || a.sessionDate);
+        const dateB = new Date(b.sessionDateTime || b.sessionDate);
+        return dateB.getTime() - dateA.getTime();
+      })
       .slice(0, 10);
 
     const activities: LecturerActivity[] = [];
@@ -138,7 +142,7 @@ const Activity = () => {
         id: `session-${session.courseCode}-${session.sessionDate}-${index}`,
         action: "Conducted Class",
         subject: `${session.courseCode} - ${session.attendanceCount}/${session.totalCourseStudents} students (${session.attendanceRate}% - ${attendanceDescription})`,
-        time: getRelativeTime(session.sessionDate),
+        time: getRelativeTime(session.sessionDateTime || session.sessionDate),
         icon: Users,
         color: getAttendanceColor(session.attendanceRate),
         metadata: {
@@ -273,7 +277,7 @@ const Activity = () => {
 
   return (
     <motion.div
-      className="bg-white rounded-3xl p-6 shadow-sm"
+      className="bg-white rounded-3xl p-6 shadow-sm "
       initial={{ opacity: 0, x: -30 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}

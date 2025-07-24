@@ -143,7 +143,7 @@ const ChartOne = () => {
     onError: () => {
       // console.error("Error fetching attendance trend:", error);
       // const errorMessage = error?.response?.data?.error || error?.message || "Unknown error";
-      toast.error("Error fetching attendance trend");
+      toast.error("Error fetching attendance data");
 
       // Reset state on error
       setChartData([]);
@@ -312,10 +312,9 @@ const ChartOne = () => {
       <Card className="bg-white shadow-sm">
         <CardHeader className="">
           <div className="flex justify-between items-center flex-wrap gap-4">
-            <CardTitle className="text-lg font-semibold flex items-center text-gray-800">
-              <h2 className="text-lg font-semibold text-gray-800">
-                Attendance Trend
-              </h2>
+            <CardTitle className="text-lg font-semibold flex items-center mb-2">
+              Attendance Trend
+              <TrendingUp className="h-5 w-5 ml-2 text-blue-600" />
             </CardTitle>
             <div className="flex space-x-3">
               <select

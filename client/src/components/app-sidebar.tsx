@@ -31,7 +31,7 @@ import { Link, NavLink } from "react-router-dom";
 import { Separator } from "./ui/separator";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
-import logo from "/at.svg";
+// import logo from "/at.svg";
 
 export function AppSidebar() {
   const { user, logout } = useAuth();
@@ -130,13 +130,13 @@ export function AppSidebar() {
           <div className="mb-12 flex flex-col items-center space-y-3">
             <SidebarGroupLabel className="text-2xl font-semibold text-slate-800 tracking-widest">
               <div className="sidebar-gl font-semibold flex items-center gap-2 group">
-                <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-lg border border-slate-500 transition-transform duration-200 group-hover:scale-105">
+                {/* <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-lg border border-slate-500 transition-transform duration-200 group-hover:scale-105">
                   <img
                     src={logo}
                     alt="AttendEase Logo"
                     className="w-8 h-8 object-contain"
                   />
-                </div>
+                </div> */}
                 <span className="bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
                   AttendEase
                 </span>

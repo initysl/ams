@@ -421,6 +421,7 @@ const recentlyMarkedAttendance = asyncHandler(async (req, res) => {
   }
 });
 
+// Attendance Trend
 const attendanceTrend = asyncHandler(async (req, res) => {
   try {
     if (!req.user || req.user.role !== "lecturer") {
@@ -434,7 +435,8 @@ const attendanceTrend = asyncHandler(async (req, res) => {
 
     const trendData = sessions.map((session) => ({
       courseCode: session.courseCode,
-      sessionDate: session.sessionStart.toISOString().split("T")[0], // e.g., '2025-05-13'
+      sessionDate: session.sessionStart.toISOString().split("T")[0], // Keep for backward compatibility
+      sessionDateTime: session.sessionStart.toISOString(), // Full datetime for accurate relative time
       attendanceCount: session.attendanceRecords.length,
       totalCourseStudents: session.totalCourseStudents || 0,
       attendanceRate:
@@ -447,7 +449,9 @@ const attendanceTrend = asyncHandler(async (req, res) => {
     }));
 
     // Optional: sort by course and date
-    trendData.sort((a, b) => new Date(a.sessionDate) - new Date(b.sessionDate));
+    trendData.sort(
+      (a, b) => new Date(a.sessionDateTime) - new Date(b.sessionDateTime)
+    );
 
     res.status(200).json(trendData);
   } catch (error) {

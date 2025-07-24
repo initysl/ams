@@ -448,12 +448,12 @@ const QRScanner: React.FC = () => {
           {/* Cotrols Panel Mobile */}
 
           <motion.div
-            className="space-y-5 sm:hidden fixed bottom-5 right-5 z-50"
+            className="space-y-5 sm:hidden fixed bottom-5 right-0 z-50"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5, duration: 0.5 }}
           >
-            <div className="w-fit rounded-full bg-white/80 backdrop-blur-sm border border-white/50 p-4 shadow-lg">
+            <div className="w-fit rounded-full bg-white/80 backdrop-blur-sm border border-white/50 p-2 shadow-lg">
               <div className="flex flex-col gap-3">
                 {/* Scan/Stop Button */}
                 <motion.div
