@@ -216,7 +216,7 @@ const DeleteProfile = ({ className = "" }: DeleteProfileProps) => {
                   <Loader className="animate-spin h-4 w-4 ml-2" />
                 </>
               ) : (
-                "Delete Account"
+                "Delete Profile"
               )}
             </AlertDialogAction>
           )}

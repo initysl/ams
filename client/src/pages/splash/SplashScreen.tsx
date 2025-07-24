@@ -243,7 +243,7 @@ const SplashScreen = () => {
             onClick={handleNext}
             className={`w-full py-3 rounded-full flex items-center justify-center ${screens[currentScreen].bgColor} text-white transform transition-all duration-300 hover:brightness-110 hover:shadow-lg active:scale-95`}
           >
-            {currentScreen < 2 ? "Next Screen" : "Get Started"}
+            {currentScreen < 2 ? "Next" : "Get Started"}
             <ArrowRightCircle size={16} className="ml-2 animate-pulse" />
           </Button>
         </div>
