@@ -2,7 +2,7 @@
   "cards": [
     {
       "id": 1,
-      "title": "Smart Attendance Management System",
+      "title": "Automated Attendance Management System",
       "value": "Instant Digital Check-ins",
       "description": "Generate dynamic QR codes instantly for students to mark attendance effortlessly.",
       "icon": "QrCode",
