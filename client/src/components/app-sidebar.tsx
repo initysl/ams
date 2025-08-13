@@ -266,7 +266,7 @@ export function AppSidebar() {
               <FaGithub size={20} />
             </a>
             <a
-              href="https://x.com/ysl0xD3v"
+              href="https://x.com/yusolaaa"
               target="_blank"
               rel="noopener noreferrer"
               className="text-slate-400 hover:text-slate-700 transition-colors duration-150"
