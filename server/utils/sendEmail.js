@@ -15,12 +15,7 @@ const createTransporter = () => {
 };
 
 // --- HTML Email Template ---
-const getEmailTemplate = (
-  title: string,
-  content: string,
-  buttonText: string,
-  buttonUrl: string
-) => {
+const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
   return `
   <!DOCTYPE html>
   <html lang="en">
@@ -59,7 +54,7 @@ const getEmailTemplate = (
                         color:#ffffff;
                         text-decoration:none;
                         border-radius:6px;
-                        background-color:#329932;
+                        background-color:#0000ff;
                       ">
                         ${buttonText}
                       </a>
@@ -71,10 +66,15 @@ const getEmailTemplate = (
             <tr>
               <td align="center" style="padding: 10px 20px 30px;">
                 <p style="font-size:12px; color:#999999;">
-                  If you didn’t request this, please ignore this email.
+                  This is an automated message. Please do not reply to this email.
                 </p>
                 <p style="font-size:12px; color:#999999;">
-                  &copy; ${new Date().getFullYear()} ${process.env.ORG_NAME || "TheFirst Studio"}. All rights reserved.
+                  If you didn't request this, please ignore this email.
+                </p>
+                <p style="font-size:12px; color:#999999;">
+                  &copy; ${new Date().getFullYear()} ${
+    process.env.ORG_NAME || "TheFirst Studio"
+  }. All rights reserved.
                 </p>
               </td>
             </tr>
@@ -85,6 +85,26 @@ const getEmailTemplate = (
   </body>
   </html>
   `;
+};
+
+// --- Common email options with no-reply setup ---
+const getBaseMailOptions = (to, subject) => {
+  return {
+    from: {
+      name: `${process.env.APP_NAME || "AttendEase"} (No-Reply)`,
+      address: process.env.NOREPLY_EMAIL || process.env.EMAIL_USER,
+    },
+    replyTo: process.env.SUPPORT_EMAIL || undefined, // Optional: redirect replies to support
+    to: to,
+    subject: subject,
+    headers: {
+      "X-Priority": "1",
+      "X-MSMail-Priority": "High",
+      "X-Mailer": `${process.env.APP_NAME || "AttendEase"} Email Service`,
+      "X-Auto-Response-Suppress": "All", // Suppress auto-replies
+      Precedence: "bulk", // Indicates bulk/automated email
+    },
+  };
 };
 
 // --- Verification Email ---
@@ -102,13 +122,13 @@ const sendVerificationEmail = async (email, token, userName = null) => {
   `;
 
   const mailOptions = {
-    from: {
-      name: process.env.APP_NAME || "AttendEase",
-      address: process.env.EMAIL_USER,
-    },
-    to: email,
-    subject: "Verify your account",
-    html: getEmailTemplate("Verify Your Email Address", content, "Verify Email Address", verificationUrl),
+    ...getBaseMailOptions(email, "Verify your account"),
+    html: getEmailTemplate(
+      "Verify Your Email Address",
+      content,
+      "Verify Email Address",
+      verificationUrl
+    ),
     text: `
 Hello${userName ? ` ${userName}` : ""},
 
@@ -119,15 +139,17 @@ This link is valid for 24 hours and can only be used once.
 
 If you didn't request this, please ignore this email.
 
+This is an automated message. Please do not reply to this email.
+${
+  process.env.SUPPORT_EMAIL
+    ? `For support, contact us at: ${process.env.SUPPORT_EMAIL}`
+    : ""
+}
+
 Best regards,  
 ${process.env.ORG_NAME || "TheFirst Studio"} Team
     `,
     priority: "high",
-    headers: {
-      "X-Priority": "1",
-      "X-MSMail-Priority": "High",
-      "X-Mailer": `${process.env.APP_NAME || "AttendEase"} Email Service`,
-    },
   };
 
   try {
@@ -156,13 +178,13 @@ const sendResetPasswordEmail = async (email, token, userName = null) => {
   `;
 
   const mailOptions = {
-    from: {
-      name: process.env.APP_NAME || "AttendEase",
-      address: process.env.EMAIL_USER,
-    },
-    to: email,
-    subject: "Reset your account password",
-    html: getEmailTemplate("Reset Your Password", content, "Reset Password", resetUrl),
+    ...getBaseMailOptions(email, "Reset your account password"),
+    html: getEmailTemplate(
+      "Reset Your Password",
+      content,
+      "Reset Password",
+      resetUrl
+    ),
     text: `
 Hello${userName ? ` ${userName}` : ""},
 
@@ -173,15 +195,17 @@ This link will expire in 5 minutes.
 
 If you didn't request this, just ignore this email.
 
+This is an automated message. Please do not reply to this email.
+${
+  process.env.SUPPORT_EMAIL
+    ? `For support, contact us at: ${process.env.SUPPORT_EMAIL}`
+    : ""
+}
+
 Best regards,  
 ${process.env.ORG_NAME || "TheFirst Studio"} Team
     `,
     priority: "high",
-    headers: {
-      "X-Priority": "1",
-      "X-MSMail-Priority": "High",
-      "X-Mailer": `${process.env.APP_NAME || "AttendEase"} Email Service`,
-    },
   };
 
   try {
@@ -198,7 +222,7 @@ const sendWelcomeEmail = async (email, userName) => {
   const content = `
     <p>Hello ${userName},</p>
     <p>Welcome to ${process.env.APP_NAME || "our platform"}! 🎉</p>
-    <p>Your account has been successfully verified. Here’s how to get started:</p>
+    <p>Your account has been successfully verified. Here's how to get started:</p>
     <ul style="color: #4b5563; margin: 20px 0;">
       <li>Complete your profile to personalize your experience</li>
       <li>Explore our features and settings</li>
@@ -208,12 +232,10 @@ const sendWelcomeEmail = async (email, userName) => {
   `;
 
   const mailOptions = {
-    from: {
-      name: process.env.APP_NAME || "AttendEase",
-      address: process.env.EMAIL_USER,
-    },
-    to: email,
-    subject: `Welcome to ${process.env.APP_NAME || "AttendEase"}!`,
+    ...getBaseMailOptions(
+      email,
+      `Welcome to ${process.env.APP_NAME || "AttendEase"}!`
+    ),
     html: getEmailTemplate(
       `Welcome to ${process.env.APP_NAME || "AttendEase"}!`,
       content,
@@ -226,6 +248,13 @@ Hello ${userName},
 Welcome to ${process.env.APP_NAME || "AttendEase"}!
 
 Your account has been successfully verified and you're ready to get started.
+
+This is an automated message. Please do not reply to this email.
+${
+  process.env.SUPPORT_EMAIL
+    ? `For support, contact us at: ${process.env.SUPPORT_EMAIL}`
+    : ""
+}
 
 Best regards,  
 ${process.env.ORG_NAME || "TheFirst Studio"} Team
