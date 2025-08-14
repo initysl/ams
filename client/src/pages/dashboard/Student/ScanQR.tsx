@@ -83,7 +83,7 @@ const QRScanner: React.FC = () => {
 
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  // const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Initial scan mutation to get course data
   const scanQRMutation = useMutation<AttendanceResponse, Error, string>({
