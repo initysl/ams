@@ -21,12 +21,12 @@ const register = asyncHandler(async (req, res) => {
 
   const { name, email, matricNumber, department, password } = req.body;
 
-  // FIXED: Better validation for matricNumber
+  // Better validation for matricNumber.
   if (matricNumber && matricNumber.trim() === "") {
     return res.status(400).json({ message: "Matric number cannot be empty" });
   }
 
-  // FIXED: Check email and matricNumber separately for better error messages
+  // Check email and matricNumber separately for better error messages.
   const existingEmail = await User.findOne({ email });
   if (existingEmail) {
     return res.status(400).json({ message: "Email already exists" });
@@ -41,12 +41,9 @@ const register = asyncHandler(async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  let profilePicture;
-  if (req.file) {
-    profilePicture = `/uploads/${req.file.filename}`;
-  } else {
-    profilePicture = "/api/images/default.png";
-  }
+  // CORRECTED: Use the profilePicture URL from req.body, which was
+  // set by the previous middleware after the Cloudinary upload.
+  const profilePicture = req.body.profilePicture || "/api/images/default.png";
 
   const role =
     matricNumber && matricNumber.trim() !== "" ? "student" : "lecturer";
@@ -56,7 +53,7 @@ const register = asyncHandler(async (req, res) => {
     email: email.toLowerCase().trim(),
     matricNumber: matricNumber ? matricNumber.trim() : undefined,
     department: department.trim(),
-    profilePicture,
+    profilePicture, // This will now correctly be the Cloudinary URL or the default.
     password: hashedPassword,
     role,
   });
@@ -64,7 +61,7 @@ const register = asyncHandler(async (req, res) => {
   try {
     await newUser.save();
   } catch (saveError) {
-    // FIXED: Handle duplicate key errors that might slip through
+    // Handle duplicate key errors that might slip through.
     if (saveError.code === 11000) {
       const field = Object.keys(saveError.keyPattern)[0];
       return res.status(400).json({
@@ -81,7 +78,7 @@ const register = asyncHandler(async (req, res) => {
   });
 
   try {
-    // Pass the user's name as the third parameter
+    // Pass the user's name as the third parameter.
     await sendVerificationEmail(newUser.email, token, newUser.name);
 
     res.status(201).json({
@@ -93,9 +90,9 @@ const register = asyncHandler(async (req, res) => {
       `User registered: ${newUser.email}, ${newUser.matricNumber || "lecturer"}`
     );
   } catch (emailError) {
-    // FIXED: Handle email sending failure
+    // Handle email sending failure.
     logger.error(`Failed to send verification email: ${emailError.message}`);
-    // User is created but email failed - still return success but with different message
+    // User is created but email failed - still return success but with a different message.
     res.status(201).json({
       message:
         "User registered successfully! Please contact support for email verification.",

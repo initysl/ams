@@ -1,34 +1,21 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
 
-// Define the upload path
-const uploadPath = path.join(__dirname, "..", "uploads");
-
-// Ensure the upload directory exists, If not exist, create.
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true }); // recursive in case parent folders are missing
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadPath); // use the resolved path
-  },
-  filename: (req, file, cb) => {
-    // Generate a more unique filename to avoid conflicts
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const fileExtension = path.extname(file.originalname);
-    const baseName = path.basename(file.originalname, fileExtension);
-    const uniqueName = `${baseName}-${uniqueSuffix}${fileExtension}`;
-    cb(null, uniqueName);
-  },
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// File filter to allow only specific image types
+// Use memory storage to handle file in memory before uploading to Cloudinary
+const storage = multer.memoryStorage();
+
+// File filter
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png/;
   const extname = allowedTypes.test(
-    path.extname(file.originalname).toLowerCase()
+    file.originalname.toLowerCase().split(".").pop()
   );
   const mimetype = allowedTypes.test(file.mimetype);
 
@@ -36,7 +23,6 @@ const fileFilter = (req, file, cb) => {
     return cb(null, true);
   }
 
-  // FIXED: Pass an Error object instead of a string
   cb(
     new Error(
       "File upload only supports the following filetypes - jpeg, jpg, png"
@@ -50,4 +36,34 @@ const upload = multer({
   fileFilter: fileFilter,
 });
 
-module.exports = upload;
+// Helper function to upload to Cloudinary
+const uploadToCloudinary = (fileBuffer, originalname) => {
+  return new Promise((resolve, reject) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const baseName = originalname.split(".")[0];
+    const publicId = `${baseName}-${uniqueSuffix}`;
+
+    cloudinary.uploader
+      .upload_stream(
+        {
+          folder: "uploads",
+          public_id: publicId,
+          resource_type: "auto", // automatically detect file type
+          transformation: [
+            { width: 1000, height: 1000, crop: "limit" },
+            { quality: "auto" },
+          ],
+        },
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      )
+      .end(fileBuffer);
+  });
+};
+
+module.exports = { upload, uploadToCloudinary, cloudinary };

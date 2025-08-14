@@ -66,19 +66,12 @@ export function AppSidebar() {
 
   // Function to get the correct image URL with cache busting
   const getImageUrl = (profilePicture: string | null | undefined) => {
-    const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
-
     if (!profilePicture) {
-      const defaultUrl = `${baseUrl}/images/default.png?t=${imageKey}`;
-      return defaultUrl;
+      const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
+      return `${baseUrl}/images/default.png?t=${Date.now()}`;
     }
 
-    if (profilePicture.startsWith("http")) {
-      return `${profilePicture}?t=${imageKey}`;
-    }
-
-    const fullUrl = `${baseUrl}${profilePicture}?t=${imageKey}`;
-    return fullUrl;
+    return profilePicture;
   };
 
   if (!user) return null;

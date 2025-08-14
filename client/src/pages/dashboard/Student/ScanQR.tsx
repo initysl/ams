@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import {
   CheckSquare,
   Loader,
-  Upload,
   Scan,
   QrCode,
   Camera,
@@ -206,56 +205,56 @@ const QRScanner: React.FC = () => {
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("QR code size must be under 2MB.");
-      fileInputRef.current!.value = "";
-      return;
-    }
+  //   if (file.size > 2 * 1024 * 1024) {
+  //     toast.error("QR code size must be under 2MB.");
+  //     fileInputRef.current!.value = "";
+  //     return;
+  //   }
 
-    const supportedTypes = ["image/jpeg", "image/png", "image/webp"];
-    if (!supportedTypes.includes(file.type)) {
-      toast.error("Unsupported file type.");
-      fileInputRef.current!.value = "";
-      return;
-    }
+  //   const supportedTypes = ["image/jpeg", "image/png", "image/webp"];
+  //   if (!supportedTypes.includes(file.type)) {
+  //     toast.error("Unsupported file type.");
+  //     fileInputRef.current!.value = "";
+  //     return;
+  //   }
 
-    setIsLoading(true);
-    try {
-      if (!html5QrCodeRef.current) {
-        html5QrCodeRef.current = new Html5Qrcode("reader", {
-          formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
-          verbose: false,
-        });
-      }
+  //   setIsLoading(true);
+  //   try {
+  //     if (!html5QrCodeRef.current) {
+  //       html5QrCodeRef.current = new Html5Qrcode("reader", {
+  //         formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+  //         verbose: false,
+  //       });
+  //     }
 
-      if (isScanning) await stopScanner();
+  //     if (isScanning) await stopScanner();
 
-      const decodedText = await html5QrCodeRef.current.scanFile(file, true);
-      toast.success("QR code successfully read from image");
-      handleQRCodeScanned(decodedText);
-    } catch (err) {
-      // console.error("Image QR scan failed:", err);
-      // More specific error messages
-      if (err instanceof Error) {
-        if (err.message.includes("QR code not found")) {
-          toast.error("No QR code found in the image.");
-        } else if (err.message.includes("decoder failed")) {
-          toast.error(
-            "QR code found but couldn't be read. Try a clearer image."
-          );
-        } else {
-          toast.error("Failed to scan QR code from image.");
-        }
-      }
-    } finally {
-      setIsLoading(false);
-      fileInputRef.current!.value = "";
-    }
-  };
+  //     const decodedText = await html5QrCodeRef.current.scanFile(file, true);
+  //     toast.success("QR code successfully read from image");
+  //     handleQRCodeScanned(decodedText);
+  //   } catch (err) {
+  //     // console.error("Image QR scan failed:", err);
+  //     // More specific error messages
+  //     if (err instanceof Error) {
+  //       if (err.message.includes("QR code not found")) {
+  //         toast.error("No QR code found in the image.");
+  //       } else if (err.message.includes("decoder failed")) {
+  //         toast.error(
+  //           "QR code found but couldn't be read. Try a clearer image."
+  //         );
+  //       } else {
+  //         toast.error("Failed to scan QR code from image.");
+  //       }
+  //     }
+  //   } finally {
+  //     setIsLoading(false);
+  //     fileInputRef.current!.value = "";
+  //   }
+  // };
 
   // const copyToClipboard = (text: string) => {
   //   navigator.clipboard.writeText(text);
@@ -369,13 +368,13 @@ const QRScanner: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
             >
-              <Card className="bg-white/70 backdrop-blur-sm p-5 border border-white/50">
+              <Card className="bg-white/70 backdrop-blur-sm p-5 border border-white/50 w-full">
                 <CardHeader className="text-xl font-semibold text-gray-800 mb-4 flex items-center justify-center">
                   <Camera className="w-5 h-5 mr-2 text-blue-500" />
                   Scanner Controls
                 </CardHeader>
 
-                <CardContent className="grid grid-cols-2 gap-3">
+                <CardContent className="grid gap-3">
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -405,28 +404,6 @@ const QRScanner: React.FC = () => {
                           )}
                         </>
                       )}
-                    </Button>
-                  </motion.div>
-
-                  <input
-                    type="file"
-                    accept="image/*"
-                    ref={fileInputRef}
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Button
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isLoading}
-                      className="h-12 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-300 w-full"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload
                     </Button>
                   </motion.div>
                 </CardContent>
