@@ -18,7 +18,7 @@ import {
   ListCheck,
   Loader2,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import MarkPopover from "./MarkPopover";
@@ -85,6 +85,7 @@ const QRScanner: React.FC = () => {
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
   // const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const navigate = useNavigate();
   // Initial scan mutation to get course data
   const scanQRMutation = useMutation<AttendanceResponse, Error, string>({
     mutationFn: async (token: string) => {
@@ -422,13 +423,30 @@ const QRScanner: React.FC = () => {
               </Card>
             </motion.div>
           </div>
-          {/* Cotrols Panel Mobile */}
 
+          {/* Cotrols Panel Mobile */}
+          {/* Mobile Controls Panel - FIXED VERSION */}
           <motion.div
-            className="space-y-5 sm:hidden fixed bottom-5 right-0 z-50"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            className="space-y-5 sm:hidden fixed bottom-5 right-5 z-50"
+            initial={{
+              opacity: 0,
+              scale: 0.8,
+              // Start from the final fixed position, not from document flow
+              position: "fixed",
+              bottom: "1.25rem", // 20px (bottom-5)
+              right: "1.25rem", // 20px (right-5)
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+            }}
             transition={{ delay: 0.5, duration: 0.5 }}
+            style={{
+              // Ensure it's always in fixed position, even during animation
+              position: "fixed",
+              bottom: "1.25rem",
+              right: "1.25rem",
+            }}
           >
             <div className="w-fit rounded-full bg-white/80 backdrop-blur-sm border border-white/50 p-2 shadow-lg">
               <div className="flex flex-col gap-3">
@@ -461,16 +479,15 @@ const QRScanner: React.FC = () => {
                   </Button>
                 </motion.div>
 
-                {/* Attendance Records Button */}
-                <Link to="/dashboard/attendance" className="block">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="h-12 w-12 bg-emerald-500 hover:bg-emerald-600 rounded-full shadow-xl hover:shadow-lg shadow-emerald-500/25 transition-all duration-300 flex items-center justify-center cursor-pointer text-white"
-                  >
-                    <ListCheck className="w-5 h-5" />
-                  </motion.div>
-                </Link>
+                {/* Attendance Records Button - FIXED VERSION */}
+                <motion.button
+                  onClick={() => navigate("/dashboard/attendance")} // Use navigate instead of Link
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="h-12 w-12 bg-emerald-500 hover:bg-emerald-600 rounded-full shadow-xl hover:shadow-lg shadow-emerald-500/25 transition-all duration-300 flex items-center justify-center text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                >
+                  <CheckSquare className="w-5 h-5" />
+                </motion.button>
               </div>
             </div>
           </motion.div>
