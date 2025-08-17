@@ -50,13 +50,20 @@ const VerifyEmail: React.FC = () => {
         const res = await api.get(`auth/verify?token=${token}`);
         if (res.data.success) {
           toast.success("Email verified successfully! Redirecting to login");
-          setSuccess(true);
+          setState((prev) => ({
+            ...prev,
+            isVerifying: false,
+            success: true,
+            error: false,
+            errorMessage: null,
+            countdown: 5, // Set countdown for redirect
+          }));
           // Optionally open login modal after short delay
           setTimeout(() => {
             navigate("/auth");
           }, 3000);
         } else {
-          throw new Error(response.data.message || "Verification failed");
+          throw new Error(res.data.message || "Verification failed");
         }
       } catch (error: any) {
         let errorMessage = "Something went wrong during verification.";
@@ -81,7 +88,7 @@ const VerifyEmail: React.FC = () => {
       }
     };
 
-    verifyEmail();
+    verify();
   }, [token]);
 
   // Resend verification email
