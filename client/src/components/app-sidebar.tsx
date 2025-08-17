@@ -35,7 +35,6 @@ import { useState, useEffect } from "react";
 
 export function AppSidebar() {
   const { user, logout } = useAuth();
-  const [imageKey, setImageKey] = useState(Date.now());
   const [isMobile, setIsMobile] = useState(false);
   const { setOpenMobile } = useSidebar();
 
@@ -50,13 +49,6 @@ export function AppSidebar() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Reset image cache when user data changes
-  useEffect(() => {
-    if (user?.profilePicture) {
-      setImageKey(Date.now());
-    }
-  }, [user?.profilePicture]);
-
   // Function to handle navigation click
   const handleNavClick = () => {
     if (isMobile) {
@@ -64,13 +56,12 @@ export function AppSidebar() {
     }
   };
 
-  // Function to get the correct image URL with cache busting
+  // Get profile picture URL
   const getImageUrl = (profilePicture: string | null | undefined) => {
     if (!profilePicture) {
       const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
-      return `${baseUrl}/images/default.png?t=${Date.now()}`;
+      return `${baseUrl}/images/default.png`;
     }
-
     return profilePicture;
   };
 
@@ -175,11 +166,9 @@ export function AppSidebar() {
               <div className="flex items-center gap-3 px-3 py-3 rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-colors duration-150">
                 <div className="relative w-9 h-9 flex-shrink-0">
                   <img
-                    key={imageKey}
                     src={getImageUrl(user?.profilePicture)}
                     className="w-9 h-9 rounded-full object-cover ring-2 ring-slate-200"
                     alt="Profile picture"
-                    crossOrigin="use-credentials"
                     onError={(e) => {
                       const baseUrl = import.meta.env.VITE_API_URL.replace(
                         "/api/",

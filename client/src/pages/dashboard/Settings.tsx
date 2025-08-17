@@ -19,15 +19,8 @@ const Settings = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const isSmallMobile = useMediaQuery("(max-width: 480px)");
   const [showMobileDialog, setShowMobileDialog] = useState(false);
-  const [imageKey, setImageKey] = useState(Date.now());
-  const location = useLocation();
 
-  // Reset image cache when user data changes
-  useEffect(() => {
-    if (user?.profilePicture) {
-      setImageKey(Date.now());
-    }
-  }, [user?.profilePicture]);
+  const location = useLocation();
 
   // Detect route changes to open dialog on mobile
   useEffect(() => {
@@ -42,9 +35,8 @@ const Settings = () => {
   const getImageUrl = (profilePicture: string | null | undefined) => {
     if (!profilePicture) {
       const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
-      return `${baseUrl}/images/default.png?t=${Date.now()}`;
+      return `${baseUrl}/images/default.png`;
     }
-
     return profilePicture;
   };
 
@@ -122,7 +114,6 @@ const Settings = () => {
               className={`relative ${isMobile ? "mb-6" : "mb-3"}`}
             >
               <img
-                key={imageKey}
                 src={getImageUrl(user?.profilePicture)}
                 className={`
                   rounded-full object-cover ring-4 ring-white shadow-lg
@@ -135,7 +126,6 @@ const Settings = () => {
                   }
                 `}
                 alt="Profile picture"
-                crossOrigin="use-credentials"
                 onError={(e) => {
                   const baseUrl = import.meta.env.VITE_API_URL.replace(
                     "/api/",

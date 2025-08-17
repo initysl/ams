@@ -43,7 +43,7 @@ const register = asyncHandler(async (req, res) => {
 
   // CORRECTED: Use the profilePicture URL from req.body, which was
   // set by the previous middleware after the Cloudinary upload.
-  const profilePicture = req.body.profilePicture || "/api/images/default.png";
+  const profilePicture = req.body.profilePicture || null;
 
   const role =
     matricNumber && matricNumber.trim() !== "" ? "student" : "lecturer";
