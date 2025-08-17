@@ -16,7 +16,7 @@ const {
   validateRegistration,
   validateLogin,
 } = require("../middlewares/validationMiddleware");
-const upload = require("../utils/multerConfig");
+const { upload, uploadToCloudinary } = require("../utils/multerConfig");
 
 const router = express.Router();
 
@@ -25,6 +25,20 @@ router.post(
   "/register",
   upload.single("profilePicture"),
   validateRegistration,
+  async (req, res, next) => {
+    try {
+      if (req.file) {
+        const result = await uploadToCloudinary(
+          req.file.buffer,
+          req.file.originalname
+        );
+        req.body.profilePicture = result.secure_url; // Add the Cloudinary URL to req.body
+      }
+      next(); // Continue to your register function
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
   register
 );
 router.post("/login", validateLogin, loginLimiter, login);

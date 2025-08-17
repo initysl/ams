@@ -565,12 +565,12 @@ const AttendanceS = () => {
                       >
                         <div className="text-center space-y-2 ">
                           <p>No attendance records available.</p>
-                          {/* <p className="text-sm mt-1">
-                            Click "Get Records" to fetch your data.
-                          </p> */}
-                          <p className="text-sm">
-                            Senior man, load your record naa, abi you never
-                            attend any class nii 👀.
+                          <p className="text-sm mt-1">
+                            Click "Get Records" to load your attendance data.
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            Once you attend classes, your records will appear
+                            here.
                           </p>
                         </div>
                       </motion.div>

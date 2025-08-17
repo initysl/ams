@@ -9,7 +9,7 @@ const {
 const {
   validateProfileUpdate,
 } = require("../middlewares/validationMiddleware");
-const upload = require("../utils/multerConfig");
+const { upload, uploadToCloudinary } = require("../utils/multerConfig");
 
 const router = express.Router();
 
@@ -22,6 +22,20 @@ router.put(
   authMiddleware,
   upload.single("profilePicture"),
   validateProfileUpdate,
+  async (req, res, next) => {
+    try {
+      if (req.file) {
+        const result = await uploadToCloudinary(
+          req.file.buffer,
+          req.file.originalname
+        );
+        req.body.profilePicture = result.secure_url;
+      }
+      next();
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
   updateUserProfile
 );
 

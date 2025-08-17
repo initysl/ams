@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import {
   CheckSquare,
   Loader,
-  Upload,
   Scan,
   QrCode,
   Camera,
@@ -19,7 +18,7 @@ import {
   ListCheck,
   Loader2,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import MarkPopover from "./MarkPopover";
@@ -84,8 +83,9 @@ const QRScanner: React.FC = () => {
 
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  // const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const navigate = useNavigate();
   // Initial scan mutation to get course data
   const scanQRMutation = useMutation<AttendanceResponse, Error, string>({
     mutationFn: async (token: string) => {
@@ -206,56 +206,56 @@ const QRScanner: React.FC = () => {
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("QR code size must be under 2MB.");
-      fileInputRef.current!.value = "";
-      return;
-    }
+  //   if (file.size > 2 * 1024 * 1024) {
+  //     toast.error("QR code size must be under 2MB.");
+  //     fileInputRef.current!.value = "";
+  //     return;
+  //   }
 
-    const supportedTypes = ["image/jpeg", "image/png", "image/webp"];
-    if (!supportedTypes.includes(file.type)) {
-      toast.error("Unsupported file type.");
-      fileInputRef.current!.value = "";
-      return;
-    }
+  //   const supportedTypes = ["image/jpeg", "image/png", "image/webp"];
+  //   if (!supportedTypes.includes(file.type)) {
+  //     toast.error("Unsupported file type.");
+  //     fileInputRef.current!.value = "";
+  //     return;
+  //   }
 
-    setIsLoading(true);
-    try {
-      if (!html5QrCodeRef.current) {
-        html5QrCodeRef.current = new Html5Qrcode("reader", {
-          formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
-          verbose: false,
-        });
-      }
+  //   setIsLoading(true);
+  //   try {
+  //     if (!html5QrCodeRef.current) {
+  //       html5QrCodeRef.current = new Html5Qrcode("reader", {
+  //         formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+  //         verbose: false,
+  //       });
+  //     }
 
-      if (isScanning) await stopScanner();
+  //     if (isScanning) await stopScanner();
 
-      const decodedText = await html5QrCodeRef.current.scanFile(file, true);
-      toast.success("QR code successfully read from image");
-      handleQRCodeScanned(decodedText);
-    } catch (err) {
-      // console.error("Image QR scan failed:", err);
-      // More specific error messages
-      if (err instanceof Error) {
-        if (err.message.includes("QR code not found")) {
-          toast.error("No QR code found in the image.");
-        } else if (err.message.includes("decoder failed")) {
-          toast.error(
-            "QR code found but couldn't be read. Try a clearer image."
-          );
-        } else {
-          toast.error("Failed to scan QR code from image.");
-        }
-      }
-    } finally {
-      setIsLoading(false);
-      fileInputRef.current!.value = "";
-    }
-  };
+  //     const decodedText = await html5QrCodeRef.current.scanFile(file, true);
+  //     toast.success("QR code successfully read from image");
+  //     handleQRCodeScanned(decodedText);
+  //   } catch (err) {
+  //     // console.error("Image QR scan failed:", err);
+  //     // More specific error messages
+  //     if (err instanceof Error) {
+  //       if (err.message.includes("QR code not found")) {
+  //         toast.error("No QR code found in the image.");
+  //       } else if (err.message.includes("decoder failed")) {
+  //         toast.error(
+  //           "QR code found but couldn't be read. Try a clearer image."
+  //         );
+  //       } else {
+  //         toast.error("Failed to scan QR code from image.");
+  //       }
+  //     }
+  //   } finally {
+  //     setIsLoading(false);
+  //     fileInputRef.current!.value = "";
+  //   }
+  // };
 
   // const copyToClipboard = (text: string) => {
   //   navigator.clipboard.writeText(text);
@@ -369,13 +369,13 @@ const QRScanner: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
             >
-              <Card className="bg-white/70 backdrop-blur-sm p-5 border border-white/50">
+              <Card className="bg-white/70 backdrop-blur-sm p-5 border border-white/50 w-full">
                 <CardHeader className="text-xl font-semibold text-gray-800 mb-4 flex items-center justify-center">
                   <Camera className="w-5 h-5 mr-2 text-blue-500" />
                   Scanner Controls
                 </CardHeader>
 
-                <CardContent className="grid grid-cols-2 gap-3">
+                <CardContent className="grid gap-3">
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -407,28 +407,6 @@ const QRScanner: React.FC = () => {
                       )}
                     </Button>
                   </motion.div>
-
-                  <input
-                    type="file"
-                    accept="image/*"
-                    ref={fileInputRef}
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Button
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isLoading}
-                      className="h-12 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-300 w-full"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload
-                    </Button>
-                  </motion.div>
                 </CardContent>
 
                 <motion.div
@@ -445,13 +423,30 @@ const QRScanner: React.FC = () => {
               </Card>
             </motion.div>
           </div>
-          {/* Cotrols Panel Mobile */}
 
+          {/* Cotrols Panel Mobile */}
+          {/* Mobile Controls Panel - FIXED VERSION */}
           <motion.div
-            className="space-y-5 sm:hidden fixed bottom-5 right-0 z-50"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            className="space-y-5 sm:hidden fixed bottom-5 right-5 z-50"
+            initial={{
+              opacity: 0,
+              scale: 0.8,
+              // Start from the final fixed position, not from document flow
+              position: "fixed",
+              bottom: "1.25rem", // 20px (bottom-5)
+              right: "1.25rem", // 20px (right-5)
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+            }}
             transition={{ delay: 0.5, duration: 0.5 }}
+            style={{
+              // Ensure it's always in fixed position, even during animation
+              position: "fixed",
+              bottom: "1.25rem",
+              right: "1.25rem",
+            }}
           >
             <div className="w-fit rounded-full bg-white/80 backdrop-blur-sm border border-white/50 p-2 shadow-lg">
               <div className="flex flex-col gap-3">
@@ -484,16 +479,15 @@ const QRScanner: React.FC = () => {
                   </Button>
                 </motion.div>
 
-                {/* Attendance Records Button */}
-                <Link to="/dashboard/attendance" className="block">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="h-12 w-12 bg-emerald-500 hover:bg-emerald-600 rounded-full shadow-xl hover:shadow-lg shadow-emerald-500/25 transition-all duration-300 flex items-center justify-center cursor-pointer text-white"
-                  >
-                    <ListCheck className="w-5 h-5" />
-                  </motion.div>
-                </Link>
+                {/* Attendance Records Button - FIXED VERSION */}
+                <motion.button
+                  onClick={() => navigate("/dashboard/attendance")} // Use navigate instead of Link
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="h-12 w-12 bg-emerald-500 hover:bg-emerald-600 rounded-full shadow-xl hover:shadow-lg shadow-emerald-500/25 transition-all duration-300 flex items-center justify-center text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                >
+                  <CheckSquare className="w-5 h-5" />
+                </motion.button>
               </div>
             </div>
           </motion.div>

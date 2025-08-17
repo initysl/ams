@@ -93,12 +93,13 @@ const Profile = () => {
   const getImageUrl = (profilePicture: string | null | undefined) => {
     if (!profilePicture) return "";
 
-    const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
-
+    // For Cloudinary URLs, return as-is (they handle caching internally)
     if (profilePicture.startsWith("http")) {
-      return `${profilePicture}?t=${Date.now()}`;
+      return profilePicture;
     }
 
+    // Fallback for any legacy local files
+    const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
     return `${baseUrl}${profilePicture}?t=${Date.now()}`;
   };
 

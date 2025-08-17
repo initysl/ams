@@ -1,7 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import React, { useState, useEffect } from "react";
 import { ChevronRight, User } from "lucide-react";
 
 import { useAuth } from "@/context/AuthContext";
@@ -15,31 +14,16 @@ const Layout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [imageKey, setImageKey] = useState(Date.now());
 
-  // Reset image cache when user data changes
-  useEffect(() => {
-    if (user?.profilePicture) {
-      setImageKey(Date.now());
-    }
-  }, [user?.profilePicture]);
-
-  // Function to get the correct image URL with cache busting
+  // Get profile picture URL
   const getImageUrl = (profilePicture: string | null | undefined) => {
-    const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
-
     if (!profilePicture) {
-      const defaultUrl = `${baseUrl}/images/default.png?t=${imageKey}`;
-      return defaultUrl;
+      const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
+      return `${baseUrl}/images/default.png`;
     }
-
-    if (profilePicture.startsWith("http")) {
-      return `${profilePicture}?t=${imageKey}`;
-    }
-
-    const fullUrl = `${baseUrl}${profilePicture}?t=${imageKey}`;
-    return fullUrl;
+    return profilePicture;
   };
+
   // Generate breadcrumbs from current path
   const generateBreadcrumbs = () => {
     const pathSegments = location.pathname.split("/").filter(Boolean);
@@ -169,11 +153,9 @@ const Layout: React.FC = () => {
                         {user?.profilePicture ? (
                           <div className="relative flex-shrink-0">
                             <img
-                              key={imageKey}
                               src={getImageUrl(user?.profilePicture)}
                               className="w-8 h-8 md:w-4 md:h-4 rounded-full object-cover ring-1 ring-slate-300"
                               alt="Profile picture"
-                              crossOrigin="use-credentials"
                               onError={(e) => {
                                 const baseUrl =
                                   import.meta.env.VITE_API_URL.replace(
@@ -182,7 +164,7 @@ const Layout: React.FC = () => {
                                   );
                                 (
                                   e.target as HTMLImageElement
-                                ).src = `${baseUrl}/api/images/default.png?t=${Date.now()}`;
+                                ).src = `${baseUrl}/images/default.png`;
                               }}
                             />
                           </div>

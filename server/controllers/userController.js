@@ -1,13 +1,13 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const fs = require("fs");
-const path = require("path");
+const SECRET_KEY = process.env.JWT_SECRET;
 const logger = require("../middlewares/log");
 const { validationResult } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 const { sendVerificationEmail } = require("../utils/sendEmail");
 const Feedback = require("../models/Feedback");
+const { cloudinary } = require("../utils/multerConfig");
 
 // Get User Profile
 const UserProfile = asyncHandler(async (req, res) => {
@@ -67,23 +67,34 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   } else {
     delete updates.password;
   }
+
   // Handle profile picture upload with deletion
   if (req.file) {
-    // Delete old profile picture if exists
-    if (user.profilePicture) {
-      const oldImagePath = path.join(
-        __dirname,
-        "..",
-        "uploads",
-        path.basename(user.profilePicture)
-      );
-      fs.unlink(oldImagePath, (err) => {
-        if (err) {
-          // console.error("Failed to delete old profile picture:", err.message);
+    // Delete old profile picture from Cloudinary if exists
+    if (user.profilePicture && user.profilePicture.includes("cloudinary")) {
+      try {
+        // Better way to extract public_id from Cloudinary URL
+        // URL format: https://res.cloudinary.com/cloud/image/upload/v123456/uploads/filename.jpg
+        const urlParts = user.profilePicture.split("/");
+        const uploadIndex = urlParts.indexOf("upload");
+        if (uploadIndex !== -1 && uploadIndex + 2 < urlParts.length) {
+          // Get everything after 'upload/v123456/' or 'upload/'
+          const pathAfterUpload = urlParts.slice(uploadIndex + 2).join("/");
+          const publicId = pathAfterUpload.split(".")[0]; // Remove file extension
+          await cloudinary.uploader.destroy(publicId);
+          console.log(`Deleted old image: ${publicId}`);
         }
-      });
+      } catch (error) {
+        console.error(
+          "Failed to delete old profile picture from Cloudinary:",
+          error.message
+        );
+        // Don't return error here, continue with upload
+      }
     }
-    updates.profilePicture = `/uploads/${req.file.filename}`;
+
+    // req.body.profilePicture is already set by the middleware
+    updates.profilePicture = req.body.profilePicture;
   }
   // Email update logic
   if (updates.email && updates.email !== user.email) {
@@ -100,7 +111,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 
     const token = jwt.sign(
       { id: req.user._id, newEmail: updates.email },
-      process.env.JWT_SECRET,
+      SECRET_KEY,
       { expiresIn: "1h" }
     );
     try {
