@@ -17,7 +17,7 @@ const VerifyEmail: React.FC = () => {
   useEffect(() => {
     const verify = async () => {
       try {
-        const res = await api.get(`auth/verify-email?token=${token}`);
+        const res = await api.get(`auth/verify?token=${token}`);
         if (res.data.success) {
           toast.success("Email verified successfully! Redirecting to login");
           setSuccess(true);

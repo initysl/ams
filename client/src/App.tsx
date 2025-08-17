@@ -44,7 +44,7 @@ function App() {
           {/* Public routes */}
           <Route path="/" element={<SplashScreen />} />
           <Route path="/auth" element={<AuthForm />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/verify" element={<VerifyEmail />} />
           <Route path="/recover" element={<ForgetPass />} />
           <Route path="/reset" element={<ResetPass />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
