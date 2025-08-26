@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Splashscreen -->
+  <url>
+    <loc>https://attendease-0sme.onrender.com</loc>
+    <lastmod>2025-08-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://attendease-0sme.onrender.com/at.svg</image:loc>
+      <image:title>Attendance Management System</image:title>
+      <image:caption>Attendance Management System</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Auth Page -->
+  <url>
+    <loc>https://attendease-0sme.onrender.com/auth</loc>
+    <lastmod>2025-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+</urlset>
