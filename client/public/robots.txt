@@ -1,0 +1,31 @@
+# robots.txt for AttendEase - Attendance Management System
+
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+
+# Block API endpoints
+Disallow: /api/
+
+# Block private frontend areas  
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /register
+Disallow: /profile/
+Disallow: /settings/
+
+# Block sensitive uploads (if any)
+Disallow: /uploads/
+
+# Allow public assets
+Allow: /images/
+Allow: /api/images/
+Allow: *.css
+Allow: *.js
+Allow: *.png
+Allow: *.jpg
+Allow: *.svg
+
+Crawl-delay: 1
+Sitemap: https://attendease-0sme.onrender.com/sitemap.xml
