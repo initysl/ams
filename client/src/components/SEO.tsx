@@ -15,7 +15,7 @@ interface SEOProps {
 
 const SEO: React.FC<SEOProps> = ({
   title = "AttendEase - Attendance Management System",
-  description = "Streamline attendance tracking with AttendEase - a modern QR code-based attendance management system.",
+  description = "Streamline attendance tracking with AttendEase - a digital QR code-based attendance management system.",
   keywords = "attendance management, QR code attendance, student tracking",
   canonical = "https://attendease-0sme.onrender.com",
   image = "https://attendease-0sme.onrender.com/at.svg",
