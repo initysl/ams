@@ -239,7 +239,7 @@ export function AppSidebar() {
           {/* Social Links */}
           <div className="flex items-center justify-center gap-4">
             <a
-              href="https://github.com/yusolaa"
+              href="https://github.com/initysl"
               target="_blank"
               rel="noopener noreferrer"
               className="text-slate-400 hover:text-slate-700 transition-colors duration-150"
@@ -248,7 +248,7 @@ export function AppSidebar() {
               <FaGithub size={20} />
             </a>
             <a
-              href="https://x.com/yusolaaa"
+              href="https://x.com/initysl"
               target="_blank"
               rel="noopener noreferrer"
               className="text-slate-400 hover:text-slate-700 transition-colors duration-150"
@@ -257,7 +257,7 @@ export function AppSidebar() {
               <FaXTwitter size={20} />
             </a>
             <a
-              href="https://instagram.com/yusolaaa"
+              href="https://instagram.com/initysl"
               target="_blank"
               rel="noopener noreferrer"
               className="text-slate-400 hover:text-slate-700 transition-colors duration-150"
