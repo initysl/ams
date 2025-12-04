@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   TableHeader,
   TableRow,
@@ -8,9 +8,9 @@ import {
   TableBody,
   TableCell,
   Table,
-} from "@/components/ui/table";
-import { useAuth } from "@/context/AuthContext";
-import api from "@/lib/axios";
+} from '@/components/ui/table';
+import { useAuth } from '@/context/AuthContext';
+import api from '@/lib/axios';
 import {
   Loader2,
   FileQuestion,
@@ -22,36 +22,36 @@ import {
   Clock,
   Search,
   ListFilter,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
-import { useMutation } from "@tanstack/react-query";
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useMutation } from '@tanstack/react-query';
 
 type AttendanceRecord = {
   courseTitle: string;
   courseCode: string;
   level: string;
-  status: "present";
+  status: 'present';
   date: string | number;
 };
 
 const AttendanceS = () => {
   const { user } = useAuth();
-  const [matricNumber] = useState(user?.matricNumber || "");
+  const [matricNumber] = useState(user?.matricNumber || '');
   const [records, setRecords] = useState<AttendanceRecord[] | null>(null);
-  const [selectedView, setSelectedView] = useState<"all" | "recent">("all");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedView, setSelectedView] = useState<'all' | 'recent'>('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const saved = sessionStorage.getItem("attendanceRecords");
+    const saved = sessionStorage.getItem('attendanceRecords');
     if (saved) setRecords(JSON.parse(saved));
   }, []);
 
   // Fetch attendance mutation
   const fetchAttendanceMutation = useMutation({
     mutationFn: async (matricNumber: string) => {
-      const response = await api.get("attendance/record", {
+      const response = await api.get('attendance/record', {
         params: { matricNumber },
         withCredentials: true,
       });
@@ -59,13 +59,13 @@ const AttendanceS = () => {
     },
     onSuccess: (data) => {
       setRecords(data);
-      sessionStorage.setItem("attendanceRecords", JSON.stringify(data));
-      toast.success("Attendance records retrieved successfully");
+      sessionStorage.setItem('attendanceRecords', JSON.stringify(data));
+      toast.success('Attendance records retrieved successfully');
     },
     onError: (error: any) => {
       toast.error(
         error?.response?.data?.error ||
-          "An error occurred while retrieving attendance records"
+          'An error occurred while retrieving attendance records'
       );
     },
   });
@@ -78,13 +78,13 @@ const AttendanceS = () => {
 
   const clearRecords = () => {
     setRecords(null);
-    sessionStorage.removeItem("attendanceRecords");
-    toast.info("Attendance records cleared");
+    sessionStorage.removeItem('attendanceRecords');
+    toast.info('Attendance records cleared');
   };
 
   // Calculate statistics
   const presentCount =
-    records?.filter((r) => r.status.trim().toLowerCase() === "present")
+    records?.filter((r) => r.status.trim().toLowerCase() === 'present')
       .length || 0;
   const totalCount = records?.length || 0;
   const attendancePercentage = totalCount
@@ -124,7 +124,7 @@ const AttendanceS = () => {
 
   // Get displayed records based on view selection
   const displayedRecords = filteredRecords
-    ? selectedView === "recent"
+    ? selectedView === 'recent'
       ? [...filteredRecords]
           .sort(
             (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -135,7 +135,7 @@ const AttendanceS = () => {
         )
     : null;
 
-  // Animation variants
+  // Animation variants - FIXED
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -154,7 +154,7 @@ const AttendanceS = () => {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: [0.25, 0.46, 0.45, 0.94],
+        ease: 'easeOut' as const,
       },
     },
   };
@@ -167,7 +167,7 @@ const AttendanceS = () => {
       scale: 1,
       transition: {
         duration: 0.5,
-        ease: [0.25, 0.46, 0.45, 0.94],
+        ease: 'easeOut' as const,
       },
     },
     hover: {
@@ -181,49 +181,49 @@ const AttendanceS = () => {
 
   return (
     <motion.div
-      className="container mx-auto space-y-6"
+      className='container mx-auto space-y-6'
       variants={containerVariants}
-      initial="hidden"
-      animate="visible"
+      initial='hidden'
+      animate='visible'
     >
       {/* Search Bar */}
-      <motion.div variants={itemVariants} className="flex gap-2 w-full">
-        <div className="relative w-full">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+      <motion.div variants={itemVariants} className='flex gap-2 w-full'>
+        <div className='relative w-full'>
+          <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
           <Input
-            type="text"
-            id="search-courses"
-            placeholder="Search courses..."
+            type='text'
+            id='search-courses'
+            placeholder='Search courses...'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 w-full rounded-md bg-white"
+            className='pl-9 w-full rounded-md bg-white'
           />
         </div>
       </motion.div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
         {/* Fetch Controls & Table */}
         <motion.div
           variants={itemVariants}
-          className="md:col-span-2 backdrop-blur-sm shadow-xl"
+          className='md:col-span-2 backdrop-blur-sm shadow-xl'
         >
-          <Card className="bg-white shadow-sm">
-            <CardHeader className="card-header">
-              <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-2 w-full">
+          <Card className='bg-white shadow-sm'>
+            <CardHeader className='card-header'>
+              <div className='flex flex-col sm:flex-row sm:items-center flex-wrap gap-2 w-full'>
                 {/* Top row: Primary Action + Filter Controls */}
-                <div className="flex items-center flex-wrap gap-2 flex-1">
+                <div className='flex items-center flex-wrap gap-2 flex-1'>
                   {/* Primary Action */}
                   <div>
                     <Button
                       onClick={handleFetchAttendance}
-                      className="bg-blue-500 hover:bg-blue-600 text-white"
+                      className='bg-blue-500 hover:bg-blue-600 text-white'
                       disabled={isLoading}
                     >
                       {isLoading ? (
-                        <Loader2 className="animate-spin w-4 h-4 mr-2" />
+                        <Loader2 className='animate-spin w-4 h-4 mr-2' />
                       ) : (
-                        "Get Records"
+                        'Get Records'
                       )}
                     </Button>
                   </div>
@@ -231,29 +231,29 @@ const AttendanceS = () => {
                   {/* Filter Controls */}
                   <div>
                     {records && records.length > 0 && (
-                      <div className="inline-flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                      <div className='inline-flex items-center gap-1 bg-gray-100 rounded-lg p-1'>
                         <Button
-                          variant={selectedView === "all" ? "default" : "ghost"}
-                          size="sm"
-                          onClick={() => setSelectedView("all")}
+                          variant={selectedView === 'all' ? 'default' : 'ghost'}
+                          size='sm'
+                          onClick={() => setSelectedView('all')}
                           className={
-                            selectedView === "all"
-                              ? "bg-yellow-500 text-white hover:bg-yellow-600 shadow-sm"
-                              : "hover:bg-gray-200"
+                            selectedView === 'all'
+                              ? 'bg-yellow-500 text-white hover:bg-yellow-600 shadow-sm'
+                              : 'hover:bg-gray-200'
                           }
                         >
                           All Records
                         </Button>
                         <Button
                           variant={
-                            selectedView === "recent" ? "default" : "ghost"
+                            selectedView === 'recent' ? 'default' : 'ghost'
                           }
-                          size="sm"
-                          onClick={() => setSelectedView("recent")}
+                          size='sm'
+                          onClick={() => setSelectedView('recent')}
                           className={
-                            selectedView === "recent"
-                              ? "bg-teal-500 text-white hover:bg-teal-600 shadow-sm"
-                              : "hover:bg-gray-200"
+                            selectedView === 'recent'
+                              ? 'bg-teal-500 text-white hover:bg-teal-600 shadow-sm'
+                              : 'hover:bg-gray-200'
                           }
                         >
                           Recent 5
@@ -264,12 +264,12 @@ const AttendanceS = () => {
                 </div>
 
                 {/* Destructive Action - Full width on mobile, inline on larger screens */}
-                <div className="w-full sm:w-auto">
+                <div className='w-full sm:w-auto'>
                   {records && (
                     <Button
                       onClick={clearRecords}
-                      variant="outline"
-                      className="w-full sm:w-auto bg-red-50 border-red-300 text-red-700 hover:bg-red-600 hover:text-white hover:border-red-600 transition-colors"
+                      variant='outline'
+                      className='w-full sm:w-auto bg-red-50 border-red-300 text-red-700 hover:bg-red-600 hover:text-white hover:border-red-600 transition-colors'
                     >
                       Clear
                     </Button>
@@ -277,11 +277,11 @@ const AttendanceS = () => {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-4">
+            <CardContent className='p-4'>
               {isLoading && (
-                <div className="text-center py-12">
-                  <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-500" />
-                  <p className="mt-2 text-gray-500">
+                <div className='text-center py-12'>
+                  <Loader2 className='mx-auto h-8 w-8 animate-spin text-blue-500' />
+                  <p className='mt-2 text-gray-500'>
                     Retreving attendance records...
                   </p>
                 </div>
@@ -289,16 +289,16 @@ const AttendanceS = () => {
 
               {!isLoading && !records && (
                 <motion.div
-                  className="flex flex-col items-center justify-center py-12 text-gray-400"
+                  className='flex flex-col items-center justify-center py-12 text-gray-400'
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5 }}
                 >
-                  <Calendar className="h-16 w-16 mb-4 opacity-20" />
+                  <Calendar className='h-16 w-16 mb-4 opacity-20' />
 
-                  <div className="text-center space-y-2">
-                    <p className="font-medium">No attendance records loaded</p>
-                    <p className="text-sm text-granoy-400">
+                  <div className='text-center space-y-2'>
+                    <p className='font-medium'>No attendance records loaded</p>
+                    <p className='text-sm text-granoy-400'>
                       Click "Get Records" to fetch your attendance history
                     </p>
                   </div>
@@ -307,14 +307,14 @@ const AttendanceS = () => {
 
               {!isLoading && filteredRecords?.length === 0 && (
                 <motion.div
-                  className="flex flex-col items-center py-12 text-gray-500"
+                  className='flex flex-col items-center py-12 text-gray-500'
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <FileQuestion className="h-12 w-12 mb-3 text-gray-300" />
-                  <p className="font-medium">No matching records found</p>
-                  <p className="text-sm text-gray-400 mt-1">
+                  <FileQuestion className='h-12 w-12 mb-3 text-gray-300' />
+                  <p className='font-medium'>No matching records found</p>
+                  <p className='text-sm text-gray-400 mt-1'>
                     Try adjusting your search or view settings
                   </p>
                 </motion.div>
@@ -322,22 +322,22 @@ const AttendanceS = () => {
 
               {searchTerm && filteredRecords && filteredRecords.length > 0 && (
                 <motion.div
-                  className="mb-3 flex items-center gap-2 text-sm text-blue-600"
+                  className='mb-3 flex items-center gap-2 text-sm text-blue-600'
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <ListFilter className="h-4 w-4" />
+                  <ListFilter className='h-4 w-4' />
                   <span>
                     Found {filteredRecords.length} matching records for "
                     {searchTerm}"
                   </span>
                   {searchTerm && (
                     <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-xs py-0 h-6"
-                      onClick={() => setSearchTerm("")}
+                      variant='ghost'
+                      size='sm'
+                      className='text-xs py-0 h-6'
+                      onClick={() => setSearchTerm('')}
                     >
                       Clear
                     </Button>
@@ -355,57 +355,57 @@ const AttendanceS = () => {
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.4 }}
                     >
-                      <Card className="bg-white overflow-x-auto overflow-y-auto sm:mx-0 border rounded-md">
-                        <Table className="min-w-full">
-                          <TableHeader className="table-header">
+                      <Card className='bg-white overflow-x-auto overflow-y-auto sm:mx-0 border rounded-md'>
+                        <Table className='min-w-full'>
+                          <TableHeader className='table-header'>
                             <TableRow>
-                              <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                              <TableHead className='text-xs font-bold text-gray-500 uppercase tracking-wider'>
                                 Course
                               </TableHead>
-                              <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                              <TableHead className='text-xs font-bold text-gray-500 uppercase tracking-wider'>
                                 Code
                               </TableHead>
-                              <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                              <TableHead className='text-xs font-bold text-gray-500 uppercase tracking-wider'>
                                 Level
                               </TableHead>
-                              <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                              <TableHead className='text-xs font-bold text-gray-500 uppercase tracking-wider'>
                                 Status
                               </TableHead>
-                              <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                              <TableHead className='text-xs font-bold text-gray-500 uppercase tracking-wider'>
                                 Date
                               </TableHead>
                             </TableRow>
                           </TableHeader>
-                          <TableBody className="table-body font-semibold">
+                          <TableBody className='table-body font-semibold'>
                             {displayedRecords.map((record, index) => (
                               <motion.tr
                                 key={index}
-                                className="hover:bg-gray-50"
+                                className='hover:bg-gray-50'
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{
                                   duration: 0.3,
                                   delay: index * 0.05,
-                                  ease: "easeOut",
+                                  ease: 'easeOut',
                                 }}
-                                whileHover={{ backgroundColor: "#f9fafb" }}
+                                whileHover={{ backgroundColor: '#f9fafb' }}
                               >
                                 <TableCell
-                                  className="max-w-[200px] truncate font-semibold"
+                                  className='max-w-[200px] truncate font-semibold'
                                   title={record.courseTitle}
                                 >
                                   {record.courseTitle}
                                 </TableCell>
-                                <TableCell className="whitespace-nowrap">
+                                <TableCell className='whitespace-nowrap'>
                                   {record.courseCode}
                                 </TableCell>
                                 <TableCell>{record.level}</TableCell>
                                 <TableCell>
                                   <motion.span
                                     className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                      record.status === "present"
-                                        ? "bg-green-100 text-green-700"
-                                        : "bg-red-100 text-red-600"
+                                      record.status === 'present'
+                                        ? 'bg-green-100 text-green-700'
+                                        : 'bg-red-100 text-red-600'
                                     }`}
                                     initial={{ scale: 0.8 }}
                                     animate={{ scale: 1 }}
@@ -414,17 +414,17 @@ const AttendanceS = () => {
                                     {record.status}
                                   </motion.span>
                                 </TableCell>
-                                <TableCell className="whitespace-nowrap">
+                                <TableCell className='whitespace-nowrap'>
                                   {record.date
                                     ? new Date(record.date).toLocaleDateString(
-                                        "en-US",
+                                        'en-US',
                                         {
-                                          year: "numeric",
-                                          month: "short",
-                                          day: "numeric",
+                                          year: 'numeric',
+                                          month: 'short',
+                                          day: 'numeric',
                                         }
                                       )
-                                    : "—"}
+                                    : '—'}
                                 </TableCell>
                               </motion.tr>
                             ))}
@@ -432,30 +432,30 @@ const AttendanceS = () => {
                         </Table>
                       </Card>
 
-                      {selectedView === "recent" &&
+                      {selectedView === 'recent' &&
                         filteredRecords &&
                         filteredRecords.length > 5 && (
                           <motion.div
-                            className="mt-4 text-center"
+                            className='mt-4 text-center'
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.5 }}
                           >
                             <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setSelectedView("all")}
-                              className="text-blue-600 hover:text-blue-700"
+                              variant='ghost'
+                              size='sm'
+                              onClick={() => setSelectedView('all')}
+                              className='text-blue-600 hover:text-blue-700'
                             >
                               View All ({filteredRecords.length}) Records
                             </Button>
                           </motion.div>
                         )}
 
-                      {selectedView === "all" &&
+                      {selectedView === 'all' &&
                         displayedRecords.length > 10 && (
                           <motion.div
-                            className="mt-4 text-center text-sm text-gray-500"
+                            className='mt-4 text-center text-sm text-gray-500'
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.5 }}
@@ -471,38 +471,38 @@ const AttendanceS = () => {
         </motion.div>
 
         {/* Summary & Stats Section */}
-        <motion.div variants={itemVariants} className="md:col-span-2">
+        <motion.div variants={itemVariants} className='md:col-span-2'>
           <motion.div
-            className="space-y-6"
+            className='space-y-6'
             initial={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, margin: '-100px' }}
             transition={{
               duration: 0.6,
-              ease: "easeOut",
+              ease: 'easeOut',
             }}
           >
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <motion.div variants={cardVariants} whileHover="hover">
-                <Card className="backdrop-blur-sm shadow-xl card-header bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 h-full">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center gap-2 text-blue-700">
-                      <BookOpenCheck className="h-5 w-5" />
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+              <motion.div variants={cardVariants} whileHover='hover'>
+                <Card className='backdrop-blur-sm shadow-xl card-header bg-linear-to-br from-blue-50 to-indigo-50 border-blue-100 h-full'>
+                  <CardHeader className='pb-2'>
+                    <CardTitle className='flex items-center gap-2 text-blue-700'>
+                      <BookOpenCheck className='h-5 w-5' />
                       Attendance Summary
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     {totalCount > 0 ? (
-                      <div className="space-y-4">
+                      <div className='space-y-4'>
                         <div>
-                          <p className="text-gray-600">
+                          <p className='text-gray-600'>
                             You've attended <strong>{presentCount}</strong> out
                             of <strong>{totalCount}</strong> classes.
                           </p>
 
-                          <div className="mt-3 w-full  bg-white rounded-full h-3">
+                          <div className='mt-3 w-full  bg-white rounded-full h-3'>
                             <motion.div
-                              className="bg-blue-500 h-3 rounded-full"
+                              className='bg-blue-500 h-3 rounded-full'
                               initial={{ width: 0 }}
                               whileInView={{
                                 width: `${attendancePercentage}%`,
@@ -511,32 +511,32 @@ const AttendanceS = () => {
                               transition={{ duration: 1, delay: 0.3 }}
                             />
                           </div>
-                          <p className="text-right text-sm mt-1 text-blue-600 font-medium">
+                          <p className='text-right text-sm mt-1 text-blue-600 font-medium'>
                             {attendancePercentage}% Attendance
                           </p>
                         </div>
 
-                        <div className="pt-2 border-t border-blue-100 ">
-                          <p className="text-sm text-gray-600 font-medium">
+                        <div className='pt-2 border-t border-blue-100 '>
+                          <p className='text-sm text-gray-600 font-medium'>
                             Course Breakdown:
                           </p>
-                          <ul className="mt-2 space-y-1">
+                          <ul className='mt-2 space-y-1'>
                             {Object.entries(courseAttendance)
                               .sort((a, b) => b[1] - a[1])
                               .slice(0, 3)
                               .map(([course, count], index) => (
                                 <motion.li
                                   key={index}
-                                  className="flex justify-between items-center text-sm"
+                                  className='flex justify-between items-center text-sm'
                                   initial={{ opacity: 0, x: -10 }}
                                   whileInView={{ opacity: 1, x: 0 }}
                                   viewport={{ once: true }}
                                   transition={{ delay: index * 0.1 + 0.5 }}
                                 >
-                                  <span className="truncate" title={course}>
+                                  <span className='truncate' title={course}>
                                     {course}
                                   </span>
-                                  <span className="font-medium text-blue-700">
+                                  <span className='font-medium text-blue-700'>
                                     {count} class
                                   </span>
                                 </motion.li>
@@ -544,7 +544,7 @@ const AttendanceS = () => {
                           </ul>
                           {Object.keys(courseAttendance).length > 3 && (
                             <motion.p
-                              className="text-xs text-gray-500 mt-2"
+                              className='text-xs text-gray-500 mt-2'
                               initial={{ opacity: 0 }}
                               whileInView={{ opacity: 1 }}
                               viewport={{ once: true }}
@@ -558,17 +558,17 @@ const AttendanceS = () => {
                       </div>
                     ) : (
                       <motion.div
-                        className="flex flex-col items-center justify-center py-8 text-gray-500 "
+                        className='flex flex-col items-center justify-center py-8 text-gray-500 '
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5 }}
                       >
-                        <div className="text-center space-y-2 ">
+                        <div className='text-center space-y-2 '>
                           <p>No attendance records available.</p>
-                          <p className="text-sm mt-1">
+                          <p className='text-sm mt-1'>
                             Click "Get Records" to load your attendance data.
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className='text-sm text-gray-500'>
                             Once you attend classes, your records will appear
                             here.
                           </p>
@@ -580,32 +580,32 @@ const AttendanceS = () => {
               </motion.div>
 
               {records && records.length > 0 && (
-                <motion.div variants={cardVariants} whileHover="hover">
-                  <Card className="backdrop-blur-sm shadow-xl bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100 h-full">
-                    <CardHeader className="card-header pb-2">
-                      <CardTitle className="flex items-center gap-2 text-amber-700">
-                        <Clock className="h-5 w-5" />
+                <motion.div variants={cardVariants} whileHover='hover'>
+                  <Card className='backdrop-blur-sm shadow-xl bg-linear-to-br from-amber-50 to-yellow-50 border-amber-100 h-full'>
+                    <CardHeader className='card-header pb-2'>
+                      <CardTitle className='flex items-center gap-2 text-amber-700'>
+                        <Clock className='h-5 w-5' />
                         Recent Activity
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       {mostRecentClass && (
-                        <div className="space-y-3">
+                        <div className='space-y-3'>
                           <motion.div
-                            className="p-3 bg-white rounded-lg border border-amber-100"
+                            className='p-3 bg-white rounded-lg border border-amber-100'
                             initial={{ opacity: 0, y: 10 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.3 }}
                           >
-                            <p className="font-medium text-amber-800">
+                            <p className='font-medium text-amber-800'>
                               {mostRecentClass.courseTitle}
                             </p>
-                            <div className="flex justify-between mt-1">
-                              <p className="text-sm text-gray-500">
+                            <div className='flex justify-between mt-1'>
+                              <p className='text-sm text-gray-500'>
                                 {mostRecentClass.courseCode}
                               </p>
-                              <p className="text-sm text-amber-600">
+                              <p className='text-sm text-amber-600'>
                                 {new Date(
                                   mostRecentClass.date
                                 ).toLocaleDateString()}
@@ -613,8 +613,8 @@ const AttendanceS = () => {
                             </div>
                           </motion.div>
 
-                          <p className="text-sm text-gray-600">
-                            Last attended course was{" "}
+                          <p className='text-sm text-gray-600'>
+                            Last attended course was{' '}
                             <strong>{mostRecentClass.courseTitle}</strong>
                           </p>
                         </div>
@@ -626,41 +626,41 @@ const AttendanceS = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ">
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 '>
               {[
                 {
-                  title: "Classes Attended",
+                  title: 'Classes Attended',
                   value: presentCount,
                   subtitle: `out of ${totalCount} total`,
                   icon: CheckCircle2,
-                  color: "green",
+                  color: 'green',
                   delay: 0.1,
                 },
                 {
-                  title: "Attendance Rate",
+                  title: 'Attendance Rate',
                   value: `${attendancePercentage}%`,
-                  subtitle: "",
+                  subtitle: '',
                   icon: BarChart3,
-                  color: "blue",
+                  color: 'blue',
                   delay: 0.2,
                   showProgress: true,
                 },
                 {
-                  title: "Courses",
+                  title: 'Courses',
                   value: coursesAttended,
-                  subtitle: "unique courses",
+                  subtitle: 'unique courses',
                   icon: Award,
-                  color: "purple",
+                  color: 'purple',
                   delay: 0.3,
                 },
                 {
-                  title: "Last Attended",
-                  value: mostRecentClass?.courseCode || "None",
+                  title: 'Last Attended',
+                  value: mostRecentClass?.courseCode || 'None',
                   subtitle: mostRecentClass
                     ? new Date(mostRecentClass.date).toLocaleDateString()
-                    : "No classes yet",
+                    : 'No classes yet',
                   icon: Clock,
-                  color: "amber",
+                  color: 'amber',
                   delay: 0.4,
                 },
               ].map((stat, index) => (
@@ -672,7 +672,7 @@ const AttendanceS = () => {
                   transition={{
                     duration: 0.5,
                     delay: stat.delay,
-                    ease: [0.25, 0.46, 0.45, 0.94],
+                    ease: 'easeOut' as const,
                   }}
                   whileHover={{
                     scale: 1.02,
@@ -680,8 +680,8 @@ const AttendanceS = () => {
                     transition: { duration: 0.2 },
                   }}
                 >
-                  <Card className="bg-white backdrop-blur-sm shadow-xl hover:shadow-lg transition-shadow duration-300 h-full">
-                    <CardHeader className="card-header pb-2">
+                  <Card className='bg-white backdrop-blur-sm shadow-xl hover:shadow-lg transition-shadow duration-300 h-full'>
+                    <CardHeader className='card-header pb-2'>
                       <CardTitle
                         className={`text-sm text-gray-500 flex items-center gap-2`}
                       >
@@ -694,16 +694,16 @@ const AttendanceS = () => {
                     <CardContent>
                       <p
                         className={`text-2xl font-bold text-${stat.color}-600 ${
-                          stat.title === "Last Attended" ? "text-lg" : ""
+                          stat.title === 'Last Attended' ? 'text-lg' : ''
                         }`}
                       >
                         {stat.value}
                       </p>
                       {stat.subtitle && (
-                        <p className="text-sm text-gray-500">{stat.subtitle}</p>
+                        <p className='text-sm text-gray-500'>{stat.subtitle}</p>
                       )}
                       {stat.showProgress && (
-                        <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                        <div className='w-full bg-gray-200 rounded-full h-2.5 mt-2'>
                           <motion.div
                             className={`bg-${stat.color}-600 h-2.5 rounded-full`}
                             initial={{ width: 0 }}
@@ -712,7 +712,7 @@ const AttendanceS = () => {
                             transition={{
                               duration: 1,
                               delay: 0.5,
-                              ease: "easeOut",
+                              ease: 'easeOut',
                             }}
                           />
                         </div>

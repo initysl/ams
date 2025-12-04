@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AdaptiveInput } from "@/components/app-ui/adaptive-input";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AdaptiveInput } from '@/components/app-ui/adaptive-input';
 import {
   Select,
   SelectContent,
@@ -7,35 +7,35 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useState, useEffect } from "react";
-import { z } from "zod";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import api from "@/lib/axios";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
-import qrplaceholder from "../../../assets/images/qr-placeholder.svg";
-import { AlertCircle, Clock, Loader2, Printer, Save, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/select';
+import { useState, useEffect } from 'react';
+import { z } from 'zod';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import api from '@/lib/axios';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { motion, AnimatePresence } from 'framer-motion';
+import qrplaceholder from '../../../assets/images/qr-placeholder.svg';
+import { AlertCircle, Clock, Loader2, Printer, Save, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const qrSchema = z.object({
-  courseTitle: z.string().min(5, "Course title is required"),
-  totalCourseStudents: z.number().min(1, "At least one student is required"),
-  courseCode: z.string().min(5, "Course code is required"),
-  level: z.enum(["100", "200", "300", "400", "500"], {
-    required_error: "Course level is required",
+  courseTitle: z.string().min(5, 'Course title is required'),
+  totalCourseStudents: z.number().min(1, 'At least one student is required'),
+  courseCode: z.string().min(5, 'Course code is required'),
+  level: z.enum(['100', '200', '300', '400', '500'], {
+    message: 'Course level is required',
   }),
   duration: z
     .number()
-    .min(1, "Duration must be at least 1 minute")
-    .max(60, "Duration must be at most 60 minutes"),
+    .min(1, 'Duration must be at least 1 minute')
+    .max(60, 'Duration must be at most 60 minutes'),
 });
 
 // Local storage key
-const STORAGE_KEY = "qr_session_data";
+const STORAGE_KEY = 'qr_session_data';
 
 type GenerateFields = z.infer<typeof qrSchema>;
 
@@ -80,9 +80,9 @@ const buttonVariants = {
 
 const GenerateQR = () => {
   const [qrGenerated, setQrGenerated] = useState(false);
-  const [qrCodeUrl, setQrCodeUrl] = useState("");
-  const [sessionId, setSessionId] = useState("");
-  const [expiryTime, setExpiryTime] = useState("");
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [sessionId, setSessionId] = useState('');
+  const [expiryTime, setExpiryTime] = useState('');
   const [courseDetails, setCourseDetails] = useState<{
     courseTitle: string;
     totalCourseStudents: number;
@@ -104,10 +104,10 @@ const GenerateQR = () => {
   } = useForm<GenerateFields>({
     resolver: zodResolver(qrSchema),
     defaultValues: {
-      courseTitle: "",
+      courseTitle: '',
       totalCourseStudents: 30,
-      courseCode: "",
-      level: "400",
+      courseCode: '',
+      level: '400',
       duration: 10,
     },
   });
@@ -115,7 +115,7 @@ const GenerateQR = () => {
   // Generate QR Code Mutation
   const generateQRMutation = useMutation({
     mutationFn: async (data: GenerateFields) => {
-      const response = await api.post("attendance/generate", data, {
+      const response = await api.post('attendance/generate', data, {
         withCredentials: true,
       });
       return response.data;
@@ -128,7 +128,7 @@ const GenerateQR = () => {
       setCourseDetails(courseDetails);
       setQrGenerated(true);
       setIsExpired(false);
-      toast.success("QR code generated successfully");
+      toast.success('QR code generated successfully');
     },
     onError: (error) => {
       toast.error(`Error generating QR code ${error}`);
@@ -151,10 +151,10 @@ const GenerateQR = () => {
       setQrGenerated(false);
       setIsExpired(false);
       localStorage.removeItem(STORAGE_KEY);
-      toast.success("QR code stopped successfully");
+      toast.success('QR code stopped successfully');
     },
     onError: () => {
-      toast.error("Error stopping QR code session");
+      toast.error('Error stopping QR code session');
       // console.error("Error stopping session:", error);
     },
   });
@@ -167,25 +167,25 @@ const GenerateQR = () => {
       });
     },
     onSuccess: () => {
-      toast.success("Session deleted successfully");
+      toast.success('Session deleted successfully');
       // Reset UI state
       setQrGenerated(false);
-      setQrCodeUrl("");
-      setSessionId("");
-      setExpiryTime("");
+      setQrCodeUrl('');
+      setSessionId('');
+      setExpiryTime('');
       setCourseDetails(null);
       setIsExpired(false);
       localStorage.removeItem(STORAGE_KEY);
       reset();
     },
     onError: () => {
-      toast.error("Error deleting session");
+      toast.error('Error deleting session');
       // console.error("Error deleting session:", error);
       // Still reset UI state even if API fails
       setQrGenerated(false);
-      setQrCodeUrl("");
-      setSessionId("");
-      setExpiryTime("");
+      setQrCodeUrl('');
+      setSessionId('');
+      setExpiryTime('');
       setCourseDetails(null);
       setIsExpired(false);
       localStorage.removeItem(STORAGE_KEY);
@@ -220,7 +220,7 @@ const GenerateQR = () => {
           }
         }
       } catch (error) {
-        console.error("Error loading saved session:", error);
+        console.error('Error loading saved session:', error);
         localStorage.removeItem(STORAGE_KEY);
       }
     };
@@ -240,7 +240,7 @@ const GenerateQR = () => {
       if (difference <= 0) {
         setIsExpired(true);
         setQrGenerated(false);
-        toast.info("QR code expired");
+        toast.info('QR code expired');
         localStorage.removeItem(STORAGE_KEY);
         return { minutes: 0, seconds: 0 };
       }
@@ -301,9 +301,9 @@ const GenerateQR = () => {
     } else {
       // If no active session, just reset the form
       setQrGenerated(false);
-      setQrCodeUrl("");
-      setSessionId("");
-      setExpiryTime("");
+      setQrCodeUrl('');
+      setSessionId('');
+      setExpiryTime('');
       setCourseDetails(null);
       setIsExpired(false);
       localStorage.removeItem(STORAGE_KEY);
@@ -313,11 +313,11 @@ const GenerateQR = () => {
 
   const handleDownload = () => {
     if (isExpired) {
-      toast.error("Cannot download expired QR code");
+      toast.error('Cannot download expired QR code');
       return;
     }
 
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = qrCodeUrl;
     link.download = `qr_code_${courseDetails?.courseCode}.png`;
     document.body.appendChild(link);
@@ -327,11 +327,11 @@ const GenerateQR = () => {
 
   const handlePrint = () => {
     if (isExpired) {
-      toast.error("Cannot print expired QR code");
+      toast.error('Cannot print expired QR code');
       return;
     }
 
-    const printWindow = window.open("", "_blank");
+    const printWindow = window.open('', '_blank');
     if (printWindow) {
       printWindow.document.writeln(`
         <html>
@@ -382,43 +382,43 @@ const GenerateQR = () => {
   };
 
   const QRPlaceholder = ({ generated = false }) => (
-    <div className="flex flex-col items-center justify-center min-h-52 border border-gray-200 mb-6 p-4 rounded-lg">
+    <div className='flex flex-col items-center justify-center min-h-52 border border-gray-200 mb-6 p-4 rounded-lg'>
       {generated ? (
-        <div className={`${isExpired ? "opacity-50 grayscale" : ""}`}>
+        <div className={`${isExpired ? 'opacity-50 grayscale' : ''}`}>
           <img
             src={qrCodeUrl}
-            alt="Generated QR Code"
-            className="w-52 h-52 mb-4"
+            alt='Generated QR Code'
+            className='w-52 h-52 mb-4'
           />
         </div>
       ) : (
-        <div className="w-40 h-40 mb-4 flex items-center justify-center">
-          <img src={qrplaceholder} alt="QR Code placeholder" />
+        <div className='w-40 h-40 mb-4 flex items-center justify-center'>
+          <img src={qrplaceholder} alt='QR Code placeholder' />
         </div>
       )}
-      <p className="text-gray-500 text-sm text-center">
+      <p className='text-gray-500 text-sm text-center'>
         {generated
           ? isExpired
-            ? "QR Code has expired"
-            : "QR Code has been generated"
-          : "QR Code not generated yet"}
+            ? 'QR Code has expired'
+            : 'QR Code has been generated'
+          : 'QR Code not generated yet'}
       </p>
       {generated && timeRemaining && (
         <div
           className={`mt-2 flex items-center gap-1 px-3 py-1 rounded-full ${
             isExpired
-              ? "bg-red-100 text-red-800"
-              : "bg-amber-100 text-amber-800"
+              ? 'bg-red-100 text-red-800'
+              : 'bg-amber-100 text-amber-800'
           }`}
         >
           <Clock size={16} />
-          <span className="font-medium">
+          <span className='font-medium'>
             {isExpired ||
             (timeRemaining.minutes === 0 && timeRemaining.seconds === 0)
-              ? "QR Code expired"
-              : `${String(timeRemaining.minutes).padStart(2, "0")}:${String(
+              ? 'QR Code expired'
+              : `${String(timeRemaining.minutes).padStart(2, '0')}:${String(
                   timeRemaining.seconds
-                ).padStart(2, "0")} remaining`}
+                ).padStart(2, '0')} remaining`}
           </span>
         </div>
       )}
@@ -428,41 +428,41 @@ const GenerateQR = () => {
   if (qrGenerated) {
     return (
       <motion.div
-        className="space-y-6"
+        className='space-y-6'
         variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
+        initial='hidden'
+        animate='visible'
+        exit='exit'
       >
         <motion.div variants={itemVariants}>
-          <Card className="bg-white">
-            <CardHeader className="card-header border-b border-gray-100 bg-gray-50">
-              <CardTitle className="text-xl text-gray-800">
+          <Card className='bg-white'>
+            <CardHeader className='card-header border-b border-gray-100 bg-gray-50'>
+              <CardTitle className='text-xl text-gray-800'>
                 {isExpired
-                  ? "Expired QR Code Session"
-                  : "Active QR Code Session"}
+                  ? 'Expired QR Code Session'
+                  : 'Active QR Code Session'}
               </CardTitle>
             </CardHeader>
-            <CardContent className="">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CardContent className=''>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                 <motion.div variants={itemVariants}>
                   <QRPlaceholder generated={true} />
                   <motion.div
-                    className="grid grid-cols-2 gap-4 mt-4"
+                    className='grid grid-cols-2 gap-4 mt-4'
                     variants={itemVariants}
                   >
                     <motion.div
                       variants={buttonVariants}
-                      whileHover={!isExpired ? "hover" : undefined}
-                      whileTap={!isExpired ? "tap" : undefined}
+                      whileHover={!isExpired ? 'hover' : undefined}
+                      whileTap={!isExpired ? 'tap' : undefined}
                     >
                       <Button
                         onClick={handleDownload}
                         disabled={isExpired}
                         className={`w-full h-10 rounded-md font-medium transition-colors ${
                           isExpired
-                            ? "bg-gray-400 text-gray-600 cursor-not-allowed opacity-50"
-                            : "bg-blue-600 hover:bg-blue-700 text-white"
+                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed opacity-50'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white'
                         }`}
                       >
                         <Save size={16} />
@@ -471,16 +471,16 @@ const GenerateQR = () => {
                     </motion.div>
                     <motion.div
                       variants={buttonVariants}
-                      whileHover={!isExpired ? "hover" : undefined}
-                      whileTap={!isExpired ? "tap" : undefined}
+                      whileHover={!isExpired ? 'hover' : undefined}
+                      whileTap={!isExpired ? 'tap' : undefined}
                     >
                       <Button
                         onClick={handlePrint}
                         disabled={isExpired}
                         className={`w-full h-10 rounded-md font-medium transition-colors ${
                           isExpired
-                            ? "bg-gray-400 text-gray-600 cursor-not-allowed opacity-50"
-                            : "bg-green-600 hover:bg-green-700 text-white"
+                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed opacity-50'
+                            : 'bg-green-600 hover:bg-green-700 text-white'
                         }`}
                       >
                         <Printer size={16} />
@@ -490,56 +490,56 @@ const GenerateQR = () => {
                   </motion.div>
                 </motion.div>
 
-                <motion.div className="space-y-6" variants={itemVariants}>
+                <motion.div className='space-y-6' variants={itemVariants}>
                   <motion.div
-                    className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+                    className='bg-gray-50 p-4 rounded-lg border border-gray-200'
                     whileHover={{ scale: 1.02 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <h3 className="font-medium text-gray-800 mb-3">
+                    <h3 className='font-medium text-gray-800 mb-3'>
                       Session Details
                     </h3>
                     {courseDetails && (
                       <motion.div
-                        className="space-y-2"
+                        className='space-y-2'
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ staggerChildren: 0.1 }}
                       >
                         {[
                           {
-                            label: "Course Title",
+                            label: 'Course Title',
                             value: courseDetails.courseTitle,
                           },
                           {
-                            label: "Total Students",
+                            label: 'Total Students',
                             value: `${courseDetails.totalCourseStudents} students`,
                           },
                           {
-                            label: "Course Code",
+                            label: 'Course Code',
                             value: courseDetails.courseCode,
                           },
-                          { label: "Level", value: courseDetails.level },
+                          { label: 'Level', value: courseDetails.level },
                           {
-                            label: "Duration",
+                            label: 'Duration',
                             value: `${courseDetails.duration} minutes`,
                           },
                           {
-                            label: "Expires at",
+                            label: 'Expires at',
                             value: new Date(expiryTime).toLocaleTimeString(
-                              "en-US"
+                              'en-US'
                             ),
                           },
                         ].map((item, index) => (
                           <motion.div
                             key={item.label}
-                            className="flex justify-between"
+                            className='flex justify-between'
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.1 }}
                           >
-                            <span className="text-gray-500">{item.label}:</span>
-                            <span className="">{item.value}</span>
+                            <span className='text-gray-500'>{item.label}:</span>
+                            <span className=''>{item.value}</span>
                           </motion.div>
                         ))}
                       </motion.div>
@@ -547,47 +547,47 @@ const GenerateQR = () => {
                   </motion.div>
 
                   <motion.div
-                    className="flex flex-col gap-3"
+                    className='flex flex-col gap-3'
                     variants={itemVariants}
                   >
                     <motion.div
                       variants={buttonVariants}
-                      whileHover={!isExpired ? "hover" : undefined}
-                      whileTap={!isExpired ? "tap" : undefined}
+                      whileHover={!isExpired ? 'hover' : undefined}
+                      whileTap={!isExpired ? 'tap' : undefined}
                     >
                       <Button
                         onClick={handleStop}
                         disabled={stopSessionMutation.isPending || isExpired}
                         className={`h-10 rounded-md font-medium transition-colors flex items-center justify-center gap-2 w-full ${
                           isExpired
-                            ? "bg-gray-400 text-gray-600 cursor-not-allowed opacity-50"
-                            : "bg-amber-500 hover:bg-amber-600 text-white"
+                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed opacity-50'
+                            : 'bg-amber-500 hover:bg-amber-600 text-white'
                         }`}
                       >
-                        <AnimatePresence mode="wait">
+                        <AnimatePresence mode='wait'>
                           {stopSessionMutation.isPending ? (
                             <motion.div
-                              key="stopping"
+                              key='stopping'
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               exit={{ opacity: 0 }}
-                              className="flex items-center gap-2"
+                              className='flex items-center gap-2'
                             >
                               Processing
-                              <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                              <Loader2 className='h-4 w-4 ml-2 animate-spin' />
                             </motion.div>
                           ) : (
                             <motion.div
-                              key="stop"
+                              key='stop'
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               exit={{ opacity: 0 }}
-                              className="flex items-center gap-2"
+                              className='flex items-center gap-2'
                             >
                               <Clock size={16} />
                               {isExpired
-                                ? "Session Expired"
-                                : "Stop QR Code (Keep Record)"}
+                                ? 'Session Expired'
+                                : 'Stop QR Code (Keep Record)'}
                             </motion.div>
                           )}
                         </AnimatePresence>
@@ -596,39 +596,39 @@ const GenerateQR = () => {
 
                     <motion.div
                       variants={buttonVariants}
-                      whileHover="hover"
-                      whileTap="tap"
+                      whileHover='hover'
+                      whileTap='tap'
                     >
                       <Button
                         onClick={handleCancel}
                         disabled={deleteSessionMutation.isPending}
-                        variant="outline"
-                        className="border-red-500 text-red-500 hover:bg-red-50 h-10 rounded-md font-medium transition-colors flex items-center justify-center gap-2 w-full"
+                        variant='outline'
+                        className='border-red-500 text-red-500 hover:bg-red-50 h-10 rounded-md font-medium transition-colors flex items-center justify-center gap-2 w-full'
                       >
-                        <AnimatePresence mode="wait">
+                        <AnimatePresence mode='wait'>
                           {deleteSessionMutation.isPending ? (
                             <motion.div
-                              key="deleting"
+                              key='deleting'
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               exit={{ opacity: 0 }}
-                              className="flex items-center gap-2"
+                              className='flex items-center gap-2'
                             >
                               Deleting
-                              <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                              <Loader2 className='h-4 w-4 ml-2 animate-spin' />
                             </motion.div>
                           ) : (
                             <motion.div
-                              key="delete"
+                              key='delete'
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               exit={{ opacity: 0 }}
-                              className="flex items-center gap-2"
+                              className='flex items-center gap-2'
                             >
                               <X size={16} />
                               {isExpired
-                                ? "Delete Expired Session"
-                                : "Delete Session & Generate New"}
+                                ? 'Delete Expired Session'
+                                : 'Delete Session & Generate New'}
                             </motion.div>
                           )}
                         </AnimatePresence>
@@ -639,18 +639,18 @@ const GenerateQR = () => {
                   <motion.div
                     className={`flex items-start gap-2 p-2 rounded-lg text-sm ${
                       isExpired
-                        ? "bg-red-50 text-red-700"
-                        : "bg-blue-50 text-blue-700"
+                        ? 'bg-red-50 text-red-700'
+                        : 'bg-blue-50 text-blue-700'
                     }`}
                     variants={itemVariants}
                     whileHover={{ scale: 1.02 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <AlertCircle size={18} className="mt-0.5" />
+                    <AlertCircle size={18} className='mt-0.5' />
                     <p>
                       {isExpired
-                        ? "This QR code has expired and can no longer be used for attendance. You can delete this session and generate a new one."
-                        : "Students can scan this QR code to mark their attendance for this lecture session."}
+                        ? 'This QR code has expired and can no longer be used for attendance. You can delete this session and generate a new one.'
+                        : 'Students can scan this QR code to mark their attendance for this lecture session.'}
                     </p>
                   </motion.div>
                 </motion.div>
@@ -664,26 +664,26 @@ const GenerateQR = () => {
 
   return (
     <motion.div
-      className="w-full space-y-6"
+      className='w-full space-y-6'
       variants={containerVariants}
-      initial="hidden"
-      animate="visible"
+      initial='hidden'
+      animate='visible'
     >
       <motion.form
         onSubmit={handleSubmit(handleGenerateQR)}
-        className="space-y-6"
+        className='space-y-6'
         variants={itemVariants}
       >
         <motion.div variants={itemVariants}>
-          <Card className="bg-white shadow-xl">
+          <Card className='bg-white shadow-xl'>
             <CardContent>
-              <div className="space-y-6">
+              <div className='space-y-6'>
                 <motion.div
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+                  className='grid grid-cols-1 lg:grid-cols-2 gap-4'
                   variants={itemVariants}
                 >
                   <motion.div
-                    className="space-y-2"
+                    className='space-y-2'
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0 * 0.1 }}
@@ -693,16 +693,16 @@ const GenerateQR = () => {
                       transition={{ duration: 0.2 }}
                     >
                       <Controller
-                        name="courseTitle"
+                        name='courseTitle'
                         control={control}
                         render={({ field }) => (
                           <AdaptiveInput
                             {...field}
-                            id="course-title"
-                            type="text"
-                            label="Course Title"
+                            id='course-title'
+                            type='text'
+                            label='Course Title'
                             error={errors.courseTitle?.message}
-                            className="w-full"
+                            className='w-full'
                           />
                         )}
                       />
@@ -710,7 +710,7 @@ const GenerateQR = () => {
                   </motion.div>
 
                   <motion.div
-                    className="space-y-2"
+                    className='space-y-2'
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 1 * 0.1 }}
@@ -720,25 +720,25 @@ const GenerateQR = () => {
                       transition={{ duration: 0.2 }}
                     >
                       <Controller
-                        name="totalCourseStudents"
+                        name='totalCourseStudents'
                         control={control}
                         defaultValue={30} // ← here
                         render={({ field: { onChange, value, ...rest } }) => (
                           <AdaptiveInput
                             {...rest}
-                            id="total-students"
-                            type="number"
+                            id='total-students'
+                            type='number'
                             min={1}
                             max={500}
-                            label="Total Course Students"
-                            value={value ?? ""} // safe fallback
+                            label='Total Course Students'
+                            value={value ?? ''} // safe fallback
                             onChange={(e) => {
                               const v = e.target.value;
-                              onChange(v === "" ? "" : Number(v)); // keep empty as ""
+                              onChange(v === '' ? '' : Number(v)); // keep empty as ""
                             }}
                             error={errors.totalCourseStudents?.message}
-                            helperText="Maximum 500 students allowed"
-                            className="w-full"
+                            helperText='Maximum 500 students allowed'
+                            className='w-full'
                           />
                         )}
                       />
@@ -747,11 +747,11 @@ const GenerateQR = () => {
                 </motion.div>
 
                 <motion.div
-                  className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                  className='grid grid-cols-1 md:grid-cols-3 gap-4'
                   variants={itemVariants}
                 >
                   <motion.div
-                    className="space-y-2"
+                    className='space-y-2'
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0 * 0.1 }}
@@ -761,16 +761,16 @@ const GenerateQR = () => {
                       transition={{ duration: 0.2 }}
                     >
                       <Controller
-                        name="courseCode"
+                        name='courseCode'
                         control={control}
                         render={({ field }) => (
                           <AdaptiveInput
                             {...field}
-                            id="course-code"
-                            type="text"
-                            label="Course Code"
+                            id='course-code'
+                            type='text'
+                            label='Course Code'
                             error={errors.courseCode?.message}
-                            className="w-full"
+                            className='w-full'
                           />
                         )}
                       />
@@ -778,46 +778,46 @@ const GenerateQR = () => {
                   </motion.div>
 
                   <motion.div
-                    className="space-y-2"
+                    className='space-y-2'
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 1 * 0.1 }}
                   >
-                    <div className="space-y-2">
+                    <div className='space-y-2'>
                       <motion.div
                         whileFocus={{ scale: 1.02 }}
                         transition={{ duration: 0.2 }}
                       >
                         <Controller
-                          name="level"
+                          name='level'
                           control={control}
                           render={({ field: controllerField }) => (
                             <Select
                               onValueChange={controllerField.onChange}
                               value={controllerField.value}
-                              name="level"
+                              name='level'
                             >
                               <SelectTrigger
-                                id="level"
+                                id='level'
                                 className={cn(
-                                  "w-full px-3  text-sm text-gray-900 bg-white border rounded-lg transition-all duration-200",
-                                  "focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent",
-                                  "min-h-[3rem]",
+                                  'w-full px-3  text-sm text-gray-900 bg-white border rounded-lg transition-all duration-200',
+                                  'focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent',
+                                  'min-h-12',
                                   errors.level
-                                    ? "border-red-500 focus:ring-red-600"
-                                    : "border-slate-400"
+                                    ? 'border-red-500 focus:ring-red-600'
+                                    : 'border-slate-400'
                                 )}
                               >
-                                <SelectValue placeholder="Choose level" />
+                                <SelectValue placeholder='Choose level' />
                               </SelectTrigger>
-                              <SelectContent className="bg-white border border-gray-300 rounded-md">
+                              <SelectContent className='bg-white border border-gray-300 rounded-md'>
                                 <SelectGroup>
-                                  {["100", "200", "300", "400", "500"].map(
+                                  {['100', '200', '300', '400', '500'].map(
                                     (level) => (
                                       <SelectItem
                                         key={level}
                                         value={level}
-                                        className="hover:bg-gray-100 focus:bg-gray-100"
+                                        className='hover:bg-gray-100 focus:bg-gray-100'
                                       >
                                         Level {level}
                                       </SelectItem>
@@ -832,7 +832,7 @@ const GenerateQR = () => {
                       <AnimatePresence>
                         {errors.level && (
                           <motion.p
-                            className="text-red-500 text-sm mt-1"
+                            className='text-red-500 text-sm mt-1'
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
@@ -846,7 +846,7 @@ const GenerateQR = () => {
                   </motion.div>
 
                   <motion.div
-                    className="space-y-2"
+                    className='space-y-2'
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 2 * 0.1 }}
@@ -856,25 +856,25 @@ const GenerateQR = () => {
                       transition={{ duration: 0.2 }}
                     >
                       <Controller
-                        name="duration"
+                        name='duration'
                         control={control}
                         defaultValue={10}
                         render={({ field: { onChange, value, ...rest } }) => (
                           <AdaptiveInput
                             {...rest}
-                            id="duration"
-                            type="number"
+                            id='duration'
+                            type='number'
                             min={1}
                             max={60}
-                            label="Duration (minutes)"
-                            value={value ?? ""}
+                            label='Duration (minutes)'
+                            value={value ?? ''}
                             onChange={(e) => {
                               const v = e.target.value;
-                              onChange(v === "" ? "" : Number(v));
+                              onChange(v === '' ? '' : Number(v));
                             }}
                             error={errors.duration?.message}
-                            helperText=" 1-60 minutes"
-                            className="w-full"
+                            helperText=' 1-60 minutes'
+                            className='w-full'
                           />
                         )}
                       />
@@ -887,36 +887,36 @@ const GenerateQR = () => {
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Card className="bg-white shadow-xl">
-            <CardContent className="pt-4">
+          <Card className='bg-white shadow-xl'>
+            <CardContent className='pt-4'>
               <QRPlaceholder />
-              <motion.div className="flex gap-4" variants={itemVariants}>
+              <motion.div className='flex gap-4' variants={itemVariants}>
                 <motion.div
-                  className="flex-1"
+                  className='flex-1'
                   variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
+                  whileHover='hover'
+                  whileTap='tap'
                 >
                   <Button
-                    type="submit"
+                    type='submit'
                     disabled={generateQRMutation.isPending}
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-md font-medium transition-colors flex items-center justify-center gap-2"
+                    className='w-full bg-blue-500 hover:bg-blue-600 text-white rounded-md font-medium transition-colors flex items-center justify-center gap-2'
                   >
-                    <AnimatePresence mode="wait">
+                    <AnimatePresence mode='wait'>
                       {generateQRMutation.isPending ? (
                         <motion.div
-                          key="generating"
+                          key='generating'
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
-                          className="flex items-center gap-2"
+                          className='flex items-center gap-2'
                         >
-                          Generating{" "}
-                          <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                          Generating{' '}
+                          <Loader2 className='h-4 w-4 ml-2 animate-spin' />
                         </motion.div>
                       ) : (
                         <motion.div
-                          key="generate"
+                          key='generate'
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
@@ -928,16 +928,16 @@ const GenerateQR = () => {
                   </Button>
                 </motion.div>
                 <motion.div
-                  className="flex-1"
+                  className='flex-1'
                   variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
+                  whileHover='hover'
+                  whileTap='tap'
                 >
                   <Button
-                    type="button"
+                    type='button'
                     onClick={() => reset()}
-                    variant="outline"
-                    className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md font-medium transition-colors flex items-center justify-center gap-2"
+                    variant='outline'
+                    className='w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md font-medium transition-colors flex items-center justify-center gap-2'
                   >
                     Reset
                   </Button>
