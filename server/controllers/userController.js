@@ -1,13 +1,13 @@
-const User = require("../models/User");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const User = require('../models/User');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const SECRET_KEY = process.env.JWT_SECRET;
-const logger = require("../middlewares/log");
-const { validationResult } = require("express-validator");
-const asyncHandler = require("express-async-handler");
-const { sendVerificationEmail } = require("../utils/sendEmail");
-const Feedback = require("../models/Feedback");
-const { cloudinary } = require("../utils/multerConfig");
+const logger = require('../middlewares/log');
+const { validationResult } = require('express-validator');
+const asyncHandler = require('express-async-handler');
+const { sendVerificationEmail } = require('../utils/sendEmail');
+const Feedback = require('../models/Feedback');
+const { cloudinary } = require('../utils/multerConfig');
 
 // Get User Profile
 const UserProfile = asyncHandler(async (req, res) => {
@@ -16,9 +16,9 @@ const UserProfile = asyncHandler(async (req, res) => {
   //   return res.status(400).json({ message: errors.array() });
   // }
   if (!req.user) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: 'Unauthorized' });
   }
-  const user = await User.findById(req.user._id).select("-password");
+  const user = await User.findById(req.user._id).select('-password');
   if (user) {
     res.json({
       user: {
@@ -34,7 +34,7 @@ const UserProfile = asyncHandler(async (req, res) => {
     });
   } else {
     res.status(404);
-    throw new Error("User profile not found");
+    throw new Error('User profile not found');
   }
 });
 
@@ -45,22 +45,22 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: errors.array() });
   }
   if (!req.user) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: 'Unauthorized' });
   }
-  const user = await User.findById(req.user._id).select("+password");
+  const user = await User.findById(req.user._id).select('+password');
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    return res.status(404).json({ message: 'User not found' });
   }
   const updates = { ...req.body };
   let isEmailUpdated = false;
-  if (updates.password && updates.password.trim() !== "") {
+  if (updates.password && updates.password.trim() !== '') {
     const isSamePassword = await bcrypt.compare(
       updates.password,
       user.password
     );
     if (isSamePassword) {
       return res.status(400).json({
-        message: "New password cannot be the same as the old password",
+        message: 'New password cannot be the same as the old password',
       });
     }
     updates.password = await bcrypt.hash(updates.password, 12);
@@ -71,22 +71,18 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   // Handle profile picture upload with deletion
   if (req.file) {
     // Delete old profile picture from Cloudinary if exists
-    if (user.profilePicture && user.profilePicture.includes("cloudinary")) {
+    if (user.profilePicture && user.profilePicture.includes('cloudinary')) {
       try {
-        // Better way to extract public_id from Cloudinary URL
-        // URL format: https://res.cloudinary.com/cloud/image/upload/v123456/uploads/filename.jpg
-        const urlParts = user.profilePicture.split("/");
-        const uploadIndex = urlParts.indexOf("upload");
+        const urlParts = user.profilePicture.split('/');
+        const uploadIndex = urlParts.indexOf('upload');
         if (uploadIndex !== -1 && uploadIndex + 2 < urlParts.length) {
-          // Get everything after 'upload/v123456/' or 'upload/'
-          const pathAfterUpload = urlParts.slice(uploadIndex + 2).join("/");
-          const publicId = pathAfterUpload.split(".")[0]; // Remove file extension
+          const pathAfterUpload = urlParts.slice(uploadIndex + 2).join('/');
+          const publicId = pathAfterUpload.split('.')[0]; // Remove file extension
           await cloudinary.uploader.destroy(publicId);
-          console.log(`Deleted old image: ${publicId}`);
         }
       } catch (error) {
         console.error(
-          "Failed to delete old profile picture from Cloudinary:",
+          'Failed to delete old profile picture from Cloudinary:',
           error.message
         );
         // Don't return error here, continue with upload
@@ -103,7 +99,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       _id: { $ne: req.user._id },
     });
     if (emailExists) {
-      return res.status(400).json({ message: "Email exits" });
+      return res.status(400).json({ message: 'Email exits' });
     }
     updates.pendingEmail = updates.email;
     updates.isVerified = false;
@@ -112,16 +108,16 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     const token = jwt.sign(
       { id: req.user._id, newEmail: updates.email },
       SECRET_KEY,
-      { expiresIn: "1h" }
+      { expiresIn: '1h' }
     );
     try {
       await sendVerificationEmail(updates.email, token);
       logger.info(`Verification email sent to ${updates.email}`);
     } catch (emailError) {
-      logger.error("Failed to send email:", emailError.message);
+      logger.error('Failed to send email:', emailError.message);
       return res
         .status(500)
-        .json({ message: "Failed to send verification email" });
+        .json({ message: 'Failed to send verification email' });
     }
     delete updates.email;
   }
@@ -130,16 +126,16 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   const updatedUser = await User.findByIdAndUpdate(req.user._id, updates, {
     new: true,
     runValidators: true,
-  }).select("-password");
+  }).select('-password');
 
   if (!updatedUser) {
-    return res.status(404).json({ message: "User profile not found" });
+    return res.status(404).json({ message: 'User profile not found' });
   }
 
   if (isEmailUpdated) {
     return res.json({
       message:
-        "Verification email sent. Please verify before changes take effect.",
+        'Verification email sent. Please verify before changes take effect.',
     });
   }
   res.json({
@@ -158,16 +154,16 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 // Delete User Profile
 const deleteUserProfile = asyncHandler(async (req, res) => {
   if (!req.user) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: 'Unauthorized' });
   }
   const user = await User.findById(req.user._id);
   if (!user) {
     res.status(404);
-    throw new Error("User profile not found");
+    throw new Error('User profile not found');
   }
   await User.deleteOne({ _id: req.user._id });
   logger.info(`User account deleted: ${user.email}, ${user.matricNumber}`);
-  res.json({ message: "Account deleted successfully" });
+  res.json({ message: 'Account deleted successfully' });
 });
 
 // User Feedback
@@ -178,7 +174,7 @@ const userFeedback = asyncHandler(async (req, res) => {
     if (!category || !message) {
       return res
         .status(400)
-        .json({ message: "Category and message are required" });
+        .json({ message: 'Category and message are required' });
     }
 
     const feedback = new Feedback({
@@ -188,10 +184,10 @@ const userFeedback = asyncHandler(async (req, res) => {
     });
 
     await feedback.save();
-    res.status(201).json({ message: "Feedback submitted successfully" });
+    res.status(201).json({ message: 'Feedback submitted successfully' });
   } catch (error) {
     logger.error(`User feedback error: ${error.message}`);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

@@ -1,22 +1,12 @@
-import dotenv from "dotenv";
-import nodemailer from "nodemailer";
+require('dotenv').config();
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 
-dotenv.config();
+// --- Brevo (Sendinblue) Setup ---
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+const apiKey = defaultClient.authentications['api-key'];
+apiKey.apiKey = process.env.BREVO_API_KEY;
 
-// --- Transporter Setup ---
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    // Additional options to improve deliverability
-    pool: true,
-    maxConnections: 5,
-    maxMessages: 100,
-  });
-};
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 // --- HTML Email Template ---
 const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
@@ -71,10 +61,7 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
                         text-decoration:none;
                         border-radius:8px;
                         background: transparent;
-                        transition: all 0.3s ease;
-                        border: none;
-                        outline: none;
-                      " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                      ">
                         ${buttonText}
                       </a>
                     </td>
@@ -101,7 +88,7 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
                     <td align="center">
                       <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
                         This is an automated message from ${
-                          process.env.APP_NAME || "AttendEase"
+                          process.env.APP_NAME || 'AttendEase'
                         }
                       </p>
                       <p style="margin: 0 0 10px 0; font-size: 12px; color: #9ca3af;">
@@ -109,7 +96,7 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
                       </p>
                       <p style="margin: 0; font-size: 12px; color: #9ca3af;">
                         &copy; ${new Date().getFullYear()} ${
-    process.env.ORG_NAME || "TheFirst Studio"
+    process.env.ORG_NAME || 'TheFirst Studio'
   }. All rights reserved.
                       </p>
                     </td>
@@ -126,43 +113,17 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
   `;
 };
 
-// --- Common email options with anti-spam setup ---
-const getBaseMailOptions = (to, subject) => {
-  return {
-    from: {
-      name: process.env.APP_NAME || "AttendEase",
-      address: process.env.EMAIL_USER,
-    },
-    replyTo: process.env.SUPPORT_EMAIL || process.env.EMAIL_USER,
-    to: to,
-    subject: subject,
-    headers: {
-      "Message-ID": `<${Date.now()}.${Math.random()
-        .toString(36)
-        .substr(2, 9)}@${process.env.EMAIL_DOMAIN || "attendease.com"}>`,
-      "X-Mailer": `${process.env.APP_NAME || "AttendEase"} v1.0`,
-      "List-Unsubscribe": `<mailto:${
-        process.env.SUPPORT_EMAIL || process.env.EMAIL_USER
-      }?subject=Unsubscribe>`,
-      Precedence: "auto-reply",
-      "X-Auto-Response-Suppress": "OOF, DR, RN, NRN, AutoReply",
-    },
-    // Note: DKIM setup removed for simplicity - can be added later with proper domain setup
-  };
-};
-
 // --- Verification Email ---
 const sendVerificationEmail = async (email, token, userName = null) => {
-  const transporter = createTransporter();
   const verificationUrl = `${process.env.CLIENT_URL}/verify?token=${token}`;
 
   const content = `
     <p style="margin: 0 0 20px 0;">Hello${
-      userName ? ` <strong>${userName}</strong>` : ""
+      userName ? ` <strong>${userName}</strong>` : ''
     },</p>
     
     <p style="margin: 0 0 20px 0;">Thank you for joining ${
-      process.env.APP_NAME || "AttendEase"
+      process.env.APP_NAME || 'AttendEase'
     }! We're excited to have you as part of our community.</p>
     
     <p style="margin: 0 0 20px 0;">To activate your account and start using all our features, please verify your email address by clicking the button below:</p>
@@ -174,21 +135,10 @@ const sendVerificationEmail = async (email, token, userName = null) => {
     </div>
   `;
 
-  const mailOptions = {
-    ...getBaseMailOptions(
-      email,
-      `Please verify your ${process.env.APP_NAME || "AttendEase"} account`
-    ),
-    html: getEmailTemplate(
-      "Verify Your Email Address",
-      content,
-      "Verify Email",
-      verificationUrl
-    ),
-    text: `
-Hello${userName ? ` ${userName}` : ""},
+  const textContent = `
+Hello${userName ? ` ${userName}` : ''},
 
-Thank you for joining ${process.env.APP_NAME || "AttendEase"}!
+Thank you for joining ${process.env.APP_NAME || 'AttendEase'}!
 
 To activate your account, please verify your email address by visiting:
 ${verificationUrl}
@@ -197,36 +147,64 @@ This verification link expires in 24 hours.
 
 If you didn't create an account with us, please ignore this email.
 
-Need help? Contact us at: ${process.env.SUPPORT_EMAIL || process.env.EMAIL_USER}
+Need help? Contact us at: ${
+    process.env.SUPPORT_EMAIL || process.env.BREVO_SENDER_EMAIL
+  }
 
 Best regards,
-The ${process.env.ORG_NAME || "TheFirst Studio"} Team
-    `,
-    priority: "normal", // Changed from "high" to avoid spam filters
+The ${process.env.ORG_NAME || 'TheFirst Studio'} Team
+  `;
+
+  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+
+  sendSmtpEmail.sender = {
+    name: process.env.APP_NAME || 'AttendEase',
+    email: process.env.BREVO_SENDER_EMAIL,
   };
+  sendSmtpEmail.to = [{ email: email, name: userName || '' }];
+  sendSmtpEmail.subject = `Please verify your ${
+    process.env.APP_NAME || 'AttendEase'
+  } account`;
+  sendSmtpEmail.htmlContent = getEmailTemplate(
+    'Verify Your Email Address',
+    content,
+    'Verify Email',
+    verificationUrl
+  );
+  sendSmtpEmail.textContent = textContent;
+  sendSmtpEmail.tags = ['verification'];
 
   try {
-    const info = transporter.sendMail(mailOptions);
-    console.log(`Verification email sent to ${email}: ${info.messageId}`);
-    return { success: true, messageId: info.messageId };
+    console.log('📧 Attempting to send verification email...');
+    console.log('From:', sendSmtpEmail.sender);
+    console.log('To:', email);
+    console.log('API Key exists:', !!process.env.BREVO_API_KEY);
+
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+
+    console.log('✅ Email sent successfully:', data);
+    return { success: true, messageId: data.messageId };
   } catch (error) {
-    console.error("Failed to send verification email:", error);
+    console.error('❌ Failed to send verification email:', error);
+    console.error('Error details:', {
+      message: error.message,
+      response: error.response?.text || error.response?.body,
+    });
     throw new Error(`Failed to send verification email: ${error.message}`);
   }
 };
 
 // --- Reset Password Email ---
 const sendResetPasswordEmail = async (email, token, userName = null) => {
-  const transporter = createTransporter();
   const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
 
   const content = `
     <p style="margin: 0 0 20px 0;">Hello${
-      userName ? ` <strong>${userName}</strong>` : ""
+      userName ? ` <strong>${userName}</strong>` : ''
     },</p>
     
     <p style="margin: 0 0 20px 0;">We received a request to reset the password for your ${
-      process.env.APP_NAME || "AttendEase"
+      process.env.APP_NAME || 'AttendEase'
     } account.</p>
     
     <p style="margin: 0 0 20px 0;">Click the button below to create a new password:</p>
@@ -244,23 +222,12 @@ const sendResetPasswordEmail = async (email, token, userName = null) => {
     </div>
   `;
 
-  const mailOptions = {
-    ...getBaseMailOptions(
-      email,
-      `Reset your ${process.env.APP_NAME || "AttendEase"} password`
-    ),
-    html: getEmailTemplate(
-      "Reset Your Password",
-      content,
-      "Reset My Password",
-      resetUrl
-    ),
-    text: `
-Hello${userName ? ` ${userName}` : ""},
+  const textContent = `
+Hello${userName ? ` ${userName}` : ''},
 
 We received a request to reset your ${
-      process.env.APP_NAME || "AttendEase"
-    } password.
+    process.env.APP_NAME || 'AttendEase'
+  } password.
 
 To create a new password, visit:
 ${resetUrl}
@@ -269,34 +236,52 @@ This link expires in 15 minutes.
 
 If you didn't request this reset, please ignore this email.
 
-Need help? Contact us at: ${process.env.SUPPORT_EMAIL || process.env.EMAIL_USER}
+Need help? Contact us at: ${
+    process.env.SUPPORT_EMAIL || process.env.BREVO_SENDER_EMAIL
+  }
 
 Best regards,
-The ${process.env.ORG_NAME || "TheFirst Studio"} Team
-    `,
-    priority: "normal",
+The ${process.env.ORG_NAME || 'TheFirst Studio'} Team
+  `;
+
+  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+
+  sendSmtpEmail.sender = {
+    name: process.env.APP_NAME || 'AttendEase',
+    email: process.env.BREVO_SENDER_EMAIL,
   };
+  sendSmtpEmail.to = [{ email: email, name: userName || '' }];
+  sendSmtpEmail.subject = `Reset your ${
+    process.env.APP_NAME || 'AttendEase'
+  } password`;
+  sendSmtpEmail.htmlContent = getEmailTemplate(
+    'Reset Your Password',
+    content,
+    'Reset My Password',
+    resetUrl
+  );
+  sendSmtpEmail.textContent = textContent;
+  sendSmtpEmail.tags = ['password-reset'];
 
   try {
-    const info = transporter.sendMail(mailOptions);
-    console.log(`Password reset email sent to ${email}: ${info.messageId}`);
-    return { success: true, messageId: info.messageId };
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('✅ Password reset email sent successfully');
+    return { success: true, messageId: data.messageId };
   } catch (error) {
-    console.error("Failed to send password reset email:", error);
+    console.error('❌ Failed to send password reset email:', error);
     throw new Error(`Failed to send password reset email: ${error.message}`);
   }
 };
 
 // --- Welcome Email ---
 const sendWelcomeEmail = async (email, userName) => {
-  const transporter = createTransporter();
   const dashboardUrl = `${process.env.CLIENT_URL}/dashboard`;
 
   const content = `
     <p style="margin: 0 0 20px 0;">Hello <strong>${userName}</strong>,</p>
     
     <p style="margin: 0 0 20px 0;">🎉 Welcome to ${
-      process.env.APP_NAME || "AttendEase"
+      process.env.APP_NAME || 'AttendEase'
     }! Your account has been successfully verified and you're all set to go.</p>
     
     <p style="margin: 0 0 20px 0;">Here's what you can do next:</p>
@@ -313,21 +298,10 @@ const sendWelcomeEmail = async (email, userName) => {
     <p style="margin: 20px 0;">Ready to get started? Click the button below to access your dashboard:</p>
   `;
 
-  const mailOptions = {
-    ...getBaseMailOptions(
-      email,
-      `Welcome to ${process.env.APP_NAME || "AttendEase"} - You're all set! 🎉`
-    ),
-    html: getEmailTemplate(
-      `Welcome to ${process.env.APP_NAME || "AttendEase"}!`,
-      content,
-      "Go to Dashboard",
-      dashboardUrl
-    ),
-    text: `
+  const textContent = `
 Hello ${userName},
 
-Welcome to ${process.env.APP_NAME || "AttendEase"}! 
+Welcome to ${process.env.APP_NAME || 'AttendEase'}! 
 
 Your account has been successfully verified and you're ready to get started.
 
@@ -335,26 +309,47 @@ Visit your dashboard: ${dashboardUrl}
 
 What's next:
 - Complete your profile
-- Explore our features
-- Check out the help center
-- Connect with the community
+- Enjoy your automated attendance
 
-Need help? Contact us at: ${process.env.SUPPORT_EMAIL || process.env.EMAIL_USER}
+Need help? Contact us at: ${
+    process.env.SUPPORT_EMAIL || process.env.BREVO_SENDER_EMAIL
+  }
 
 Best regards,
-The ${process.env.ORG_NAME || "TheFirst Studio"} Team
-    `,
-    priority: "normal",
+The ${process.env.ORG_NAME || 'TheFirst Studio'} Team
+  `;
+
+  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+
+  sendSmtpEmail.sender = {
+    name: process.env.APP_NAME || 'AttendEase',
+    email: process.env.BREVO_SENDER_EMAIL,
   };
+  sendSmtpEmail.to = [{ email: email, name: userName }];
+  sendSmtpEmail.subject = `Welcome to ${
+    process.env.APP_NAME || 'AttendEase'
+  } - You're all set! 🎉`;
+  sendSmtpEmail.htmlContent = getEmailTemplate(
+    `Welcome to ${process.env.APP_NAME || 'AttendEase'}!`,
+    content,
+    'Go to Dashboard',
+    dashboardUrl
+  );
+  sendSmtpEmail.textContent = textContent;
+  sendSmtpEmail.tags = ['welcome'];
 
   try {
-    const info = transporter.sendMail(mailOptions);
-    console.log(`Welcome email sent to ${email}: ${info.messageId}`);
-    return { success: true, messageId: info.messageId };
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('✅ Welcome email sent successfully');
+    return { success: true, messageId: data.messageId };
   } catch (error) {
-    console.error("Failed to send welcome email:", error);
+    console.error('❌ Failed to send welcome email:', error);
     throw new Error(`Failed to send welcome email: ${error.message}`);
   }
 };
 
-export { sendVerificationEmail, sendResetPasswordEmail, sendWelcomeEmail };
+module.exports = {
+  sendVerificationEmail,
+  sendResetPasswordEmail,
+  sendWelcomeEmail,
+};
