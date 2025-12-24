@@ -1,12 +1,9 @@
 require('dotenv').config();
-const SibApiV3Sdk = require('sib-api-v3-sdk');
+const axios = require('axios');
 
-// --- Brevo (Sendinblue) Setup ---
-const defaultClient = SibApiV3Sdk.ApiClient.instance;
-const apiKey = defaultClient.authentications['api-key'];
-apiKey.apiKey = process.env.BREVO_API_KEY;
-
-const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+// --- Elastic Email API Setup ---
+const ELASTIC_API_KEY = process.env.ELASTIC_API_KEY;
+const ELASTIC_API_URL = process.env.ELASTIC_API_URL;
 
 // --- HTML Email Template ---
 const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
@@ -113,6 +110,60 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
   `;
 };
 
+// --- Send Email via Elastic Email API ---
+const sendElasticEmail = async (
+  to,
+  subject,
+  htmlContent,
+  textContent,
+  fromName
+) => {
+  try {
+    console.log('📧 Attempting to send email via Elastic Email...');
+    console.log('From:', `${fromName} <${process.env.ELASTIC_FROM_EMAIL}>`);
+    console.log('To:', to);
+    console.log('Subject:', subject);
+    console.log('API Key exists:', !!ELASTIC_API_KEY);
+
+    const params = new URLSearchParams({
+      apikey: ELASTIC_API_KEY,
+      from: process.env.ELASTIC_FROM_EMAIL,
+      fromName: fromName,
+      to: to,
+      subject: subject,
+      bodyHtml: htmlContent,
+      bodyText: textContent,
+      isTransactional: 'true',
+    });
+
+    const response = await axios.post(ELASTIC_API_URL, params.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+
+    console.log('Email sent successfully:', response.data);
+    return {
+      success: true,
+      messageId: response.data.transactionid || response.data.messageid,
+      data: response.data,
+    };
+  } catch (error) {
+    console.error(
+      'Failed to send email:',
+      error.response?.data || error.message
+    );
+    console.error('Error details:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+    });
+    throw new Error(
+      `Failed to send email: ${error.response?.data?.error || error.message}`
+    );
+  }
+};
+
 // --- Verification Email ---
 const sendVerificationEmail = async (email, token, userName = null) => {
   const verificationUrl = `${process.env.CLIENT_URL}/verify?token=${token}`;
@@ -148,50 +199,27 @@ This verification link expires in 24 hours.
 If you didn't create an account with us, please ignore this email.
 
 Need help? Contact us at: ${
-    process.env.SUPPORT_EMAIL || process.env.BREVO_SENDER_EMAIL
+    process.env.SUPPORT_EMAIL || process.env.ELASTIC_FROM_EMAIL
   }
 
 Best regards,
 The ${process.env.ORG_NAME || 'TheFirst Studio'} Team
   `;
 
-  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-
-  sendSmtpEmail.sender = {
-    name: process.env.APP_NAME || 'AttendEase',
-    email: process.env.BREVO_SENDER_EMAIL,
-  };
-  sendSmtpEmail.to = [{ email: email, name: userName || '' }];
-  sendSmtpEmail.subject = `Please verify your ${
-    process.env.APP_NAME || 'AttendEase'
-  } account`;
-  sendSmtpEmail.htmlContent = getEmailTemplate(
+  const htmlContent = getEmailTemplate(
     'Verify Your Email Address',
     content,
     'Verify Email',
     verificationUrl
   );
-  sendSmtpEmail.textContent = textContent;
-  sendSmtpEmail.tags = ['verification'];
 
-  try {
-    console.log('📧 Attempting to send verification email...');
-    console.log('From:', sendSmtpEmail.sender);
-    console.log('To:', email);
-    console.log('API Key exists:', !!process.env.BREVO_API_KEY);
-
-    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
-
-    console.log('✅ Email sent successfully:', data);
-    return { success: true, messageId: data.messageId };
-  } catch (error) {
-    console.error('❌ Failed to send verification email:', error);
-    console.error('Error details:', {
-      message: error.message,
-      response: error.response?.text || error.response?.body,
-    });
-    throw new Error(`Failed to send verification email: ${error.message}`);
-  }
+  return sendElasticEmail(
+    email,
+    `Please verify your ${process.env.APP_NAME || 'AttendEase'} account`,
+    htmlContent,
+    textContent,
+    process.env.APP_NAME || 'AttendEase'
+  );
 };
 
 // --- Reset Password Email ---
@@ -237,40 +265,27 @@ This link expires in 15 minutes.
 If you didn't request this reset, please ignore this email.
 
 Need help? Contact us at: ${
-    process.env.SUPPORT_EMAIL || process.env.BREVO_SENDER_EMAIL
+    process.env.SUPPORT_EMAIL || process.env.ELASTIC_FROM_EMAIL
   }
 
 Best regards,
 The ${process.env.ORG_NAME || 'TheFirst Studio'} Team
   `;
 
-  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-
-  sendSmtpEmail.sender = {
-    name: process.env.APP_NAME || 'AttendEase',
-    email: process.env.BREVO_SENDER_EMAIL,
-  };
-  sendSmtpEmail.to = [{ email: email, name: userName || '' }];
-  sendSmtpEmail.subject = `Reset your ${
-    process.env.APP_NAME || 'AttendEase'
-  } password`;
-  sendSmtpEmail.htmlContent = getEmailTemplate(
+  const htmlContent = getEmailTemplate(
     'Reset Your Password',
     content,
     'Reset My Password',
     resetUrl
   );
-  sendSmtpEmail.textContent = textContent;
-  sendSmtpEmail.tags = ['password-reset'];
 
-  try {
-    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log('✅ Password reset email sent successfully');
-    return { success: true, messageId: data.messageId };
-  } catch (error) {
-    console.error('❌ Failed to send password reset email:', error);
-    throw new Error(`Failed to send password reset email: ${error.message}`);
-  }
+  return sendElasticEmail(
+    email,
+    `Reset your ${process.env.APP_NAME || 'AttendEase'} password`,
+    htmlContent,
+    textContent,
+    process.env.APP_NAME || 'AttendEase'
+  );
 };
 
 // --- Welcome Email ---
@@ -312,40 +327,27 @@ What's next:
 - Enjoy your automated attendance
 
 Need help? Contact us at: ${
-    process.env.SUPPORT_EMAIL || process.env.BREVO_SENDER_EMAIL
+    process.env.SUPPORT_EMAIL || process.env.ELASTIC_FROM_EMAIL
   }
 
 Best regards,
 The ${process.env.ORG_NAME || 'TheFirst Studio'} Team
   `;
 
-  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-
-  sendSmtpEmail.sender = {
-    name: process.env.APP_NAME || 'AttendEase',
-    email: process.env.BREVO_SENDER_EMAIL,
-  };
-  sendSmtpEmail.to = [{ email: email, name: userName }];
-  sendSmtpEmail.subject = `Welcome to ${
-    process.env.APP_NAME || 'AttendEase'
-  } - You're all set! 🎉`;
-  sendSmtpEmail.htmlContent = getEmailTemplate(
+  const htmlContent = getEmailTemplate(
     `Welcome to ${process.env.APP_NAME || 'AttendEase'}!`,
     content,
     'Go to Dashboard',
     dashboardUrl
   );
-  sendSmtpEmail.textContent = textContent;
-  sendSmtpEmail.tags = ['welcome'];
 
-  try {
-    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log('✅ Welcome email sent successfully');
-    return { success: true, messageId: data.messageId };
-  } catch (error) {
-    console.error('❌ Failed to send welcome email:', error);
-    throw new Error(`Failed to send welcome email: ${error.message}`);
-  }
+  return sendElasticEmail(
+    email,
+    `Welcome to ${process.env.APP_NAME || 'AttendEase'} - You're all set! 🎉`,
+    htmlContent,
+    textContent,
+    process.env.APP_NAME || 'AttendEase'
+  );
 };
 
 module.exports = {
