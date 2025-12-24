@@ -25,5 +25,4 @@ dist-ssr
 *.sw?
 
 # Ignore files outside the client folder
-../txt.txt
-./txtx.txt
+./
