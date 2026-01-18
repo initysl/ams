@@ -4,7 +4,7 @@
 
 An automated attendance management system that leverages QR code technology to streamline the process of tracking attendance in educational institutions.This system eliminates manual attendance taking, reduces errors, and provides real-time attendance monitoring with comprehensive reporting capabilities.
 
-Attached Doc: 
+Attached Doc: <a href'/AMS_PUBN.pdf'>Project Paper/>
 
 ## Features
 
