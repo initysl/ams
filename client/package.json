@@ -31,7 +31,7 @@
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.25",
     "html5-qrcode": "^2.3.8",
-    "jspdf": "^3.0.4",
+    "jspdf": "^4.0.0",
     "jspdf-autotable": "^5.0.2",
     "jsqr": "^1.4.0",
     "lucide-react": "^0.555.0",
