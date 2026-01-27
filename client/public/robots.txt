@@ -28,4 +28,4 @@ Allow: *.jpg
 Allow: *.svg
 
 Crawl-delay: 1
-Sitemap: https://attendease-0sme.onrender.com/sitemap.xml
+Sitemap: https://amsqr.up.railway.app/sitemap.xml

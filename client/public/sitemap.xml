@@ -4,12 +4,12 @@
   
   <!-- Splashscreen -->
   <url>
-    <loc>https://attendease-0sme.onrender.com</loc>
+    <loc>https://amsqr.up.railway.app</loc>
     <lastmod>2025-08-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
-      <image:loc>https://attendease-0sme.onrender.com/at.svg</image:loc>
+      <image:loc>https://amsqr.up.railway.app/at.svg</image:loc>
       <image:title>Attendance Management System</image:title>
       <image:caption>Attendance Management System</image:caption>
     </image:image>
@@ -17,7 +17,7 @@
 
   <!-- Auth Page -->
   <url>
-    <loc>https://attendease-0sme.onrender.com/auth</loc>
+    <loc>https://amsqr.up.railway.app/auth</loc>
     <lastmod>2025-08-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

@@ -1,16 +1,15 @@
-// AuthForm.tsx
-import React, { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
-import api from "@/lib/axios";
-import { Button } from "../../components/ui/button";
-import { Loader } from "lucide-react";
-import LoginForm from "./LoginForm";
-import RegisterForm from "./RegisterForm";
-import { useAuth } from "@/context/AuthContext"; // Import the useAuth hook
-import { useNavigate } from "react-router-dom"; // For navigation after login
-import SEO from "@/components/SEO";
-// Define interface for API error
+import React, { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import api from '@/lib/axios';
+import { Button } from '../../components/ui/button';
+import { Loader } from 'lucide-react';
+import LoginForm from './LoginForm';
+import RegisterForm from './RegisterForm';
+import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import SEO from '@/components/SEO';
+
 interface ApiError extends Error {
   response?: {
     data?: {
@@ -33,7 +32,7 @@ interface RegisterData {
 const AuthForm: React.FC = () => {
   const [isSignIn, setIsSignIn] = useState(true);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [previewURL, setPreviewURL] = useState<string>("");
+  const [previewURL, setPreviewURL] = useState<string>('');
   const navigate = useNavigate();
 
   // Use the auth context
@@ -41,9 +40,9 @@ const AuthForm: React.FC = () => {
 
   // Handle image change from Profilebox
   const handleImageChange = (file: File) => {
-    const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
     if (!validTypes.includes(file.type)) {
-      toast.error("Only JPG, JPEG, and PNG files are allowed");
+      toast.error('Only JPG, JPEG, and PNG files are allowed');
       return;
     }
     setProfilePicture(file);
@@ -56,7 +55,7 @@ const AuthForm: React.FC = () => {
       return login(credentials);
     },
     onSuccess: () => {
-      navigate("/dashboard/home");
+      navigate('/dashboard/home');
     },
     // onError: (err: ApiError) => {
     //   toast.error(`Sign in failed: ${err.response?.data?.message}`);
@@ -67,29 +66,29 @@ const AuthForm: React.FC = () => {
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterData) => {
       const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("email", data.email);
-      formData.append("department", data.department);
+      formData.append('name', data.name);
+      formData.append('email', data.email);
+      formData.append('department', data.department);
       formData.append(
-        "matricNumber",
-        data.matricNumber?.match(/^\d{4}\/\d+$/) ? data.matricNumber : ""
+        'matricNumber',
+        data.matricNumber?.match(/^\d{4}\/\d+$/) ? data.matricNumber : '',
       );
-      formData.append("password", data.password);
-      formData.append("confirmPassword", data.confirmPassword);
+      formData.append('password', data.password);
+      formData.append('confirmPassword', data.confirmPassword);
       if (profilePicture) {
-        formData.append("profilePicture", profilePicture);
+        formData.append('profilePicture', profilePicture);
       }
 
-      return api.post("auth/register", formData, {
+      return api.post('auth/register', formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       });
     },
     onSuccess: (res) => {
       toast.success(`${res.data.message}`);
       setProfilePicture(null);
-      setPreviewURL("");
+      setPreviewURL('');
       // Automatically switch to sign in form after successful registration
       setIsSignIn(true);
     },
@@ -109,26 +108,26 @@ const AuthForm: React.FC = () => {
   return (
     <>
       <SEO
-        title="Login - AttendEase"
-        description="Access your AttendEase account to manage attendance, generate QR codes, and view detailed reports."
-        canonical="https://attendease-0sme.onrender.com/auth"
-        robots="noindex, nofollow" // Don't index login pages
+        title='Login - AttendEase'
+        description='Access your AttendEase account to manage attendance, generate QR codes, and view detailed reports.'
+        canonical='https://amsqr.up.railway.app/auth'
+        robots='noindex, nofollow' // Don't index login pages
       />
-      <div className="flex justify-center items-center min-h-svh p-2">
-        <div className="bg-white p-8 rounded-xl rounded-bl-xl shadow-2xl max-w-2xl transition-all duration-500">
-          <div className="text-center space-y-2 mb-10">
-            <h1 className="text-4xl font-bold text-gray-800">
-              Welcome to <span className="text-green-600">AttendEase</span>
+      <div className='flex justify-center items-center min-h-svh p-2'>
+        <div className='bg-white p-8 rounded-xl rounded-bl-xl shadow-2xl max-w-2xl transition-all duration-500'>
+          <div className='text-center space-y-2 mb-10'>
+            <h1 className='text-4xl font-bold text-gray-800'>
+              Welcome to <span className='text-green-600'>AttendEase</span>
             </h1>
-            <p className="text-gray-500">
+            <p className='text-gray-500'>
               {isSignIn
-                ? "Sign in to manage your attendance"
-                : "Create an account to get started"}
+                ? 'Sign in to manage your attendance'
+                : 'Create an account to get started'}
             </p>
           </div>
 
-          <h2 className="text-2xl font-bold text-green-600 mb-6">
-            {isSignIn ? "Sign In" : "Register"}
+          <h2 className='text-2xl font-bold text-green-600 mb-6'>
+            {isSignIn ? 'Sign In' : 'Register'}
           </h2>
 
           {isSignIn ? (
@@ -140,38 +139,35 @@ const AuthForm: React.FC = () => {
             <RegisterForm
               onSubmit={handleRegisterSubmit}
               isPending={registerMutation.isPending}
-              previewURL={
-                previewURL ||
-                `${import.meta.env.VITE_API_URL}images/default.png`
-              }
+              previewURL={previewURL || `${import.meta.env.VITE_API_URL}at.jpg`}
               onImageChange={handleImageChange}
             />
           )}
 
-          <div className="flex flex-col items-center mt-8 space-y-5">
+          <div className='flex flex-col items-center mt-8 space-y-5'>
             <Button
-              type="submit"
-              form={isSignIn ? "login-form" : "register-form"}
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg cursor-pointer"
+              type='submit'
+              form={isSignIn ? 'login-form' : 'register-form'}
+              className='bg-green-600 hover:bg-green-700 text-white font-semibold p-5 w-full max-w-sm shadow-lg cursor-pointer'
               disabled={loginMutation.isPending || registerMutation.isPending}
             >
               {loginMutation.isPending || registerMutation.isPending ? (
-                <Loader className="h-5 w-5 animate-spin" />
+                <Loader className='h-5 w-5 animate-spin' />
               ) : isSignIn ? (
-                "Sign In"
+                'Sign In'
               ) : (
-                "Register"
+                'Register'
               )}
             </Button>
 
-            <p className="text-sm text-gray-600">
-              {isSignIn ? "Don't have an account?" : "Already have an account?"}
+            <p className='text-sm text-gray-600'>
+              {isSignIn ? "Don't have an account?" : 'Already have an account?'}
               <button
-                type="button"
+                type='button'
                 onClick={() => setIsSignIn(!isSignIn)}
-                className="text-blue-600 hover:underline ml-1"
+                className='text-blue-600 hover:underline ml-1'
               >
-                {isSignIn ? "Sign Up" : "Sign In"}
+                {isSignIn ? 'Sign Up' : 'Sign In'}
               </button>
             </p>
           </div>
