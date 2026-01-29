@@ -3,10 +3,10 @@ const queryClient = new QueryClient();
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
-import App from "./App.tsx";
+import "./styles/index.css";
+import App from "./app/App.tsx";
 import { AuthProvider } from "./context/AuthContext.tsx";
-import { AttendanceProvider } from "./context/AttendanceContex.tsx";
+import { AttendanceProvider } from "./context/AttendanceContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
