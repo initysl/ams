@@ -3,6 +3,7 @@ const {
   register,
   login,
   verifyEmail,
+  resendVerificationEmail,
   forgotPassword,
   validateResetToken,
   resetPassword,
@@ -15,6 +16,7 @@ const {
 const {
   validateRegistration,
   validateLogin,
+  validateEmailRequest,
 } = require("../middlewares/validationMiddleware");
 const { upload, uploadToCloudinary } = require("../utils/multerConfig");
 
@@ -43,8 +45,9 @@ router.post(
 );
 router.post("/login", validateLogin, loginLimiter, login);
 router.get("/verify", verifyEmail);
+router.post("/resend-verification", validateEmailRequest, resendVerificationEmail);
 router.post("/logout", authMiddleware, logout);
-router.post("/recover", forgotPassword);
+router.post("/recover", validateEmailRequest, forgotPassword);
 router.post("/validate", validateResetToken);
 router.post("/reset", resetPassword);
 

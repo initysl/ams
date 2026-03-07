@@ -1,4 +1,10 @@
-import React, { forwardRef, useState, useEffect, useRef } from "react";
+import React, {
+  forwardRef,
+  useState,
+  useEffect,
+  useRef,
+  useId,
+} from "react";
 import { cn } from "@/lib/utils";
 
 export interface AdaptiveInputProps
@@ -10,17 +16,27 @@ export interface AdaptiveInputProps
 
 const AdaptiveInput = forwardRef<HTMLInputElement, AdaptiveInputProps>(
   (
-    { className, label, error, helperText, onFocus, onBlur, id, ...props },
+    {
+      className,
+      label,
+      error,
+      helperText,
+      onFocus,
+      onBlur,
+      onChange,
+      id,
+      ...props
+    },
     ref
   ) => {
     const [isFocused, setIsFocused] = useState(false);
     const [hasAutofillValue, setHasAutofillValue] = useState(false);
     const internalRef = useRef<HTMLInputElement>(null);
     const inputRef = (ref as React.RefObject<HTMLInputElement>) || internalRef;
+    const generatedId = useId();
 
     // Generate a unique ID if none provided
-    const inputId =
-      id || `adaptive-input-${Math.random().toString(36).substr(2, 9)}`;
+    const inputId = id || generatedId;
 
     // Check for autofill values
     useEffect(() => {
@@ -44,30 +60,12 @@ const AdaptiveInput = forwardRef<HTMLInputElement, AdaptiveInputProps>(
 
       // Cleanup
       return () => clearInterval(interval);
-    }, []);
-
-    // Also check when props.value changes
-    useEffect(() => {
-      const hasValue = props.value ? String(props.value).length > 0 : false;
-      setHasAutofillValue(hasValue);
-    }, [props.value]);
-
-    // Get current input value - check both controlled and uncontrolled scenarios
-    const getCurrentValue = () => {
-      if (props.value !== undefined) {
-        // Controlled component
-        return String(props.value).length > 0;
-      } else if (inputRef.current) {
-        // Uncontrolled component
-        return inputRef.current.value.length > 0;
-      }
-      return false;
-    };
-
-    const hasValue = getCurrentValue();
+    }, [inputRef]);
 
     // Fixed logic: only float label when there's actual content or focus
-    const shouldFloatLabel = isFocused || hasValue || hasAutofillValue;
+    const hasControlledValue =
+      props.value !== undefined && String(props.value).length > 0;
+    const shouldFloatLabel = isFocused || hasControlledValue || hasAutofillValue;
 
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
       setIsFocused(true);
@@ -79,6 +77,11 @@ const AdaptiveInput = forwardRef<HTMLInputElement, AdaptiveInputProps>(
       onBlur?.(e);
     };
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setHasAutofillValue(e.target.value.length > 0);
+      onChange?.(e);
+    };
+
     return (
       <div className="relative">
         <input
@@ -88,6 +91,7 @@ const AdaptiveInput = forwardRef<HTMLInputElement, AdaptiveInputProps>(
           value={props.value ?? ""}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          onChange={handleChange}
           className={cn(
             "w-full px-3 pt-5 pb-1.5 text-sm text-gray-900 bg-white border rounded-lg transition-all duration-200",
             "focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent",

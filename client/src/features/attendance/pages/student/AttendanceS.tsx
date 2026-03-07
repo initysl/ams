@@ -23,25 +23,28 @@ import {
   Search,
   ListFilter,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMutation } from '@tanstack/react-query';
 import { StudentAttendanceRecord } from '@/types/attendance';
+import { getApiErrorMessage } from '@/lib/api-error';
 
 const AttendanceS = () => {
   const { user } = useAuth();
   const [matricNumber] = useState(user?.matricNumber || '');
-  const [records, setRecords] = useState<StudentAttendanceRecord[] | null>(
-    null
-  );
+  const [records, setRecords] = useState<StudentAttendanceRecord[] | null>(() => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    const savedRecords = sessionStorage.getItem('attendanceRecords');
+    return savedRecords
+      ? (JSON.parse(savedRecords) as StudentAttendanceRecord[])
+      : null;
+  });
   const [selectedView, setSelectedView] = useState<'all' | 'recent'>('all');
   const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    const saved = sessionStorage.getItem('attendanceRecords');
-    if (saved) setRecords(JSON.parse(saved));
-  }, []);
 
   // Fetch attendance mutation
   const fetchAttendanceMutation = useMutation({
@@ -57,10 +60,12 @@ const AttendanceS = () => {
       sessionStorage.setItem('attendanceRecords', JSON.stringify(data));
       toast.success('Attendance records retrieved successfully');
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast.error(
-        error?.response?.data?.error ||
+        getApiErrorMessage(
+          error,
           'An error occurred while retrieving attendance records'
+        )
       );
     },
   });

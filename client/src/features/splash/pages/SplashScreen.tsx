@@ -60,7 +60,7 @@ const SplashScreen = () => {
     }
   };
 
-  const goToScreen = (index: any) => {
+  const goToScreen = (index: number) => {
     if (isAnimating || index === currentScreen) return;
     setDirection(index > currentScreen ? 'next' : 'prev');
     setIsAnimating(true);

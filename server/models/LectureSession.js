@@ -17,7 +17,7 @@ const attendanceRecordSchema = new mongoose.Schema(
 const lectureSessionSchema = new mongoose.Schema(
   {
     courseTitle: { type: String, required: true },
-    totalCourseStudents: { type: String, required: true },
+    totalCourseStudents: { type: Number, required: true, min: 1 },
     courseCode: { type: String, required: true },
     level: {
       type: String,

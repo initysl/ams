@@ -9,6 +9,8 @@ const { sendVerificationEmail } = require('../utils/sendEmail');
 const Feedback = require('../models/Feedback');
 const { cloudinary } = require('../utils/multerConfig');
 
+const normalizeEmail = (email) => email.toLowerCase().trim();
+
 // Get User Profile
 const UserProfile = asyncHandler(async (req, res) => {
   // const errors = validationResult(req);
@@ -93,26 +95,35 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     updates.profilePicture = req.body.profilePicture;
   }
   // Email update logic
-  if (updates.email && updates.email !== user.email) {
+  if (updates.email) {
+    const normalizedEmail = normalizeEmail(updates.email);
+    if (normalizedEmail === user.email) {
+      delete updates.email;
+    } else {
     const emailExists = await User.findOne({
-      email: updates.email,
+      email: normalizedEmail,
       _id: { $ne: req.user._id },
     });
     if (emailExists) {
       return res.status(400).json({ message: 'Email exits' });
     }
-    updates.pendingEmail = updates.email;
-    updates.isVerified = false;
+    if (user.pendingEmail === normalizedEmail) {
+      return res.status(400).json({
+        message: 'A verification email has already been sent to this address',
+      });
+    }
+
+    updates.pendingEmail = normalizedEmail;
     isEmailUpdated = true;
 
     const token = jwt.sign(
-      { id: req.user._id, newEmail: updates.email },
+      { id: req.user._id, newEmail: normalizedEmail },
       SECRET_KEY,
       { expiresIn: '1h' }
     );
     try {
-      await sendVerificationEmail(updates.email, token);
-      logger.info(`Verification email sent to ${updates.email}`);
+      await sendVerificationEmail(normalizedEmail, token, user.name);
+      logger.info(`Verification email sent to ${normalizedEmail}`);
     } catch (emailError) {
       logger.error('Failed to send email:', emailError.message);
       return res
@@ -120,6 +131,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         .json({ message: 'Failed to send verification email' });
     }
     delete updates.email;
+    }
   }
 
   // Perform the update

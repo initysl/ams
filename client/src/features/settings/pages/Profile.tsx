@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import ProfileBox from "@/components/common/ProfileBox";
 import DeleteProfile from "./DeleteProfile";
 import { AdaptiveInput } from "@/components/common/AdaptiveInput";
+import { asApiError, getApiErrorMessage } from "@/lib/api-error";
 
 // Dynamic schema based on user role
 const createProfileSchema = (userRole: string | undefined) => {
@@ -100,7 +101,7 @@ const Profile = () => {
 
     // Fallback for any legacy local files
     const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
-    return `${baseUrl}${profilePicture}?t=${Date.now()}`;
+    return `${baseUrl}${profilePicture}`;
   };
 
   useEffect(() => {
@@ -115,10 +116,6 @@ const Profile = () => {
         formData.matricNumber = user.matricNumber || "";
       }
       reset(formData);
-      // Set preview URL with cache busting if user has profile picture
-      if (user.profilePicture) {
-        setPreviewURL(getImageUrl(user.profilePicture));
-      }
     }
   }, [user, reset]);
 
@@ -168,28 +165,31 @@ const Profile = () => {
 
         // Clear the local profile picture state since we now have the updated user data
         setProfilePicture(null);
-
-        // Force update preview URL with new cache busting parameter
-        if (user?.profilePicture) {
-          setPreviewURL(getImageUrl(user.profilePicture));
-        }
+        setPreviewURL("");
       }
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       // Handle validation errors array from backend
       let message = "Profile update failed. Please try again.";
-
-      if (error?.response?.data?.message) {
-        const errorData = error.response.data.message;
+      const errorData = asApiError(error).response?.data?.message;
+      if (errorData) {
 
         // If it's an array of validation errors
         if (Array.isArray(errorData)) {
           message = errorData
-            .map((err: any) => err.msg || err.message || err)
+            .map((err) =>
+              typeof err === "object" && err !== null
+                ? (err as { msg?: string; message?: string }).msg ||
+                  (err as { msg?: string; message?: string }).message ||
+                  String(err)
+                : String(err)
+            )
             .join(", ");
         } else {
           message = errorData;
         }
+      } else {
+        message = getApiErrorMessage(error, message);
       }
 
       toast.error(message);
@@ -211,8 +211,8 @@ const Profile = () => {
         {/* Profile Picture Section */}
         <div className="flex flex-col items-center ">
           <ProfileBox
-            key={previewURL} // Force re-render when preview URL changes
-            profilePicture={previewURL}
+            key={previewURL || user?.profilePicture || "profile-picture"}
+            profilePicture={previewURL || getImageUrl(user?.profilePicture)}
             onImageChange={handleImageChange}
           />
           <div className="text-center">

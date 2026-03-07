@@ -11,6 +11,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    pendingEmail: {
+      type: String,
+      lowercase: true,
+      trim: true,
+      sparse: true,
     },
     matricNumber: {
       type: String,

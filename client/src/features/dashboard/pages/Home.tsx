@@ -17,6 +17,8 @@ import { motion } from 'framer-motion';
 import WelcomeBanner from '@/features/dashboard/components/WelcomeBanner';
 import ActivityFeed from '@/features/dashboard/components/ActivityFeed';
 
+const MotionLink = motion(Link);
+
 const cardData = {
   cards: [
     {
@@ -61,7 +63,6 @@ const cardData = {
 const Home: React.FC = () => {
   const { user } = useAuth();
   const [isFlipped, setIsFlipped] = useState(false);
-  const MotionLink = motion(Link);
 
   return (
     <div className='space-y-8 min-h-screen'>

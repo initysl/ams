@@ -12,6 +12,10 @@ const {
   sendWelcomeEmail,
 } = require('../utils/sendEmail');
 
+const normalizeEmail = (email) => email.toLowerCase().trim();
+const buildVerificationToken = (payload, expiresIn = '24h') =>
+  jwt.sign(payload, SECRET_KEY, { expiresIn });
+
 // Register - Fixed email sending
 const register = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -20,6 +24,7 @@ const register = asyncHandler(async (req, res) => {
   }
 
   const { name, email, matricNumber, department, password } = req.body;
+  const normalizedEmail = normalizeEmail(email);
 
   // Better validation for matricNumber.
   if (matricNumber && matricNumber.trim() === '') {
@@ -27,7 +32,7 @@ const register = asyncHandler(async (req, res) => {
   }
 
   // Check email and matricNumber separately for better error messages.
-  const existingEmail = await User.findOne({ email });
+  const existingEmail = await User.findOne({ email: normalizedEmail });
   if (existingEmail) {
     return res.status(400).json({ message: 'Email already exists' });
   }
@@ -46,7 +51,7 @@ const register = asyncHandler(async (req, res) => {
 
   const newUser = new User({
     name: name.trim(),
-    email: email.toLowerCase().trim(),
+    email: normalizedEmail,
     matricNumber: matricNumber ? matricNumber.trim() : undefined,
     department: department.trim(),
     profilePicture,
@@ -69,9 +74,7 @@ const register = asyncHandler(async (req, res) => {
   }
 
   // Generate verification token
-  const token = jwt.sign({ id: newUser._id }, SECRET_KEY, {
-    expiresIn: '24h',
-  });
+  const token = buildVerificationToken({ id: newUser._id });
 
   //FIX: Use await and handle the email sending properly
   try {
@@ -91,10 +94,6 @@ const register = asyncHandler(async (req, res) => {
     res.status(201).json({
       message:
         'Registration successful! Please check your mail(spam) to verify your account.',
-      debug: {
-        emailSent: true,
-        messageId: emailResult.messageId,
-      },
     });
 
     logger.info(
@@ -110,11 +109,6 @@ const register = asyncHandler(async (req, res) => {
     res.status(201).json({
       message:
         'User registered successfully but email sending failed. Please contact support.',
-      error: emailError.message,
-      debug: {
-        emailSent: false,
-        reason: emailError.message,
-      },
     });
   }
 });
@@ -128,7 +122,8 @@ const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   // FIXED: Normalize email for lookup
-  const user = await User.findOne({ email: email.toLowerCase().trim() });
+  const normalizedEmail = normalizeEmail(email);
+  const user = await User.findOne({ email: normalizedEmail });
 
   if (!user) {
     return res.status(400).json({ message: 'Invalid email or password' });
@@ -145,21 +140,11 @@ const login = asyncHandler(async (req, res) => {
   }
 
   if (!user.isVerified) {
-    const token = jwt.sign({ id: user._id }, SECRET_KEY, {
-      expiresIn: '24h',
+    return res.status(403).json({
+      code: 'ACCOUNT_NOT_VERIFIED',
+      message: 'Account not verified. Request a new verification email.',
+      email: user.email,
     });
-
-    try {
-      return res.status(400).json({
-        message: 'Account not verified.',
-      });
-    } catch (emailError) {
-      logger.error(`Failed to send verification email: ${emailError.message}`);
-      return res.status(400).json({
-        message:
-          'Please verify your email before logging in. Contact support if needed.',
-      });
-    }
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
@@ -242,13 +227,37 @@ const verifyEmail = asyncHandler(async (req, res) => {
     });
   }
 
-  if (user.isVerified) {
+  const pendingEmail = decoded.newEmail ? normalizeEmail(decoded.newEmail) : null;
+
+  if (!pendingEmail && user.isVerified) {
     return res.status(200).json({
       success: true,
       message: 'Email is already verified!',
     });
   }
 
+  if (pendingEmail) {
+    if (user.pendingEmail !== pendingEmail) {
+      return res.status(400).json({
+        success: false,
+        message: 'This email change request is no longer valid.',
+      });
+    }
+
+    const existingUser = await User.findOne({
+      email: pendingEmail,
+      _id: { $ne: user._id },
+    });
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: 'That email address is already in use.',
+      });
+    }
+
+    user.email = pendingEmail;
+    user.pendingEmail = undefined;
+  }
   user.isVerified = true;
   await user.save();
 
@@ -267,6 +276,40 @@ const verifyEmail = asyncHandler(async (req, res) => {
   });
 
   logger.info(`Email verified for user: ${user.email}`);
+});
+
+const resendVerificationEmail = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array() });
+  }
+
+  const email = normalizeEmail(req.body.email);
+  const user = await User.findOne({
+    $or: [{ email }, { pendingEmail: email }],
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: 'No account found for this email address.' });
+  }
+
+  if (user.email === email && user.isVerified) {
+    return res.status(400).json({ message: 'This email is already verified.' });
+  }
+
+  const tokenPayload =
+    user.pendingEmail === email
+      ? { id: user._id, newEmail: user.pendingEmail }
+      : { id: user._id };
+
+  await sendVerificationEmail(email, buildVerificationToken(tokenPayload), user.name);
+
+  logger.info(`Verification email resent to: ${email}`);
+
+  res.status(200).json({
+    success: true,
+    message: 'Verification email sent. Please check your inbox.',
+  });
 });
 
 // Forgot Password - Updated with rate limiting and better error handling
@@ -490,6 +533,7 @@ module.exports = {
   login,
   verifyEmail,
   forgotPassword,
+  resendVerificationEmail,
   validateResetToken,
   resetPassword,
   logout,

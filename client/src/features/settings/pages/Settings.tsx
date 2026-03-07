@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
@@ -11,25 +11,16 @@ import {
 } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const Settings = () => {
   const { user, logout } = useAuth();
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isSmallMobile = useMediaQuery('(max-width: 480px)');
-  const [showMobileDialog, setShowMobileDialog] = useState(false);
-
   const location = useLocation();
-
-  // Detect route changes to open dialog on mobile
-  useEffect(() => {
-    if (isMobile && location.pathname !== '/dashboard/settings') {
-      setShowMobileDialog(true);
-    } else {
-      setShowMobileDialog(false);
-    }
-  }, [location, isMobile]);
+  const navigate = useNavigate();
+  const showMobileDialog =
+    isMobile && location.pathname !== '/dashboard/settings';
 
   // Function to get the correct image URL with cache busting
   const getImageUrl = (profilePicture: string | null | undefined) => {
@@ -446,7 +437,14 @@ const Settings = () => {
 
       {/* Mobile full-screen dialog */}
       {isMobile && (
-        <Dialog open={showMobileDialog} onOpenChange={setShowMobileDialog}>
+        <Dialog
+          open={showMobileDialog}
+          onOpenChange={(open) => {
+            if (!open) {
+              navigate('/dashboard/settings');
+            }
+          }}
+        >
           {/* Readd h-full if continue overlapping */}
           <DialogContent className='w-full space-y-8 m-0 p-0 overflow-y-auto bg-white border-none rounded-xl'>
             <div className={`${isSmallMobile ? 'p-3' : 'p-4'}`}>

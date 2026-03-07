@@ -7,6 +7,7 @@ const asyncHandler = require("express-async-handler");
 const logger = require("../middlewares/log");
 
 let qrGenerationCount = 0;
+const normalizeMatricNumber = (value = "") => value.trim().toUpperCase();
 
 // Generate Attendance QR Code
 const generateAttendanceQRCode = asyncHandler(async (req, res) => {
@@ -22,19 +23,28 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
 
     const { courseTitle, totalCourseStudents, courseCode, level, duration } =
       req.body;
-    if (!courseCode || !courseTitle || !level || !duration) {
+    const parsedDuration = Number(duration);
+    const parsedTotalStudents = Number(totalCourseStudents);
+
+    if (!courseCode || !courseTitle || !level || !parsedDuration) {
       return res.status(400).json({
         error:
           "courseTitle, totalCourseStudents, courseCode, level, and duration are required",
       });
     }
+    if (!Number.isInteger(parsedDuration) || parsedDuration < 1 || parsedDuration > 60) {
+      return res.status(400).json({ error: "Duration must be between 1 and 60 minutes" });
+    }
+    if (!Number.isInteger(parsedTotalStudents) || parsedTotalStudents < 1) {
+      return res.status(400).json({ error: "Total course students must be a positive number" });
+    }
 
     const sessionStart = new Date();
-    const sessionEnd = addMinutes(sessionStart, duration);
+    const sessionEnd = addMinutes(sessionStart, parsedDuration);
 
     const lectureSession = new LectureSession({
       courseTitle,
-      totalCourseStudents,
+      totalCourseStudents: parsedTotalStudents,
       courseCode,
       level,
       sessionStart,
@@ -52,13 +62,13 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
       {
         sessionId,
         courseTitle,
-        totalCourseStudents,
+        totalCourseStudents: parsedTotalStudents,
         courseCode,
         level,
         expiryTime,
       },
       process.env.JWT_SECRET,
-      { expiresIn: duration * 60 }
+      { expiresIn: parsedDuration * 60 }
     );
 
     const qrCodeUrl = await QRCode.toDataURL(token);
@@ -76,10 +86,10 @@ const generateAttendanceQRCode = asyncHandler(async (req, res) => {
       expiryTime,
       courseDetails: {
         courseCode,
-        totalCourseStudents,
+        totalCourseStudents: parsedTotalStudents,
         courseTitle,
         level,
-        duration,
+        duration: parsedDuration,
       },
     });
   } catch (error) {
@@ -115,6 +125,9 @@ const stopLectureSession = asyncHandler(async (req, res) => {
       return res
         .status(403)
         .json({ error: "You can only manage your own sessions" });
+    }
+    if (!lectureSession.active) {
+      return res.status(400).json({ error: "Session has already been stopped" });
     }
     lectureSession.active = false;
     lectureSession.sessionEnd = new Date(); // End the session now rather than at original end time
@@ -158,15 +171,10 @@ const deleteLectureSession = asyncHandler(async (req, res) => {
         .json({ error: "You can only delete your own sessions" });
     }
 
-    // Delete the session and all related attendance records
-    // First, delete attendance records
-    await LectureSession.deleteMany({ lectureSession: sessionId });
-
-    // Then delete the session itself
     await LectureSession.findByIdAndDelete(sessionId);
 
     res.status(200).json({
-      message: "Session and related attendance records deleted successfully",
+      message: "Session deleted successfully",
     });
   } catch (error) {
     // console.error("Error deleting lecture session:", error);
@@ -207,16 +215,28 @@ const markAttendance = asyncHandler(async (req, res) => {
     if (!student) {
       return res.status(401).json({ error: "Unauthorized user" });
     }
+    if (student.role !== "student") {
+      return res.status(403).json({ error: "Only students can mark attendance" });
+    }
 
     const lectureSession = await LectureSession.findById(sessionId);
     if (!lectureSession) {
       return res.status(404).json({ error: "Session not found" });
     }
+    if (!lectureSession.active) {
+      return res.status(400).json({ error: "Lecture session has been stopped" });
+    }
+    if (new Date() > new Date(lectureSession.sessionEnd)) {
+      lectureSession.active = false;
+      await lectureSession.save();
+      return res.status(400).json({ error: "Lecture session has ended" });
+    }
 
     const { name, matricNumber } = student;
+    const normalizedMatricNumber = normalizeMatricNumber(matricNumber);
 
     const alreadyMarked = lectureSession.attendanceRecords.some(
-      (record) => record.matricNumber === matricNumber
+      (record) => normalizeMatricNumber(record.matricNumber) === normalizedMatricNumber
     );
 
     if (alreadyMarked) {
@@ -237,12 +257,11 @@ const markAttendance = asyncHandler(async (req, res) => {
         requiresConfirmation: true,
         courseData: {
           courseCode: courseCode.trim().toUpperCase(),
-          courseTitle: courseTitle.trim(),
+            courseTitle: courseTitle.trim(),
           level: level.trim(),
           duration: `${durationInMinutes} minutes remaining`,
           sessionTime:
-            lectureSession.startTime ||
-            new Date().toLocaleTimeString("en-US", {
+            lectureSession.sessionStart.toLocaleTimeString("en-US", {
               hour: "2-digit",
               minute: "2-digit",
               hour12: true,
@@ -255,7 +274,7 @@ const markAttendance = asyncHandler(async (req, res) => {
     const record = {
       student: student._id,
       name: name.trim(),
-      matricNumber: matricNumber.trim().toUpperCase(),
+      matricNumber: normalizedMatricNumber,
       courseCode: courseCode.trim().toUpperCase(),
       courseTitle: courseTitle.trim(),
       level: level.trim(),
@@ -299,6 +318,9 @@ const getAttendanceReport = asyncHandler(async (req, res) => {
     if (!lectureSession) {
       return res.status(404).json({ error: "Session not found" });
     }
+    if (lectureSession.lecturer.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: "You can only view your own session reports" });
+    }
 
     const report = lectureSession.attendanceRecords.map((record) => ({
       name: record.name,
@@ -313,7 +335,7 @@ const getAttendanceReport = asyncHandler(async (req, res) => {
       (r) => r.status.toLowerCase() === "present"
     ).length;
 
-    const totalCourseStudents = lectureSession.totalCourseStudents || 0;
+    const totalCourseStudents = Number(lectureSession.totalCourseStudents) || 0;
     const attendanceRate =
       totalCourseStudents > 0
         ? Math.round((presentCount / totalCourseStudents) * 100)
@@ -380,7 +402,7 @@ const getLectureSessions = asyncHandler(async (req, res) => {
 // Recently Marked Attendance
 const recentlyMarkedAttendance = asyncHandler(async (req, res) => {
   try {
-    const { matricNumber } = req.user;
+    const matricNumber = normalizeMatricNumber(req.user.matricNumber);
     if (!matricNumber) {
       return res.status(401).json({ error: "Unauthorized. Please log in" });
     }
@@ -397,7 +419,7 @@ const recentlyMarkedAttendance = asyncHandler(async (req, res) => {
     // Map the sessions to the format we want to return
     const recentSessions = lectureSessions.map((session) => {
       const studentRecord = session.attendanceRecords.find(
-        (record) => record.matricNumber === matricNumber
+        (record) => normalizeMatricNumber(record.matricNumber) === matricNumber
       );
 
       return {
@@ -440,9 +462,10 @@ const attendanceTrend = asyncHandler(async (req, res) => {
       attendanceCount: session.attendanceRecords.length,
       totalCourseStudents: session.totalCourseStudents || 0,
       attendanceRate:
-        session.totalCourseStudents > 0
+        Number(session.totalCourseStudents) > 0
           ? Math.round(
-              (session.attendanceRecords.length / session.totalCourseStudents) *
+              (session.attendanceRecords.length /
+                Number(session.totalCourseStudents)) *
                 100
             )
           : 0,

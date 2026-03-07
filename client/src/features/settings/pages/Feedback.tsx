@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { AdaptiveInput } from "@/components/common/AdaptiveInput";
+import { getApiErrorMessage } from "@/lib/api-error";
 
 type FeedbackFormInputs = {
   category: string;
@@ -45,9 +46,8 @@ const Feedback = () => {
         setValue("email", user.email);
       }
     },
-    onError: (error: any) => {
-      toast.error(`Failed to submit feedback: ${error}`);
-      // console.error(error);
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, "Failed to submit feedback"));
     },
   });
 

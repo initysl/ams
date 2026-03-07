@@ -17,6 +17,7 @@ import {
 import { Loader, AlertTriangle } from "lucide-react";
 import api from "@/lib/axios";
 import { toast } from "sonner";
+import { getApiErrorMessage, asApiError } from "@/lib/api-error";
 
 interface DeleteProfileProps {
   className?: string;
@@ -42,19 +43,25 @@ const DeleteProfile = ({ className = "" }: DeleteProfileProps) => {
       // Logout user and redirect
       logout();
     },
-    onError: (error: any) => {
-      // console.error("Delete error:", error);
+    onError: (error: unknown) => {
       let message = "Failed to delete account.";
-
-      if (error?.response?.data?.message) {
-        const errorData = error.response.data.message;
+      const errorData = asApiError(error).response?.data?.message;
+      if (errorData) {
         if (Array.isArray(errorData)) {
           message = errorData
-            .map((err: any) => err.msg || err.message || err)
+            .map((err) =>
+              typeof err === "object" && err !== null
+                ? (err as { msg?: string; message?: string }).msg ||
+                  (err as { msg?: string; message?: string }).message ||
+                  String(err)
+                : String(err)
+            )
             .join(", ");
         } else {
           message = errorData;
         }
+      } else {
+        message = getApiErrorMessage(error, message);
       }
 
       toast.error(message);

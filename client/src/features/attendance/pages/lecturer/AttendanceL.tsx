@@ -35,18 +35,43 @@ import {
   LectureSession,
   LecturerAttendanceRecord,
 } from "@/types/attendance";
+import { getApiErrorMessage } from "@/lib/api-error";
 
 interface AttendanceProps {
   attendanceCount?: number;
   onUpdateRecord?: (count: number) => void;
 }
 
+const REPORT_CACHE_PREFIX = "reportData_";
+
+const getCachedSelectedSession = () =>
+  typeof window !== "undefined"
+    ? sessionStorage.getItem("selectedSession") || ""
+    : "";
+
+const getCachedReportData = (sessionId: string): AttendanceReportResponse | null => {
+  if (typeof window === "undefined" || !sessionId) {
+    return null;
+  }
+
+  const cachedData = sessionStorage.getItem(`${REPORT_CACHE_PREFIX}${sessionId}`);
+  return cachedData ? (JSON.parse(cachedData) as AttendanceReportResponse) : null;
+};
+
 const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
-  const [selectedSession, setSelectedSession] = useState<string>("");
-  const [report, setReport] = useState<LecturerAttendanceRecord[]>([]);
+  const [selectedSession, setSelectedSession] = useState<string>(
+    getCachedSelectedSession
+  );
+  const [report, setReport] = useState<LecturerAttendanceRecord[]>(() => {
+    const cachedData = getCachedReportData(getCachedSelectedSession());
+    return cachedData?.report || [];
+  });
   const [sessionData, setSessionData] = useState<
     AttendanceReportResponse["sessionData"] | null
-  >(null);
+  >(() => {
+    const cachedData = getCachedReportData(getCachedSelectedSession());
+    return cachedData?.sessionData || null;
+  });
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const { updateAttendanceStats } = useAttendance();
@@ -85,13 +110,13 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
 
       // Cache both report and session data
       if (selectedSession) {
-        const cachedDataKey = `reportData_${selectedSession}`;
+        const cachedDataKey = `${REPORT_CACHE_PREFIX}${selectedSession}`;
         sessionStorage.setItem(cachedDataKey, JSON.stringify(data));
       }
       toast.success("Attendance report generated successfully");
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.error || "Failed to generate report");
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, "Failed to generate report"));
       setReport([]);
       setSessionData(null);
     },
@@ -108,7 +133,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
         // Find all report keys
         for (let i = 0; i < sessionStorage.length; i++) {
           const key = sessionStorage.key(i);
-          if (key && key.startsWith("report_")) {
+          if (key && key.startsWith(REPORT_CACHE_PREFIX)) {
             keysToRemove.push(key);
           }
         }
@@ -158,22 +183,6 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     return acc;
   }, {} as Record<string, number>);
 
-  // Load cached data on mount
-  useEffect(() => {
-    // Load cached selected session
-    const cachedSelectedSession = sessionStorage.getItem("selectedSession");
-    if (cachedSelectedSession) {
-      setSelectedSession(cachedSelectedSession);
-
-      // Load cached report based on the selected session
-      const cachedReportKey = `report_${cachedSelectedSession}`;
-      const cachedReport = sessionStorage.getItem(cachedReportKey);
-      if (cachedReport) {
-        setReport(JSON.parse(cachedReport));
-      }
-    }
-  }, []);
-
   // Update total students count whenever report changes
   useEffect(() => {
     updateAttendanceStats(presentCount, totalCourseStudents);
@@ -181,7 +190,7 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     if (onUpdateRecord) {
       onUpdateRecord(totalCourseStudents);
     }
-  }, [totalCourseStudents, onUpdateRecord, updateAttendanceStats]);
+  }, [presentCount, totalCourseStudents, onUpdateRecord, updateAttendanceStats]);
 
   // Handle session selection change
   const handleSessionChange = (value: string) => {
@@ -189,13 +198,14 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     sessionStorage.setItem("selectedSession", value);
 
     // Check if we already have a cached report for this session
-    const cachedReportKey = `report_${value}`;
-    const cachedReport = sessionStorage.getItem(cachedReportKey);
+    const cachedReportData = getCachedReportData(value);
 
-    if (cachedReport) {
-      setReport(JSON.parse(cachedReport));
+    if (cachedReportData) {
+      setReport(cachedReportData.report);
+      setSessionData(cachedReportData.sessionData);
     } else {
       setReport([]);
+      setSessionData(null);
     }
   };
 
@@ -207,11 +217,11 @@ const AttendanceL: React.FC<AttendanceProps> = ({ onUpdateRecord }) => {
     }
 
     // Check if we have cached report for this session
-    const cachedReportKey = `report_${selectedSession}`;
-    const cachedReport = sessionStorage.getItem(cachedReportKey);
+    const cachedReportData = getCachedReportData(selectedSession);
 
-    if (cachedReport) {
-      setReport(JSON.parse(cachedReport));
+    if (cachedReportData) {
+      setReport(cachedReportData.report);
+      setSessionData(cachedReportData.sessionData);
       toast.success("Loaded attendance report");
       return;
     }

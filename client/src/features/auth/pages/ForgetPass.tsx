@@ -18,6 +18,7 @@ import {
 import { AdaptiveInput } from '@/components/common/AdaptiveInput';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { asApiError } from '@/lib/api-error';
 
 const recoverSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -109,8 +110,8 @@ const ForgetPass: React.FC = () => {
 
       toast.success('Reset link sent successfully!');
     },
-    onError: (error) => {
-      const errorResponse = (error as any)?.response;
+    onError: (error: unknown) => {
+      const errorResponse = asApiError(error).response;
       const errorMessage = errorResponse?.data?.message;
       const status = errorResponse?.status;
 
@@ -118,8 +119,8 @@ const ForgetPass: React.FC = () => {
       if (status === 429) {
         setIsRateLimited(true);
         setRateLimitInfo({
-          nextAttemptTime: errorResponse.data.nextAttemptTime,
-          retryAfter: errorResponse.data.retryAfter,
+          nextAttemptTime: errorResponse?.data?.nextAttemptTime,
+          retryAfter: errorResponse?.data?.retryAfter,
         });
 
         return;

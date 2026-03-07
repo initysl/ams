@@ -5,6 +5,7 @@ import api from "@/lib/axios";
 import { Loader, CheckCircle, XCircle, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { asApiError } from "@/lib/api-error";
 
 interface VerificationState {
   isVerifying: boolean;
@@ -58,24 +59,21 @@ const VerifyEmail: React.FC = () => {
             errorMessage: null,
             countdown: 5, // Set countdown for redirect
           }));
-          // Optionally open login modal after short delay
-          setTimeout(() => {
-            navigate("/auth");
-          }, 3000);
         } else {
           throw new Error(res.data.message || "Verification failed");
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const apiError = asApiError(error);
         let errorMessage = "Something went wrong during verification.";
 
-        if (error.response?.status === 400) {
+        if (apiError.response?.status === 400) {
           errorMessage = "Invalid or expired verification token.";
-        } else if (error.response?.status === 404) {
+        } else if (apiError.response?.status === 404) {
           errorMessage = "Verification token not found.";
-        } else if (error.response?.status === 409) {
+        } else if (apiError.response?.status === 409) {
           errorMessage = "Email is already verified.";
-        } else if (error.response?.data?.message) {
-          errorMessage = error.response.data.message;
+        } else if (apiError.response?.data?.message) {
+          errorMessage = apiError.response.data.message;
         }
 
         setState((prev) => ({
@@ -89,7 +87,7 @@ const VerifyEmail: React.FC = () => {
     };
 
     verify();
-  }, [token]);
+  }, [navigate, token]);
 
   // Resend verification email
   // const handleResendEmail = async () => {
@@ -250,6 +248,15 @@ const VerifyEmail: React.FC = () => {
                   <li>Contact support if the issue persists</li>
                 </ul>
               </div>
+
+              <Button
+                onClick={() => navigate("/auth")}
+                variant="outline"
+                className="w-full"
+                size="lg"
+              >
+                Back to Login
+              </Button>
 
               {/* Action buttons
               <div className="space-y-3">

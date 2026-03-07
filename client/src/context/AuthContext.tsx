@@ -5,9 +5,12 @@ import {
   useState,
   useEffect,
   useMemo,
+  useCallback,
+  useRef,
   ReactNode,
 } from "react";
 import { toast } from "sonner";
+import { asApiError, getApiErrorMessage } from "@/lib/api-error";
 
 type User = {
   name: string;
@@ -35,31 +38,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
+  const hasInitializedRef = useRef(false);
 
   const isAuthenticated = Boolean(user);
 
-  const login = async (credentials: { email: string; password: string }) => {
-    try {
-      setIsLoading(true);
-      const response = await api.post("auth/login", credentials, {
-        withCredentials: true,
-      });
+  const login = useCallback(
+    async (credentials: { email: string; password: string }) => {
+      try {
+        setIsLoading(true);
+        const response = await api.post("auth/login", credentials, {
+          withCredentials: true,
+        });
 
-      if (response.data.user) {
-        setUser(response.data.user);
-        toast.success("Signed in successfully!");
-      } else {
+        if (response.data.user) {
+          setUser(response.data.user);
+          toast.success("Signed in successfully!");
+          return;
+        }
+
         throw new Error(response.data.message || "Sign in failed");
+      } catch (error: unknown) {
+        const apiError = asApiError(error);
+        if (apiError.response?.data?.code !== "ACCOUNT_NOT_VERIFIED") {
+          toast.error(getApiErrorMessage(error, "Sign in failed"));
+        }
+        throw error;
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Sign in failed");
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    []
+  );
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       setIsLoading(true);
       await api.post(
@@ -71,15 +82,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       );
       setUser(null);
       toast.success("Signed out successfully.");
-    } catch (error) {
+    } catch {
       toast.error("Sign out failed.");
-      // console.error("Signed out error:", error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await api.get("user/profile/me", {
@@ -91,26 +101,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       } else {
         setUser(null);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       setUser(null);
+      const status = asApiError(error).response?.status;
 
-      // Don't show error for 401 (user not authenticated) or 403 (forbidden)
-      // These are expected when user is not logged in
-      const status = error?.response?.status;
-      if (isInitialized && status !== 401 && status !== 403) {
-        console.error("Auth check failed:", error);
-        // Only show toast for unexpected errors (500, network issues, etc.)
-        if (status >= 500 || !status) {
+      if (hasInitializedRef.current && status !== 401 && status !== 403) {
+        if (!status || status >= 500) {
           toast.error("Failed to verify authentication.");
         }
       }
     } finally {
       setIsLoading(false);
+      hasInitializedRef.current = true;
       setIsInitialized(true);
     }
-  };
+  }, []);
 
-  const refetchUser = async () => {
+  const refetchUser = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await api.get("user/profile/me", {
@@ -121,17 +128,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       } else {
         setUser(null);
       }
-    } catch (error) {
+    } catch {
       setUser(null);
       toast.error("Failed to refresh user session.");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchUser();
-  }, []);
+    void fetchUser();
+  }, [fetchUser]);
 
   // Enhanced loading state - only false when both initialized and user data is resolved
   const effectiveIsLoading = isLoading || !isInitialized;
@@ -145,7 +152,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       logout,
       refetchUser,
     }),
-    [user, isAuthenticated, effectiveIsLoading]
+    [user, isAuthenticated, effectiveIsLoading, login, logout, refetchUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
