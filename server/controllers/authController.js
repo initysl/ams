@@ -82,12 +82,12 @@ const register = asyncHandler(async (req, res) => {
     const emailResult = await sendVerificationEmail(
       newUser.email,
       token,
-      newUser.name
+      newUser.name,
     );
 
     // Log success for debugging
     logger.info(
-      `✅ Verification email sent to: ${newUser.email} (Message ID: ${emailResult.messageId})`
+      `✅ Verification email sent to: ${newUser.email} (Message ID: ${emailResult.messageId})`,
     );
 
     // Only send success response after email is sent
@@ -97,7 +97,7 @@ const register = asyncHandler(async (req, res) => {
     });
 
     logger.info(
-      `User registered: ${newUser.email}, ${newUser.matricNumber || 'lecturer'}`
+      `User registered: ${newUser.email}, ${newUser.matricNumber || 'lecturer'}`,
     );
   } catch (emailError) {
     // Log the full error for debugging
@@ -132,7 +132,7 @@ const login = asyncHandler(async (req, res) => {
   // Check if account is locked
   if (user.lockUntil && user.lockUntil > Date.now()) {
     const lockTimeRemaining = Math.ceil(
-      (user.lockUntil - Date.now()) / (1000 * 60)
+      (user.lockUntil - Date.now()) / (1000 * 60),
     );
     return res.status(429).json({
       message: `Account locked. Try again in ${lockTimeRemaining} minutes.`,
@@ -227,7 +227,9 @@ const verifyEmail = asyncHandler(async (req, res) => {
     });
   }
 
-  const pendingEmail = decoded.newEmail ? normalizeEmail(decoded.newEmail) : null;
+  const pendingEmail = decoded.newEmail
+    ? normalizeEmail(decoded.newEmail)
+    : null;
 
   if (!pendingEmail && user.isVerified) {
     return res.status(200).json({
@@ -290,7 +292,9 @@ const resendVerificationEmail = asyncHandler(async (req, res) => {
   });
 
   if (!user) {
-    return res.status(404).json({ message: 'No account found for this email address.' });
+    return res
+      .status(404)
+      .json({ message: 'No account found for this email address.' });
   }
 
   if (user.email === email && user.isVerified) {
@@ -302,13 +306,17 @@ const resendVerificationEmail = asyncHandler(async (req, res) => {
       ? { id: user._id, newEmail: user.pendingEmail }
       : { id: user._id };
 
-  await sendVerificationEmail(email, buildVerificationToken(tokenPayload), user.name);
+  await sendVerificationEmail(
+    email,
+    buildVerificationToken(tokenPayload),
+    user.name,
+  );
 
   logger.info(`Verification email resent to: ${email}`);
 
   res.status(200).json({
     success: true,
-    message: 'Verification email sent. Please check your inbox.',
+    message: 'Verification email sent. Please check your inbox/[spam].',
   });
 });
 
@@ -349,13 +357,13 @@ const forgotPassword = asyncHandler(async (req, res) => {
   // Check if user has exceeded daily limit
   if (user.passwordResetAttempts >= 5) {
     const hoursUntilReset = Math.ceil(
-      24 - (now.getHours() + now.getMinutes() / 60)
+      24 - (now.getHours() + now.getMinutes() / 60),
     );
     return res.status(429).json({
       message: 'Limit exceeded. Please try again tomorrow.',
       retryAfter: hoursUntilReset,
       nextAttemptTime: new Date(
-        today.getTime() + 24 * 60 * 60 * 1000
+        today.getTime() + 24 * 60 * 60 * 1000,
       ).toISOString(),
     });
   }
@@ -378,7 +386,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     });
 
     logger.info(
-      `Password reset link sent to: ${user.email} (${user.passwordResetAttempts}/5 attempts used)`
+      `Password reset link sent to: ${user.email} (${user.passwordResetAttempts}/5 attempts used)`,
     );
   } catch (emailError) {
     // Rollback the attempt counter if email fails

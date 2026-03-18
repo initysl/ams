@@ -1,11 +1,11 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import api from "@/lib/axios";
-import { Loader, CheckCircle, XCircle, Shield } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { asApiError } from "@/lib/api-error";
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import api from '@/lib/axios';
+import { Loader, CheckCircle, XCircle, Shield } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { asApiError } from '@/lib/api-error';
 
 interface VerificationState {
   isVerifying: boolean;
@@ -19,7 +19,7 @@ interface VerificationState {
 const VerifyEmail: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const token = searchParams.get("token");
+  const token = searchParams.get('token');
 
   const [state, setState] = useState<VerificationState>({
     isVerifying: true,
@@ -40,7 +40,7 @@ const VerifyEmail: React.FC = () => {
       }, 1000);
       return () => clearTimeout(timer);
     } else if (state.success && state.countdown === 0) {
-      navigate("/auth");
+      navigate('/auth');
     }
   }, [state.success, state.countdown, navigate]);
 
@@ -50,7 +50,7 @@ const VerifyEmail: React.FC = () => {
       try {
         const res = await api.get(`auth/verify?token=${token}`);
         if (res.data.success) {
-          toast.success("Email verified successfully! Redirecting to login");
+          toast.success('Email verified successfully! Redirecting to login');
           setState((prev) => ({
             ...prev,
             isVerifying: false,
@@ -60,18 +60,18 @@ const VerifyEmail: React.FC = () => {
             countdown: 5, // Set countdown for redirect
           }));
         } else {
-          throw new Error(res.data.message || "Verification failed");
+          throw new Error(res.data.message || 'Verification failed');
         }
       } catch (error: unknown) {
         const apiError = asApiError(error);
-        let errorMessage = "Something went wrong during verification.";
+        let errorMessage = 'Something went wrong during verification.';
 
         if (apiError.response?.status === 400) {
-          errorMessage = "Invalid or expired verification token.";
+          errorMessage = 'Invalid or expired verification token.';
         } else if (apiError.response?.status === 404) {
-          errorMessage = "Verification token not found.";
+          errorMessage = 'Verification token not found.';
         } else if (apiError.response?.status === 409) {
-          errorMessage = "Email is already verified.";
+          errorMessage = 'Email is already verified.';
         } else if (apiError.response?.data?.message) {
           errorMessage = apiError.response.data.message;
         }
@@ -82,7 +82,7 @@ const VerifyEmail: React.FC = () => {
           error: true,
           errorMessage,
         }));
-        toast.error("Verification failed");
+        toast.error('Verification failed');
       }
     };
 
@@ -116,32 +116,32 @@ const VerifyEmail: React.FC = () => {
   // Verification in progress
   if (state.isVerifying) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md mx-auto shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-          <CardContent className="pt-8 pb-8">
-            <div className="text-center space-y-6">
+      <div className='min-h-screen bg-linear-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4'>
+        <Card className='w-full max-w-md mx-auto shadow-lg border-0 bg-white/80 backdrop-blur-sm'>
+          <CardContent className='pt-8 pb-8'>
+            <div className='text-center space-y-6'>
               {/* Animated loader */}
-              <div className="flex justify-center">
-                <div className="relative">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Loader className="w-8 h-8 text-blue-600 animate-spin" />
+              <div className='flex justify-center'>
+                <div className='relative'>
+                  <div className='w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center'>
+                    <Loader className='w-8 h-8 text-blue-600 animate-spin' />
                   </div>
-                  <div className="absolute inset-0 w-16 h-16 border-2 border-blue-200 rounded-full animate-pulse"></div>
+                  <div className='absolute inset-0 w-16 h-16 border-2 border-blue-200 rounded-full animate-pulse'></div>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <h1 className="text-2xl font-semibold text-gray-900">
+              <div className='space-y-2'>
+                <h1 className='text-2xl font-semibold text-gray-900'>
                   Verifying Your Email
                 </h1>
-                <p className="text-gray-600">
+                <p className='text-gray-600'>
                   Please wait while we verify your email address...
                 </p>
               </div>
 
               {/* Progress indicator */}
-              <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-                <Shield className="w-4 h-4" />
+              <div className='flex items-center justify-center space-x-2 text-sm text-gray-500'>
+                <Shield className='w-4 h-4' />
                 <span>Secure verification in progress</span>
               </div>
             </div>
@@ -154,54 +154,54 @@ const VerifyEmail: React.FC = () => {
   // Success state
   if (state.success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md mx-auto shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-          <CardContent className="pt-8 pb-8">
-            <div className="text-center space-y-6">
+      <div className='min-h-screen bg-linear-to-br from-green-50 via-white to-emerald-50 flex items-center justify-center p-4'>
+        <Card className='w-full max-w-md mx-auto shadow-lg border-0 bg-white/80 backdrop-blur-sm'>
+          <CardContent className='pt-8 pb-8'>
+            <div className='text-center space-y-6'>
               {/* Success icon */}
-              <div className="flex justify-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-10 h-10 text-green-600" />
+              <div className='flex justify-center'>
+                <div className='w-16 h-16 bg-green-100 rounded-full flex items-center justify-center'>
+                  <CheckCircle className='w-10 h-10 text-green-600' />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <h1 className="text-2xl font-semibold text-gray-900">
+              <div className='space-y-2'>
+                <h1 className='text-2xl font-semibold text-gray-900'>
                   Email Verified Successfully!
                 </h1>
-                <p className="text-gray-600">
+                <p className='text-gray-600'>
                   Your email has been verified. You can now access your account.
                 </p>
               </div>
 
               {/* Auto-redirect countdown */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <p className="text-sm text-green-700 font-medium">
+              <div className='bg-green-50 border border-green-200 rounded-lg p-4'>
+                <p className='text-sm text-green-700 font-medium'>
                   Redirecting to login in {state.countdown} seconds...
                 </p>
-                <div className="mt-2 bg-green-200 rounded-full h-1">
+                <div className='mt-2 bg-green-200 rounded-full h-1'>
                   <div
-                    className="bg-green-500 h-1 rounded-full transition-all duration-1000"
+                    className='bg-green-500 h-1 rounded-full transition-all duration-1000'
                     style={{ width: `${((5 - state.countdown) / 5) * 100}%` }}
                   />
                 </div>
               </div>
 
               {/* Action buttons */}
-              <div className="space-y-3">
+              <div className='space-y-3'>
                 <Button
-                  onClick={() => navigate("/auth")}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
-                  size="lg"
+                  onClick={() => navigate('/auth')}
+                  className='w-full bg-green-600 hover:bg-green-700 text-white'
+                  size='lg'
                 >
                   Continue to Login
                 </Button>
 
                 <Button
-                  onClick={() => navigate("/dashboard")}
-                  variant="outline"
-                  className="w-full"
-                  size="lg"
+                  onClick={() => navigate('/dashboard')}
+                  variant='outline'
+                  className='w-full'
+                  size='lg'
                 >
                   Go to Dashboard
                 </Button>
@@ -216,32 +216,32 @@ const VerifyEmail: React.FC = () => {
   // Error state
   if (state.error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-rose-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md mx-auto shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-          <CardContent className="pt-8 pb-8">
-            <div className="text-center space-y-6">
+      <div className='min-h-screen bg-linear-to-br from-red-50 via-white to-rose-50 flex items-center justify-center p-4'>
+        <Card className='w-full max-w-md mx-auto shadow-lg border-0 bg-white/80 backdrop-blur-sm'>
+          <CardContent className='pt-8 pb-8'>
+            <div className='text-center space-y-6'>
               {/* Error icon */}
-              <div className="flex justify-center">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                  <XCircle className="w-10 h-10 text-red-600" />
+              <div className='flex justify-center'>
+                <div className='w-16 h-16 bg-red-100 rounded-full flex items-center justify-center'>
+                  <XCircle className='w-10 h-10 text-red-600' />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <h1 className="text-2xl font-semibold text-gray-900">
+              <div className='space-y-2'>
+                <h1 className='text-2xl font-semibold text-gray-900'>
                   Verification Failed
                 </h1>
-                <p className="text-gray-600 text-sm leading-relaxed">
+                <p className='text-gray-600 text-sm leading-relaxed'>
                   {state.errorMessage}
                 </p>
               </div>
 
               {/* Error details */}
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-left">
-                <h3 className="text-sm font-medium text-red-800 mb-2">
+              <div className='bg-red-50 border border-red-200 rounded-lg p-4 text-left'>
+                <h3 className='text-sm font-medium text-red-800 mb-2'>
                   What can you do?
                 </h3>
-                <ul className="text-sm text-red-700 space-y-1 list-disc list-inside">
+                <ul className='text-sm text-red-700 space-y-1 list-disc list-inside'>
                   <li>Check if the link in your email is complete</li>
                   <li>Try copying and pasting the entire URL</li>
                   <li>Request a new verification email</li>
@@ -250,10 +250,10 @@ const VerifyEmail: React.FC = () => {
               </div>
 
               <Button
-                onClick={() => navigate("/auth")}
-                variant="outline"
-                className="w-full"
-                size="lg"
+                onClick={() => navigate('/auth')}
+                variant='outline'
+                className='w-full'
+                size='lg'
               >
                 Back to Login
               </Button>
