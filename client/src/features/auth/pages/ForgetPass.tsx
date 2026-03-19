@@ -139,7 +139,7 @@ const ForgetPass: React.FC = () => {
         toast.error('Too many attempts. Please wait before trying again');
       } else {
         toast.error(
-          errorMessage || 'Unable to send reset link. Please try again'
+          errorMessage || 'Unable to send reset link. Please try again',
         );
       }
     },

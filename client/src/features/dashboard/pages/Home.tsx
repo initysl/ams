@@ -17,7 +17,7 @@ import { motion } from 'framer-motion';
 import WelcomeBanner from '@/features/dashboard/components/WelcomeBanner';
 import ActivityFeed from '@/features/dashboard/components/ActivityFeed';
 
-const MotionLink = motion(Link);
+const MotionLink = motion.create(Link);
 
 const cardData = {
   cards: [

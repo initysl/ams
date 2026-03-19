@@ -93,7 +93,7 @@ const register = asyncHandler(async (req, res) => {
     // Only send success response after email is sent
     res.status(201).json({
       message:
-        'Registration successful! Please check your mail(spam) to verify your account.',
+        'Registration successful! Please check your inbox/spam to verify your account.',
     });
 
     logger.info(
@@ -316,7 +316,7 @@ const resendVerificationEmail = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: 'Verification email sent. Please check your inbox/[spam].',
+    message: 'Verification email sent. Please check your inbox/spam.',
   });
 });
 

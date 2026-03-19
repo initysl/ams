@@ -1,9 +1,7 @@
 require('dotenv').config();
-const axios = require('axios');
+const { Resend } = require('resend');
 
-// --- Elastic Email API Setup ---
-const ELASTIC_API_KEY = process.env.ELASTIC_API_KEY;
-const ELASTIC_API_URL = process.env.ELASTIC_API_URL;
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // --- HTML Email Template ---
 const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
@@ -15,7 +13,7 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${title}</title>
     <style type="text/css">
-      @media only screen and (max-width: 600px) {
+      @media only screen and (max-width: 700px) {
         .email-container { width: 100% !important; }
         .email-content { padding: 20px !important; }
       }
@@ -29,7 +27,7 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
             
             <!-- Header -->
             <tr>
-              <td align="center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px;">
+              <td align="center" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); padding: 40px 30px;">
                 <h1 style="font-size:28px; margin:0; color:#ffffff; font-weight:600; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">${title}</h1>
               </td>
             </tr>
@@ -48,7 +46,7 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
               <td align="center" style="padding: 20px 30px 40px;">
                 <table border="0" cellpadding="0" cellspacing="0">
                   <tr>
-                    <td align="center" style="border-radius:8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
+                    <td align="center" style="border-radius:8px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
                       <a href="${buttonUrl}" target="_blank" style="
                         display:inline-block;
                         padding:16px 32px;
@@ -66,8 +64,8 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
                 </table>
                 
                 <!-- Fallback link -->
-                <div style="margin-top: 20px; padding: 15px; background-color: #f3f4f6; border-radius: 6px; border-left: 4px solid #6366f1;">
-                  <p style="margin: 0; font-size: 14px; color: #6b7280;">
+                <div style="margin-top: 20px; padding: 15px; background-color: #f3f4f6; border-radius: 6px; border-left: 4px solid #11998e;">
+                  <p style="margin: 0; font-size: 14px; color: #38ef7d;">
                     <strong>Button not working?</strong> Copy and paste this link into your browser:
                   </p>
                   <p style="margin: 8px 0 0 0; font-size: 14px; word-break: break-all;">
@@ -93,8 +91,8 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
                       </p>
                       <p style="margin: 0; font-size: 12px; color: #9ca3af;">
                         &copy; ${new Date().getFullYear()} ${
-    process.env.ORG_NAME || 'TheFirst Studio'
-  }. All rights reserved.
+                          process.env.ORG_NAME || 'TheFirst Studio'
+                        }. All rights reserved.
                       </p>
                     </td>
                   </tr>
@@ -110,57 +108,36 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
   `;
 };
 
-// --- Send Email via Elastic Email API ---
-const sendElasticEmail = async (
+// --- Send Email via Resend ---
+const sendResendEmail = async (
   to,
   subject,
   htmlContent,
   textContent,
-  fromName
+  fromName,
 ) => {
   try {
-    console.log('📧 Attempting to send email via Elastic Email...');
-    console.log('From:', `${fromName} <${process.env.ELASTIC_FROM_EMAIL}>`);
-    console.log('To:', to);
-    console.log('Subject:', subject);
-    console.log('API Key exists:', !!ELASTIC_API_KEY);
-
-    const params = new URLSearchParams({
-      apikey: ELASTIC_API_KEY,
-      from: process.env.ELASTIC_FROM_EMAIL,
-      fromName: fromName,
-      to: to,
+    const { data, error } = await resend.emails.send({
+      from: `${fromName} <${process.env.RESEND_FROM_EMAIL}>`,
+      to: [to],
       subject: subject,
-      bodyHtml: htmlContent,
-      bodyText: textContent,
-      isTransactional: 'true',
+      html: htmlContent,
+      text: textContent,
     });
 
-    const response = await axios.post(ELASTIC_API_URL, params.toString(), {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    });
+    if (error) {
+      throw new Error(error.message);
+    }
 
-    console.log('Email sent successfully:', response.data);
+    console.log('Email sent successfully:', data);
     return {
       success: true,
-      messageId: response.data.transactionid || response.data.messageid,
-      data: response.data,
+      messageId: data.id,
+      data,
     };
   } catch (error) {
-    console.error(
-      'Failed to send email:',
-      error.response?.data || error.message
-    );
-    console.error('Error details:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
-    });
-    throw new Error(
-      `Failed to send email: ${error.response?.data?.error || error.message}`
-    );
+    console.error('Failed to send email:', error.message);
+    throw new Error(`Failed to send email: ${error.message}`);
   }
 };
 
@@ -177,11 +154,11 @@ const sendVerificationEmail = async (email, token, userName = null) => {
       process.env.APP_NAME || 'AttendEase'
     }! We're excited to have you as part of our community.</p>
     
-    <p style="margin: 0 0 20px 0;">To activate your account and start using all our features, please verify your email address by clicking the button below:</p>
+    <p style="margin: 0 0 20px 0;">To activate your account and get started, please verify your email address by clicking the button below:</p>
     
     <div style="background: #fef3c7; padding: 16px; border-radius: 8px; border-left: 4px solid #f59e0b; margin: 20px 0;">
       <p style="margin: 0; color: #92400e; font-size: 14px;">
-        <strong>🔒 Security Notice:</strong> This verification link expires in 24 hours and can only be used once. Keep this email secure.
+        <strong>Security Notice:</strong> This verification link expires in 24 hours and can only be used once. Keep this email secure.
       </p>
     </div>
   `;
@@ -210,15 +187,15 @@ The ${process.env.ORG_NAME || 'TheFirst Studio'} Team
     'Verify Your Email Address',
     content,
     'Verify Email',
-    verificationUrl
+    verificationUrl,
   );
 
-  return sendElasticEmail(
+  return sendResendEmail(
     email,
     `Please verify your ${process.env.APP_NAME || 'AttendEase'} account`,
     htmlContent,
     textContent,
-    process.env.APP_NAME || 'AttendEase'
+    process.env.APP_NAME || 'AttendEase',
   );
 };
 
@@ -276,15 +253,15 @@ The ${process.env.ORG_NAME || 'TheFirst Studio'} Team
     'Reset Your Password',
     content,
     'Reset My Password',
-    resetUrl
+    resetUrl,
   );
 
-  return sendElasticEmail(
+  return sendResendEmail(
     email,
     `Reset your ${process.env.APP_NAME || 'AttendEase'} password`,
     htmlContent,
     textContent,
-    process.env.APP_NAME || 'AttendEase'
+    process.env.APP_NAME || 'AttendEase',
   );
 };
 
@@ -338,15 +315,15 @@ The ${process.env.ORG_NAME || 'TheFirst Studio'} Team
     `Welcome to ${process.env.APP_NAME || 'AttendEase'}!`,
     content,
     'Go to Dashboard',
-    dashboardUrl
+    dashboardUrl,
   );
 
-  return sendElasticEmail(
+  return sendResendEmail(
     email,
     `Welcome to ${process.env.APP_NAME || 'AttendEase'} - You're all set! 🎉`,
     htmlContent,
     textContent,
-    process.env.APP_NAME || 'AttendEase'
+    process.env.APP_NAME || 'AttendEase',
   );
 };
 
