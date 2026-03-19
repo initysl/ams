@@ -27,7 +27,7 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
             
             <!-- Header -->
             <tr>
-              <td align="center" style="background: background-color:#11998e; padding: 40px 30px;">
+              <td align="center" style="background-color:#11998e; padding: 40px 30px;">
                 <h1 style="font-size:28px; margin:0; color:#ffffff; font-weight:600; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">${title}</h1>
               </td>
             </tr>
