@@ -24,9 +24,14 @@ const About = () => {
           <h3 className="text-lg font-medium">Developer</h3>
           <p className="text-gray-600">
             Developed by{" "}
-            <span className="text-gray-700 hover:underline">
-              Yusuf Lawal @TheFirstStudio
-            </span>
+              <a
+              href='https://x.com/initysl'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-slate-400 hover:text-slate-700 underline transition-colors duration-150'
+              aria-label='X (Twitter)'
+            >initysl
+            </a>
           </p>
         </div>
 
@@ -35,10 +40,12 @@ const About = () => {
           <p className="text-gray-600">
             For support or inquiries, please contact:{" "}
             <a
-              href="mailto:lawalyusuf356@gmail.com"
-              className="text-blue-600 hover:underline"
-            >
-              lawalyusuf356@gmail.com
+              href='https://x.com/initysl'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-slate-400 hover:text-slate-700 underline transition-colors duration-150'
+              aria-label='X (Twitter)'
+            >initysl
             </a>
           </p>
         </div>
