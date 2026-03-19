@@ -58,7 +58,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   if (updates.password && updates.password.trim() !== '') {
     const isSamePassword = await bcrypt.compare(
       updates.password,
-      user.password
+      user.password,
     );
     if (isSamePassword) {
       return res.status(400).json({
@@ -83,10 +83,10 @@ const updateUserProfile = asyncHandler(async (req, res) => {
           await cloudinary.uploader.destroy(publicId);
         }
       } catch (error) {
-        console.error(
-          'Failed to delete old profile picture from Cloudinary:',
-          error.message
-        );
+        // console.error(
+        //   'Failed to delete old profile picture from Cloudinary:',
+        //   error.message
+        // );
         // Don't return error here, continue with upload
       }
     }
@@ -100,37 +100,37 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     if (normalizedEmail === user.email) {
       delete updates.email;
     } else {
-    const emailExists = await User.findOne({
-      email: normalizedEmail,
-      _id: { $ne: req.user._id },
-    });
-    if (emailExists) {
-      return res.status(400).json({ message: 'Email exits' });
-    }
-    if (user.pendingEmail === normalizedEmail) {
-      return res.status(400).json({
-        message: 'A verification email has already been sent to this address',
+      const emailExists = await User.findOne({
+        email: normalizedEmail,
+        _id: { $ne: req.user._id },
       });
-    }
+      if (emailExists) {
+        return res.status(400).json({ message: 'Email exits' });
+      }
+      if (user.pendingEmail === normalizedEmail) {
+        return res.status(400).json({
+          message: 'A verification email has already been sent to this address',
+        });
+      }
 
-    updates.pendingEmail = normalizedEmail;
-    isEmailUpdated = true;
+      updates.pendingEmail = normalizedEmail;
+      isEmailUpdated = true;
 
-    const token = jwt.sign(
-      { id: req.user._id, newEmail: normalizedEmail },
-      SECRET_KEY,
-      { expiresIn: '1h' }
-    );
-    try {
-      await sendVerificationEmail(normalizedEmail, token, user.name);
-      logger.info(`Verification email sent to ${normalizedEmail}`);
-    } catch (emailError) {
-      logger.error('Failed to send email:', emailError.message);
-      return res
-        .status(500)
-        .json({ message: 'Failed to send verification email' });
-    }
-    delete updates.email;
+      const token = jwt.sign(
+        { id: req.user._id, newEmail: normalizedEmail },
+        SECRET_KEY,
+        { expiresIn: '1h' },
+      );
+      try {
+        await sendVerificationEmail(normalizedEmail, token, user.name);
+        logger.info(`Verification email sent to ${normalizedEmail}`);
+      } catch (emailError) {
+        logger.error('Failed to send email:', emailError.message);
+        return res
+          .status(500)
+          .json({ message: 'Failed to send verification email' });
+      }
+      delete updates.email;
     }
   }
 

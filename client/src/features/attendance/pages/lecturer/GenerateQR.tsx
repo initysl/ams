@@ -100,7 +100,11 @@ const QRPlaceholder = ({
   <div className='flex flex-col items-center justify-center min-h-52 border border-gray-200 mb-6 p-4 rounded-lg'>
     {generated ? (
       <div className={`${isExpired ? 'opacity-50 grayscale' : ''}`}>
-        <img src={qrCodeUrl} alt='Generated QR Code' className='w-52 h-52 mb-4' />
+        <img
+          src={qrCodeUrl}
+          alt='Generated QR Code'
+          className='w-52 h-52 mb-4'
+        />
       </div>
     ) : (
       <div className='w-40 h-40 mb-4 flex items-center justify-center'>
@@ -126,7 +130,7 @@ const QRPlaceholder = ({
           (timeRemaining.minutes === 0 && timeRemaining.seconds === 0)
             ? 'QR Code expired'
             : `${String(timeRemaining.minutes).padStart(2, '0')}:${String(
-                timeRemaining.seconds
+                timeRemaining.seconds,
               ).padStart(2, '0')} remaining`}
         </span>
       </div>
@@ -199,7 +203,7 @@ const GenerateQR = () => {
         {},
         {
           withCredentials: true,
-        }
+        },
       );
     },
     onSuccess: () => {
@@ -275,7 +279,7 @@ const GenerateQR = () => {
           }
         }
       } catch (error) {
-        console.error('Error loading saved session:', error);
+        // console.error('Error loading saved session:', error);
         localStorage.removeItem(STORAGE_KEY);
       }
     };
@@ -544,7 +548,7 @@ const GenerateQR = () => {
                           {
                             label: 'Expires at',
                             value: new Date(expiryTime).toLocaleTimeString(
-                              'en-US'
+                              'en-US',
                             ),
                           },
                         ].map((item, index) => (
@@ -822,7 +826,7 @@ const GenerateQR = () => {
                                   'min-h-12',
                                   errors.level
                                     ? 'border-red-500 focus:ring-red-600'
-                                    : 'border-slate-400'
+                                    : 'border-slate-400',
                                 )}
                               >
                                 <SelectValue placeholder='Choose level' />
@@ -838,7 +842,7 @@ const GenerateQR = () => {
                                       >
                                         Level {level}
                                       </SelectItem>
-                                    )
+                                    ),
                                   )}
                                 </SelectGroup>
                               </SelectContent>

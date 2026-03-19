@@ -129,14 +129,14 @@ const sendResendEmail = async (
       throw new Error(error.message);
     }
 
-    console.log('Email sent successfully:', data);
+    // console.log('Email sent successfully:', data);
     return {
       success: true,
       messageId: data.id,
       data,
     };
   } catch (error) {
-    console.error('Failed to send email:', error.message);
+    // console.error('Failed to send email:', error.message);
     throw new Error(`Failed to send email: ${error.message}`);
   }
 };
