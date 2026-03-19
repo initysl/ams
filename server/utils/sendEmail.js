@@ -22,12 +22,12 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
   <body style="margin:0; padding:0; background-color:#f8fafc; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; line-height:1.6;">
     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f8fafc;">
       <tr>
-        <td align="center" style="padding: 40px 15px;">
+        <td align="center" style="padding: 20px 15px;">
           <table class="email-container" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px; background-color:#ffffff; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.07); overflow:hidden;">
             
             <!-- Header -->
             <tr>
-              <td align="center" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); padding: 40px 30px;">
+              <td align="center" style="background: background-color:#11998e; padding: 40px 30px;">
                 <h1 style="font-size:28px; margin:0; color:#ffffff; font-weight:600; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">${title}</h1>
               </td>
             </tr>
@@ -46,7 +46,7 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
               <td align="center" style="padding: 20px 30px 40px;">
                 <table border="0" cellpadding="0" cellspacing="0">
                   <tr>
-                    <td align="center" style="border-radius:8px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
+                    <td align="center" style="border-radius:8px; background-color:#11998e; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
                       <a href="${buttonUrl}" target="_blank" style="
                         display:inline-block;
                         padding:16px 32px;
@@ -65,7 +65,7 @@ const getEmailTemplate = (title, content, buttonText, buttonUrl) => {
                 
                 <!-- Fallback link -->
                 <div style="margin-top: 20px; padding: 15px; background-color: #f3f4f6; border-radius: 6px; border-left: 4px solid #11998e;">
-                  <p style="margin: 0; font-size: 14px; color: #38ef7d;">
+                  <p style="margin: 0; font-size: 14px; color: #11998e;">
                     <strong>Button not working?</strong> Copy and paste this link into your browser:
                   </p>
                   <p style="margin: 8px 0 0 0; font-size: 14px; word-break: break-all;">
