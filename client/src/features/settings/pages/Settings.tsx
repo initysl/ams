@@ -12,7 +12,6 @@ import {
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
 
 const Settings = () => {
   const { user, logout } = useAuth();
