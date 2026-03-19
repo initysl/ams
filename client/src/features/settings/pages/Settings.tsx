@@ -12,6 +12,7 @@ import {
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 
 const Settings = () => {
   const { user, logout } = useAuth();
@@ -79,13 +80,13 @@ const Settings = () => {
         initial='hidden'
         animate='visible'
         className={`
-          bg-white backdrop-blur-sm shadow-xl rounded-xl
-          ${
-            isMobile
-              ? 'w-full min-h-[600px] flex flex-col'
-              : 'md:max-w-xs w-full'
-          }
-        `}
+            bg-white backdrop-blur-sm shadow-xl rounded-xl
+            ${
+              isMobile
+                ? 'w-full min-h-[600px] flex flex-col'
+                : 'md:max-w-xs w-full'
+            }
+          `}
       >
         {/* Sidebar Profile */}
         <CardContent
@@ -107,32 +108,31 @@ const Settings = () => {
               <img
                 src={getImageUrl(user?.profilePicture)}
                 className={`
-                  rounded-full object-cover ring-4 ring-white shadow-lg
-                  ${
-                    isSmallMobile
-                      ? 'w-28 h-28'
-                      : isMobile
-                      ? 'w-32 h-32'
-                      : 'w-32 h-32'
-                  }
-                `}
+                    rounded-full object-cover ring-4 ring-white shadow-lg
+                    ${
+                      isSmallMobile
+                        ? 'w-28 h-28'
+                        : isMobile
+                          ? 'w-32 h-32'
+                          : 'w-32 h-32'
+                    }
+                  `}
                 alt='Profile picture'
                 onError={(e) => {
                   const baseUrl = import.meta.env.VITE_API_URL.replace(
                     '/api/',
-                    ''
+                    '',
                   );
-                  (
-                    e.target as HTMLImageElement
-                  ).src = `${baseUrl}/api/images/default.png?t=${Date.now()}`;
+                  (e.target as HTMLImageElement).src =
+                    `${baseUrl}/api/images/default.png?t=${Date.now()}`;
                 }}
               />
               {/* Online indicator */}
               <div
                 className={`
-                absolute bottom-0 right-0 bg-green-500 rounded-full ring-2 ring-white
-                ${isSmallMobile ? 'w-5 h-5' : 'w-6 h-6'}
-              `}
+                  absolute bottom-0 right-0 bg-green-500 rounded-full ring-2 ring-white
+                  ${isSmallMobile ? 'w-5 h-5' : 'w-6 h-6'}
+                `}
               ></div>
             </motion.div>
 
@@ -141,30 +141,30 @@ const Settings = () => {
               <div className=''>
                 <h3
                   className={`
-                  font-bold text-gray-900 leading-tight
-                  ${
-                    isSmallMobile
-                      ? 'text-xl'
-                      : isMobile
-                      ? 'text-2xl'
-                      : 'text-xl'
-                  }
-                `}
+                    font-bold text-gray-900 leading-tight
+                    ${
+                      isSmallMobile
+                        ? 'text-xl'
+                        : isMobile
+                          ? 'text-2xl'
+                          : 'text-xl'
+                    }
+                  `}
                 >
                   {user?.name}
                 </h3>
 
                 <p
                   className={`
-                  text-gray-500 font-medium
-                  ${
-                    isSmallMobile
-                      ? 'text-sm'
-                      : isMobile
-                      ? 'text-base'
-                      : 'text-base'
-                  }
-                `}
+                    text-gray-500 font-medium
+                    ${
+                      isSmallMobile
+                        ? 'text-sm'
+                        : isMobile
+                          ? 'text-base'
+                          : 'text-base'
+                    }
+                  `}
                 >
                   {user?.role === 'lecturer' ? (
                     <span className='capitalize'>{user.role}</span>
@@ -177,15 +177,15 @@ const Settings = () => {
 
                 <p
                   className={`
-                  text-gray-500 break-all
-                  ${
-                    isSmallMobile
-                      ? 'text-sm px-2'
-                      : isMobile
-                      ? 'text-base px-2'
-                      : 'text-sm'
-                  }
-                `}
+                    text-gray-500 break-all
+                    ${
+                      isSmallMobile
+                        ? 'text-sm px-2'
+                        : isMobile
+                          ? 'text-base px-2'
+                          : 'text-sm'
+                    }
+                  `}
                 >
                   {user?.email}
                 </p>
@@ -217,42 +217,42 @@ const Settings = () => {
                     <div className='flex items-center space-x-3'>
                       <UserPen
                         className={`
-                        text-green-500 shrink-0
-                        ${
-                          isSmallMobile
-                            ? 'w-5 h-5'
-                            : isMobile
-                            ? 'w-6 h-6'
-                            : 'w-5 h-5'
-                        }
-                      `}
+                          text-green-500 shrink-0
+                          ${
+                            isSmallMobile
+                              ? 'w-5 h-5'
+                              : isMobile
+                                ? 'w-6 h-6'
+                                : 'w-5 h-5'
+                          }
+                        `}
                       />
                       <span
                         className={`
-                        font-medium
-                        ${
-                          isSmallMobile
-                            ? 'text-base'
-                            : isMobile
-                            ? 'text-lg'
-                            : 'text-base'
-                        }
-                      `}
+                          font-medium
+                          ${
+                            isSmallMobile
+                              ? 'text-base'
+                              : isMobile
+                                ? 'text-lg'
+                                : 'text-base'
+                          }
+                        `}
                       >
                         Profile
                       </span>
                     </div>
                     <ChevronRight
                       className={`
-                      text-gray-400 shrink-0
-                      ${
-                        isSmallMobile
-                          ? 'w-5 h-5'
-                          : isMobile
-                          ? 'w-5 h-5'
-                          : 'w-4 h-4'
-                      }
-                    `}
+                        text-gray-400 shrink-0
+                        ${
+                          isSmallMobile
+                            ? 'w-5 h-5'
+                            : isMobile
+                              ? 'w-5 h-5'
+                              : 'w-4 h-4'
+                        }
+                      `}
                     />
                   </NavLink>
                 </motion.div>
@@ -273,42 +273,42 @@ const Settings = () => {
                     <div className='flex items-center space-x-3'>
                       <BadgeHelp
                         className={`
-                        text-blue-500 shrink-0
-                        ${
-                          isSmallMobile
-                            ? 'w-5 h-5'
-                            : isMobile
-                            ? 'w-6 h-6'
-                            : 'w-5 h-5'
-                        }
-                      `}
+                          text-blue-500 shrink-0
+                          ${
+                            isSmallMobile
+                              ? 'w-5 h-5'
+                              : isMobile
+                                ? 'w-6 h-6'
+                                : 'w-5 h-5'
+                          }
+                        `}
                       />
                       <span
                         className={`
-                        font-medium
-                        ${
-                          isSmallMobile
-                            ? 'text-base'
-                            : isMobile
-                            ? 'text-lg'
-                            : 'text-base'
-                        }
-                      `}
+                          font-medium
+                          ${
+                            isSmallMobile
+                              ? 'text-base'
+                              : isMobile
+                                ? 'text-lg'
+                                : 'text-base'
+                          }
+                        `}
                       >
                         About
                       </span>
                     </div>
                     <ChevronRight
                       className={`
-                      text-gray-400 shrink-0
-                      ${
-                        isSmallMobile
-                          ? 'w-5 h-5'
-                          : isMobile
-                          ? 'w-5 h-5'
-                          : 'w-4 h-4'
-                      }
-                    `}
+                        text-gray-400 shrink-0
+                        ${
+                          isSmallMobile
+                            ? 'w-5 h-5'
+                            : isMobile
+                              ? 'w-5 h-5'
+                              : 'w-4 h-4'
+                        }
+                      `}
                     />
                   </NavLink>
                 </motion.div>
@@ -329,42 +329,42 @@ const Settings = () => {
                     <div className='flex items-center space-x-3'>
                       <MessageCircleQuestion
                         className={`
-                        text-yellow-500 shrink-0
-                        ${
-                          isSmallMobile
-                            ? 'w-5 h-5'
-                            : isMobile
-                            ? 'w-6 h-6'
-                            : 'w-5 h-5'
-                        }
-                      `}
+                          text-yellow-500 shrink-0
+                          ${
+                            isSmallMobile
+                              ? 'w-5 h-5'
+                              : isMobile
+                                ? 'w-6 h-6'
+                                : 'w-5 h-5'
+                          }
+                        `}
                       />
                       <span
                         className={`
-                        font-medium
-                        ${
-                          isSmallMobile
-                            ? 'text-base'
-                            : isMobile
-                            ? 'text-lg'
-                            : 'text-base'
-                        }
-                      `}
+                          font-medium
+                          ${
+                            isSmallMobile
+                              ? 'text-base'
+                              : isMobile
+                                ? 'text-lg'
+                                : 'text-base'
+                          }
+                        `}
                       >
                         Feedback
                       </span>
                     </div>
                     <ChevronRight
                       className={`
-                      text-gray-400 shrink-0
-                      ${
-                        isSmallMobile
-                          ? 'w-5 h-5'
-                          : isMobile
-                          ? 'w-5 h-5'
-                          : 'w-4 h-4'
-                      }
-                    `}
+                        text-gray-400 shrink-0
+                        ${
+                          isSmallMobile
+                            ? 'w-5 h-5'
+                            : isMobile
+                              ? 'w-5 h-5'
+                              : 'w-4 h-4'
+                        }
+                      `}
                     />
                   </NavLink>
                 </motion.div>
@@ -378,35 +378,35 @@ const Settings = () => {
                     onClick={logout}
                     type='button'
                     className={`
-                      flex items-center w-full rounded-lg transition-all duration-200
-                      hover:bg-red-50 text-gray-700 hover:text-red-600
-                      ${isSmallMobile ? 'p-3' : isMobile ? 'p-4' : 'p-3'}
-                    `}
+                        flex items-center w-full rounded-lg transition-all duration-200
+                        hover:bg-red-50 text-gray-700 hover:text-red-600
+                        ${isSmallMobile ? 'p-3' : isMobile ? 'p-4' : 'p-3'}
+                      `}
                   >
                     <div className='flex items-center space-x-3'>
                       <LogOut
                         className={`
-                        text-red-500 shrink-0
-                        ${
-                          isSmallMobile
-                            ? 'w-5 h-5'
-                            : isMobile
-                            ? 'w-6 h-6'
-                            : 'w-5 h-5'
-                        }
-                      `}
+                          text-red-500 shrink-0
+                          ${
+                            isSmallMobile
+                              ? 'w-5 h-5'
+                              : isMobile
+                                ? 'w-6 h-6'
+                                : 'w-5 h-5'
+                          }
+                        `}
                       />
                       <span
                         className={`
-                        font-medium
-                        ${
-                          isSmallMobile
-                            ? 'text-base'
-                            : isMobile
-                            ? 'text-lg'
-                            : 'text-base'
-                        }
-                      `}
+                          font-medium
+                          ${
+                            isSmallMobile
+                              ? 'text-base'
+                              : isMobile
+                                ? 'text-lg'
+                                : 'text-base'
+                          }
+                        `}
                       >
                         Sign Out
                       </span>

@@ -1,14 +1,14 @@
-import { AppSidebar } from "@/components/layout/AppSidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight, User } from "lucide-react";
+import { AppSidebar } from '@/components/layout/AppSidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { ChevronRight, User } from 'lucide-react';
 
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from '@/context/AuthContext';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/ui/tooltip';
 
 const Layout: React.FC = () => {
   const location = useLocation();
@@ -18,7 +18,7 @@ const Layout: React.FC = () => {
   // Get profile picture URL
   const getImageUrl = (profilePicture: string | null | undefined) => {
     if (!profilePicture) {
-      const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
+      const baseUrl = import.meta.env.VITE_API_URL.replace('/api/', '');
       return `${baseUrl}/images/default.png`;
     }
     return profilePicture;
@@ -26,52 +26,52 @@ const Layout: React.FC = () => {
 
   // Generate breadcrumbs from current path
   const generateBreadcrumbs = () => {
-    const pathSegments = location.pathname.split("/").filter(Boolean);
+    const pathSegments = location.pathname.split('/').filter(Boolean);
     const breadcrumbs = [];
 
     // Only add Dashboard if we're not already on the home page
-    if (location.pathname !== "/dashboard/home") {
-      breadcrumbs.push({ label: "Dashboard", path: "/dashboard/home" });
+    if (location.pathname !== '/dashboard/home') {
+      breadcrumbs.push({ label: 'Dashboard', path: '/dashboard/home' });
     }
 
     // Add subsequent segments
-    let currentPath = "";
+    let currentPath = '';
     pathSegments.slice(1).forEach((segment) => {
       currentPath += `/${segment}`;
       const label = segment.charAt(0).toUpperCase() + segment.slice(1);
       const fullPath = `/dashboard${currentPath}`;
 
       // Only add if it's not already the dashboard home path
-      if (fullPath !== "/dashboard/home") {
+      if (fullPath !== '/dashboard/home') {
         breadcrumbs.push({
-          label: label.replace("-", " "),
+          label: label.replace('-', ' '),
           path: fullPath,
         });
-      } else if (location.pathname === "/dashboard/home") {
+      } else if (location.pathname === '/dashboard/home') {
         breadcrumbs.push({
-          label: "Home",
-          path: "/dashboard/home",
+          label: 'Home',
+          path: '/dashboard/home',
         });
       }
     });
 
     // If we're on dashboard home and no breadcrumbs were added, add Home
-    if (breadcrumbs.length === 0 && location.pathname === "/dashboard/home") {
-      breadcrumbs.push({ label: "Home", path: "/dashboard/home" });
+    if (breadcrumbs.length === 0 && location.pathname === '/dashboard/home') {
+      breadcrumbs.push({ label: 'Home', path: '/dashboard/home' });
     }
 
     return breadcrumbs;
   };
 
   const breadcrumbs = generateBreadcrumbs();
-  const currentDateTime = new Date().toLocaleString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
+  const currentDateTime = new Date().toLocaleString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
     hour12: true,
-    weekday: "short",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
   });
 
   const handleBreadcrumbClick = (path: string, isCurrentPage: boolean) => {
@@ -81,18 +81,18 @@ const Layout: React.FC = () => {
   };
 
   return (
-    <SidebarProvider className="min-h-screen bg-slate-50">
+    <SidebarProvider className='min-h-screen bg-slate-50'>
       <AppSidebar />
-      <main className="flex-1 flex flex-col min-h-screen">
+      <main className='flex-1 flex flex-col min-h-screen'>
         {/* Enhanced Header */}
-        <header className="sticky top-0 z-40 border-b border-slate-200 backdrop-blur-sm bg-white/95">
-          <div className="flex items-center justify-between py-4">
+        <header className='sticky top-0 z-40 border-b border-slate-200 backdrop-blur-sm bg-white/95'>
+          <div className='flex items-center justify-between py-4'>
             {/* Left Section: Sidebar Trigger + Breadcrumbs */}
-            <div className="flex items-center gap-1">
-              <SidebarTrigger className="inline-flex items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 h-9 w-9 transition-colors duration-150" />
+            <div className='flex items-center gap-1'>
+              <SidebarTrigger className='inline-flex items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 h-9 w-9 transition-colors duration-150' />
 
               {/* Navigable Breadcrumbs */}
-              <nav className="flex items-center text-sm text-slate-600 w-62 md:w-full">
+              <nav className='flex items-center text-sm text-slate-600 w-62 md:w-full'>
                 {breadcrumbs.map((crumb, index) => {
                   const isCurrentPage = index === breadcrumbs.length - 1;
                   const isClickable = !isCurrentPage;
@@ -100,12 +100,12 @@ const Layout: React.FC = () => {
                   return (
                     <div
                       key={`${crumb.path}-${index}`}
-                      className="flex items-center"
+                      className='flex items-center'
                     >
                       {index > 0 && (
                         <ChevronRight
                           size={14}
-                          className="md:mx-1 text-slate-400"
+                          className='md:mx-1 text-slate-400'
                         />
                       )}
                       <span
@@ -114,15 +114,15 @@ const Layout: React.FC = () => {
                         }
                         className={`transition-colors duration-150 ${
                           isCurrentPage
-                            ? "text-slate-900 font-medium cursor-default"
-                            : "text-slate-500 hover:text-slate-700 cursor-pointer hover:bg-slate-100 px-2 py-1 rounded-md"
+                            ? 'text-slate-900 font-medium cursor-default'
+                            : 'text-slate-500 hover:text-slate-700 cursor-pointer hover:bg-slate-100 px-2 py-1 rounded-md'
                         }`}
-                        role={isClickable ? "button" : undefined}
+                        role={isClickable ? 'button' : undefined}
                         tabIndex={isClickable ? 0 : undefined}
                         onKeyDown={(e) => {
                           if (
                             isClickable &&
-                            (e.key === "Enter" || e.key === " ")
+                            (e.key === 'Enter' || e.key === ' ')
                           ) {
                             e.preventDefault();
                             handleBreadcrumbClick(crumb.path, isCurrentPage);
@@ -138,33 +138,32 @@ const Layout: React.FC = () => {
             </div>
 
             {/* Right Section: Time and User Info */}
-            <div className="flex items-center gap-3">
+            <div className='flex items-center gap-3'>
               {/* Time Display */}
-              <div className="hidden md:flex items-center text-sm text-slate-500 bg-slate-100 px-3 py-1.5 rounded-md">
+              <div className='hidden md:flex items-center text-sm text-slate-500 bg-slate-100 px-3 py-1.5 rounded-md'>
                 {currentDateTime}
               </div>
 
               {/* User Info */}
               <div>
-                <div className="flex items-center gap-2 md:bg-slate-100 text-slate-500 px-3 py-1.5 rounded-md mr-2">
-                  <div className="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center">
+                <div className='flex items-center gap-2 md:bg-slate-100 text-slate-500 px-3 py-1.5 rounded-md mr-2'>
+                  <div className='w-8 h-8 md:w-4 md:h-4 flex items-center justify-center'>
                     <Tooltip>
                       <TooltipTrigger>
                         {user?.profilePicture ? (
-                          <div className="relative flex-shrink-0">
+                          <div className='relative shrink-0'>
                             <img
                               src={getImageUrl(user?.profilePicture)}
-                              className="w-8 h-8 md:w-4 md:h-4 rounded-full object-cover ring-1 ring-slate-300"
-                              alt="Profile picture"
+                              className='w-8 h-8 md:w-4 md:h-4 rounded-full object-cover ring-1 ring-slate-300'
+                              alt='Profile picture'
                               onError={(e) => {
                                 const baseUrl =
                                   import.meta.env.VITE_API_URL.replace(
-                                    "/api/",
-                                    ""
+                                    '/api/',
+                                    '',
                                   );
-                                (
-                                  e.target as HTMLImageElement
-                                ).src = `${baseUrl}/images/default.png`;
+                                (e.target as HTMLImageElement).src =
+                                  `${baseUrl}/images/default.png`;
                               }}
                             />
                           </div>
@@ -173,19 +172,19 @@ const Layout: React.FC = () => {
                         )}
                       </TooltipTrigger>
                       <TooltipContent
-                        side="top"
-                        align="center"
+                        side='top'
+                        align='center'
                         sideOffset={0}
-                        className="md:hidden bg-slate-200 rounded-lg px-3 py-2"
+                        className='md:hidden bg-slate-200 rounded-lg px-3 py-2'
                       >
-                        <span className="text-xs font-medium text-slate-500">
+                        <span className='text-xs font-medium text-slate-500'>
                           {user?.matricNumber || user?.name}
                         </span>
                       </TooltipContent>
                     </Tooltip>
                   </div>
-                  <div className="hidden md:block text-left">
-                    <div className="text-sm  text-slate-500 ">
+                  <div className='hidden md:block text-left'>
+                    <div className='text-sm  text-slate-500 '>
                       {user?.matricNumber || user?.email}
                     </div>
                   </div>
@@ -196,7 +195,7 @@ const Layout: React.FC = () => {
         </header>
 
         {/* Main Content Area */}
-        <div className="bg-gray-100 flex-1 p-2">
+        <div className='bg-gray-100 flex-1 p-2'>
           <Outlet />
         </div>
       </main>
