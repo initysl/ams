@@ -41,13 +41,21 @@ type LecturerActivity = {
   };
 };
 
+const EmptyState = ({ title, description, icon: Icon }: EmptyStateProps) => (
+  <div className="text-center py-8 text-gray-500">
+    <Icon className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+    <p className="font-medium">{title}</p>
+    <p className="text-sm">{description}</p>
+  </div>
+);
+
 const Activity = () => {
   const [recentActivities, setRecentActivities] = useState<LecturerActivity[]>(
     []
   );
 
   // Fetch lecturer's session data
-  const lecturerSessionsMutation = useMutation({
+  const { mutate, ...lecturerSessionsMutation } = useMutation({
     mutationFn: async () => {
       const response = await api.get("attendance/trend");
       return response.data;
@@ -64,7 +72,6 @@ const Activity = () => {
   const isNoSessionsFound =
     lecturerSessionsMutation.isError &&
     (lecturerSessionsMutation.error as AxiosError)?.response?.status === 404;
-  (lecturerSessionsMutation.error as AxiosError)?.response?.status === 404;
 
   // Check if it's a different error
   const hasError = lecturerSessionsMutation.isError && !isNoSessionsFound;
@@ -255,25 +262,17 @@ const Activity = () => {
 
   // Fetch data on component mount
   useEffect(() => {
-    lecturerSessionsMutation.mutate();
-  }, []);
+    mutate();
+  }, [mutate]);
 
   // Optional: Refresh data periodically
   useEffect(() => {
     const interval = setInterval(() => {
-      lecturerSessionsMutation.mutate();
+      mutate();
     }, 300000); // Refresh every 5 minutes
 
     return () => clearInterval(interval);
-  }, []);
-
-  const EmptyState = ({ title, description, icon: Icon }: EmptyStateProps) => (
-    <div className="text-center py-8 text-gray-500">
-      <Icon className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-      <p className="font-medium">{title}</p>
-      <p className="text-sm">{description}</p>
-    </div>
-  );
+  }, [mutate]);
 
   return (
     <motion.div

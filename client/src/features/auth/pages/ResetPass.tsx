@@ -24,6 +24,7 @@ import {
   Lock,
 } from "lucide-react";
 import { AdaptiveInput } from "@/components/common/AdaptiveInput";
+import { asApiError, getApiErrorMessage } from "@/lib/api-error";
 
 // Enhanced password validation schema
 const resetPassSchema = z
@@ -88,8 +89,8 @@ const ResetPass: React.FC = () => {
           setIsTokenValid(false);
           setTokenError("Invalid reset token");
         }
-      } catch (error) {
-        const errorResponse = (error as any)?.response;
+      } catch (error: unknown) {
+        const errorResponse = asApiError(error).response;
         const errorCode = errorResponse?.data?.code;
 
         if (errorCode === "TOKEN_EXPIRED") {
@@ -129,8 +130,8 @@ const ResetPass: React.FC = () => {
       toast.success(data.message || "Password reset successfully!");
       navigate("/auth");
     },
-    onError: (error) => {
-      const errorResponse = (error as any)?.response;
+    onError: (error: unknown) => {
+      const errorResponse = asApiError(error).response;
       const errorMessage = errorResponse?.data?.message;
       const errorCode = errorResponse?.data?.code;
 
@@ -149,7 +150,7 @@ const ResetPass: React.FC = () => {
         return;
       }
 
-      toast.error(errorMessage || "An error occurred");
+      toast.error(errorMessage || getApiErrorMessage(error, "An error occurred"));
     },
   });
 
@@ -208,7 +209,7 @@ const ResetPass: React.FC = () => {
 
             <div className="space-y-5">
               <div>
-                <Link to="/auth/recover">
+                <Link to="/recover">
                   <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                     Request New Reset Link
                   </Button>
@@ -259,7 +260,7 @@ const ResetPass: React.FC = () => {
 
             <div className="space-y-5">
               <div>
-                <Link to="/auth/recover">
+                <Link to="/recover">
                   <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
                     Request New
                   </Button>

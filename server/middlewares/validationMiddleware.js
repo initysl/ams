@@ -62,6 +62,10 @@ const validateLogin = [
     .withMessage("Password must be at least 6 characters long"),
 ];
 
+const validateEmailRequest = [
+  check("email").exists().trim().isEmail().withMessage("Invalid email address"),
+];
+
 // Session ID Validation
 const validateSessionId = [
   check("sessionId")
@@ -109,6 +113,7 @@ const validateProfileUpdate = [
 module.exports = {
   validateRegistration,
   validateLogin,
+  validateEmailRequest,
   validateSessionId,
   validateProfileUpdate,
 };

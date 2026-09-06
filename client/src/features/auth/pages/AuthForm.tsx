@@ -9,6 +9,7 @@ import RegisterForm from '../components/RegisterForm';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import SEO from '@/components/common/SEO';
+import { asApiError, getApiErrorMessage } from '@/lib/api-error';
 
 interface ApiError extends Error {
   response?: {
@@ -33,6 +34,7 @@ const AuthForm: React.FC = () => {
   const [isSignIn, setIsSignIn] = useState(true);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState<string>('');
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState('');
   const navigate = useNavigate();
 
   // Use the auth context
@@ -55,11 +57,36 @@ const AuthForm: React.FC = () => {
       return login(credentials);
     },
     onSuccess: () => {
+      setPendingVerificationEmail('');
       navigate('/dashboard/home');
     },
-    // onError: (err: ApiError) => {
-    //   toast.error(`Sign in failed: ${err.response?.data?.message}`);
-    // },
+    onError: (error: unknown) => {
+      const apiError = asApiError(error);
+      const errorCode = apiError.response?.data?.code;
+
+      if (errorCode === 'ACCOUNT_NOT_VERIFIED') {
+        const email = apiError.response?.data?.email;
+        if (email) {
+          setPendingVerificationEmail(email);
+        }
+        toast.error(
+          apiError.response?.data?.message || 'Verify your email to continue'
+        );
+      }
+    },
+  });
+
+  const resendVerificationMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const response = await api.post('auth/resend-verification', { email });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || 'Verification email sent');
+    },
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, 'Failed to resend verification email'));
+    },
   });
 
   // === Register Mutation ===
@@ -89,6 +116,7 @@ const AuthForm: React.FC = () => {
       toast.success(`${res.data.message}`);
       setProfilePicture(null);
       setPreviewURL('');
+      setPendingVerificationEmail('');
       // Automatically switch to sign in form after successful registration
       setIsSignIn(true);
     },
@@ -144,6 +172,30 @@ const AuthForm: React.FC = () => {
             />
           )}
 
+          {isSignIn && pendingVerificationEmail ? (
+            <div className='mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900'>
+              <p className='font-medium'>Email verification required</p>
+              <p className='mt-1'>
+                {pendingVerificationEmail} has not been verified yet.
+              </p>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() =>
+                  resendVerificationMutation.mutate(pendingVerificationEmail)
+                }
+                disabled={resendVerificationMutation.isPending}
+                className='mt-3 w-full border-amber-300 bg-white text-amber-900 hover:bg-amber-100'
+              >
+                {resendVerificationMutation.isPending ? (
+                  <Loader className='h-4 w-4 animate-spin' />
+                ) : (
+                  'Resend Verification Email'
+                )}
+              </Button>
+            </div>
+          ) : null}
+
           <div className='flex flex-col items-center mt-8 space-y-5'>
             <Button
               type='submit'
@@ -164,7 +216,10 @@ const AuthForm: React.FC = () => {
               {isSignIn ? "Don't have an account?" : 'Already have an account?'}
               <button
                 type='button'
-                onClick={() => setIsSignIn(!isSignIn)}
+                onClick={() => {
+                  setIsSignIn(!isSignIn);
+                  setPendingVerificationEmail('');
+                }}
                 className='text-blue-600 hover:underline ml-1'
               >
                 {isSignIn ? 'Sign Up' : 'Sign In'}

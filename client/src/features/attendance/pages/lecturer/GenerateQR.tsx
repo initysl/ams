@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import qrplaceholder from '@/assets/images/qr-placeholder.svg';
 import { AlertCircle, Clock, Loader2, Printer, Save, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getApiErrorMessage } from '@/lib/api-error';
 
 const qrSchema = z.object({
   courseTitle: z.string().min(5, 'Course title is required'),
@@ -78,6 +79,65 @@ const buttonVariants = {
   },
 };
 
+type TimeRemaining = {
+  minutes: number;
+  seconds: number;
+};
+
+type QRPlaceholderProps = {
+  generated?: boolean;
+  isExpired: boolean;
+  qrCodeUrl: string;
+  timeRemaining: TimeRemaining;
+};
+
+const QRPlaceholder = ({
+  generated = false,
+  isExpired,
+  qrCodeUrl,
+  timeRemaining,
+}: QRPlaceholderProps) => (
+  <div className='flex flex-col items-center justify-center min-h-52 border border-gray-200 mb-6 p-4 rounded-lg'>
+    {generated ? (
+      <div className={`${isExpired ? 'opacity-50 grayscale' : ''}`}>
+        <img
+          src={qrCodeUrl}
+          alt='Generated QR Code'
+          className='w-52 h-52 mb-4'
+        />
+      </div>
+    ) : (
+      <div className='w-40 h-40 mb-4 flex items-center justify-center'>
+        <img src={qrplaceholder} alt='QR Code placeholder' />
+      </div>
+    )}
+    <p className='text-gray-500 text-sm text-center'>
+      {generated
+        ? isExpired
+          ? 'QR Code has expired'
+          : 'QR Code has been generated'
+        : 'QR Code not generated yet'}
+    </p>
+    {generated ? (
+      <div
+        className={`mt-2 flex items-center gap-1 px-3 py-1 rounded-full ${
+          isExpired ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'
+        }`}
+      >
+        <Clock size={16} />
+        <span className='font-medium'>
+          {isExpired ||
+          (timeRemaining.minutes === 0 && timeRemaining.seconds === 0)
+            ? 'QR Code expired'
+            : `${String(timeRemaining.minutes).padStart(2, '0')}:${String(
+                timeRemaining.seconds,
+              ).padStart(2, '0')} remaining`}
+        </span>
+      </div>
+    ) : null}
+  </div>
+);
+
 const GenerateQR = () => {
   const [qrGenerated, setQrGenerated] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
@@ -130,9 +190,8 @@ const GenerateQR = () => {
       setIsExpired(false);
       toast.success('QR code generated successfully');
     },
-    onError: (error) => {
-      toast.error(`Error generating QR code ${error}`);
-      // console.error("Error generating QR code:", error);
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, 'Error generating QR code'));
     },
   });
 
@@ -144,7 +203,7 @@ const GenerateQR = () => {
         {},
         {
           withCredentials: true,
-        }
+        },
       );
     },
     onSuccess: () => {
@@ -220,7 +279,7 @@ const GenerateQR = () => {
           }
         }
       } catch (error) {
-        console.error('Error loading saved session:', error);
+        // console.error('Error loading saved session:', error);
         localStorage.removeItem(STORAGE_KEY);
       }
     };
@@ -251,24 +310,25 @@ const GenerateQR = () => {
       return { minutes, seconds };
     };
 
-    const initialTimeLeft = calculateTimeLeft();
-    setTimeRemaining(initialTimeLeft);
-
-    if (initialTimeLeft.minutes === 0 && initialTimeLeft.seconds === 0) {
-      setIsExpired(true);
-    }
-
-    const timer = setInterval(() => {
+    const syncTimeRemaining = () => {
       const timeLeft = calculateTimeLeft();
       setTimeRemaining(timeLeft);
 
       if (timeLeft.minutes === 0 && timeLeft.seconds === 0) {
         setIsExpired(true);
-        clearInterval(timer);
       }
+    };
+
+    const initialTimer = window.setTimeout(syncTimeRemaining, 0);
+
+    const timer = setInterval(() => {
+      syncTimeRemaining();
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+      window.clearTimeout(initialTimer);
+      clearInterval(timer);
+    };
   }, [expiryTime, qrGenerated]);
 
   // Save session data to localStorage whenever it changes
@@ -381,50 +441,6 @@ const GenerateQR = () => {
     }
   };
 
-  const QRPlaceholder = ({ generated = false }) => (
-    <div className='flex flex-col items-center justify-center min-h-52 border border-gray-200 mb-6 p-4 rounded-lg'>
-      {generated ? (
-        <div className={`${isExpired ? 'opacity-50 grayscale' : ''}`}>
-          <img
-            src={qrCodeUrl}
-            alt='Generated QR Code'
-            className='w-52 h-52 mb-4'
-          />
-        </div>
-      ) : (
-        <div className='w-40 h-40 mb-4 flex items-center justify-center'>
-          <img src={qrplaceholder} alt='QR Code placeholder' />
-        </div>
-      )}
-      <p className='text-gray-500 text-sm text-center'>
-        {generated
-          ? isExpired
-            ? 'QR Code has expired'
-            : 'QR Code has been generated'
-          : 'QR Code not generated yet'}
-      </p>
-      {generated && timeRemaining && (
-        <div
-          className={`mt-2 flex items-center gap-1 px-3 py-1 rounded-full ${
-            isExpired
-              ? 'bg-red-100 text-red-800'
-              : 'bg-amber-100 text-amber-800'
-          }`}
-        >
-          <Clock size={16} />
-          <span className='font-medium'>
-            {isExpired ||
-            (timeRemaining.minutes === 0 && timeRemaining.seconds === 0)
-              ? 'QR Code expired'
-              : `${String(timeRemaining.minutes).padStart(2, '0')}:${String(
-                  timeRemaining.seconds
-                ).padStart(2, '0')} remaining`}
-          </span>
-        </div>
-      )}
-    </div>
-  );
-
   if (qrGenerated) {
     return (
       <motion.div
@@ -446,7 +462,12 @@ const GenerateQR = () => {
             <CardContent className=''>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                 <motion.div variants={itemVariants}>
-                  <QRPlaceholder generated={true} />
+                  <QRPlaceholder
+                    generated={true}
+                    isExpired={isExpired}
+                    qrCodeUrl={qrCodeUrl}
+                    timeRemaining={timeRemaining}
+                  />
                   <motion.div
                     className='grid grid-cols-2 gap-4 mt-4'
                     variants={itemVariants}
@@ -527,7 +548,7 @@ const GenerateQR = () => {
                           {
                             label: 'Expires at',
                             value: new Date(expiryTime).toLocaleTimeString(
-                              'en-US'
+                              'en-US',
                             ),
                           },
                         ].map((item, index) => (
@@ -805,7 +826,7 @@ const GenerateQR = () => {
                                   'min-h-12',
                                   errors.level
                                     ? 'border-red-500 focus:ring-red-600'
-                                    : 'border-slate-400'
+                                    : 'border-slate-400',
                                 )}
                               >
                                 <SelectValue placeholder='Choose level' />
@@ -821,7 +842,7 @@ const GenerateQR = () => {
                                       >
                                         Level {level}
                                       </SelectItem>
-                                    )
+                                    ),
                                   )}
                                 </SelectGroup>
                               </SelectContent>
@@ -889,7 +910,11 @@ const GenerateQR = () => {
         <motion.div variants={itemVariants}>
           <Card className='bg-white shadow-xl'>
             <CardContent className='pt-4'>
-              <QRPlaceholder />
+              <QRPlaceholder
+                isExpired={isExpired}
+                qrCodeUrl={qrCodeUrl}
+                timeRemaining={timeRemaining}
+              />
               <motion.div className='flex gap-4' variants={itemVariants}>
                 <motion.div
                   className='flex-1'

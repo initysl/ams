@@ -23,6 +23,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import MarkPopover from './MarkPopover';
 import { AttendanceResponse, CourseData } from '@/types/attendance';
+import { getApiErrorMessage } from '@/lib/api-error';
 
 // Feature cards data
 const cardData = {
@@ -90,8 +91,8 @@ const QRScanner: React.FC = () => {
         toast.success(data.message);
       }
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.error || 'Failed to scan QR code');
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, 'Failed to scan QR code'));
       setScanResult(null);
       setScannedToken('');
     },
@@ -119,8 +120,8 @@ const QRScanner: React.FC = () => {
         setScannedToken('');
       }
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.error || 'Failed to mark attendance');
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, 'Failed to mark attendance'));
     },
   });
 

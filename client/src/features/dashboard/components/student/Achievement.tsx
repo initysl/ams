@@ -35,7 +35,7 @@ const Achievement = () => {
   const [achievements, setAchievements] = useState<AchievementItem[]>([]);
 
   // Fetch recent attendance data
-  const recentAttendanceMutation = useMutation({
+  const { mutate, ...recentAttendanceMutation } = useMutation({
     mutationFn: async (): Promise<AttendanceRecord[]> => {
       const response = await api.get("attendance/record");
       return response.data;
@@ -172,8 +172,8 @@ const Achievement = () => {
 
   // Fetch data on component mount
   useEffect(() => {
-    recentAttendanceMutation.mutate();
-  }, []);
+    mutate();
+  }, [mutate]);
 
   return (
     <div className="grid gap-6 grid-cols-1">

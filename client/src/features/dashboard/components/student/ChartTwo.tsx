@@ -14,7 +14,7 @@ import {
 import { Loader2, Calendar, TrendingUp } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
-// import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 interface AttendanceRecord {
   sessionId: string;
@@ -53,11 +53,42 @@ interface EmptyStateProps {
 
 type TimeFilterType = "week" | "month";
 
+const ChartTooltip: React.FC<CustomTooltipProps> = ({
+  active,
+  payload,
+  label,
+}) => {
+  if (active && payload && payload.length) {
+    const courseCode = payload[0]?.payload.courseCode || "N/A";
+
+    return (
+      <div className="bg-white p-4 border border-gray-200 shadow-md rounded-md">
+        <p className="font-semibold">{`${label} (${payload[0]?.payload.day})`}</p>
+        <p className="text-gray-700">{`Course: ${courseCode}`}</p>
+        {payload.map((entry, index) => (
+          <p key={index} style={{ color: entry.color }}>
+            {`${entry.name}: ${entry.value}`}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
+const EmptyState = ({ title, description, icon: Icon }: EmptyStateProps) => (
+  <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+    <Icon className="h-12 w-12 mb-4 text-gray-300" />
+    <h3 className="text-lg font-medium text-gray-700 mb-2">{title}</h3>
+    <p className="text-sm text-center max-w-sm">{description}</p>
+  </div>
+);
+
 const ChartTwo: React.FC = () => {
   const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
   const [timeFilter, setTimeFilter] = useState<TimeFilterType>("week");
 
-  const fetchAttendanceMutation = useMutation({
+  const { mutate, ...fetchAttendanceMutation } = useMutation({
     mutationFn: async (): Promise<AttendanceRecord[]> => {
       const response = await api.get("attendance/record");
       return response.data;
@@ -72,14 +103,13 @@ const ChartTwo: React.FC = () => {
   });
 
   useEffect(() => {
-    fetchAttendanceMutation.mutate();
-  }, [timeFilter]);
+    mutate();
+  }, [mutate, timeFilter]);
 
   // Check if it's a 404 error (no records found)
   const isNoRecordsFound =
     fetchAttendanceMutation.isError &&
-    // Narrow error type to AxiosError for response property
-    (fetchAttendanceMutation.error as any)?.response?.status === 404;
+    (fetchAttendanceMutation.error as AxiosError)?.response?.status === 404;
 
   // Check if it's a different error
   const hasError = fetchAttendanceMutation.isError && !isNoRecordsFound;
@@ -139,7 +169,7 @@ const ChartTwo: React.FC = () => {
     });
 
     // Convert to array and sort by date
-    let chartData = Object.values(groupedByDay);
+    const chartData = Object.values(groupedByDay);
 
     // Sort chronologically
     chartData.sort((a, b) => {
@@ -152,37 +182,6 @@ const ChartTwo: React.FC = () => {
   };
 
   const chartData = prepareChartData();
-
-  const CustomTooltip: React.FC<CustomTooltipProps> = ({
-    active,
-    payload,
-    label,
-  }) => {
-    if (active && payload && payload.length) {
-      const courseCode = payload[0]?.payload.courseCode || "N/A";
-
-      return (
-        <div className="bg-white p-4 border border-gray-200 shadow-md rounded-md">
-          <p className="font-semibold">{`${label} (${payload[0]?.payload.day})`}</p>
-          <p className="text-gray-700">{`Course: ${courseCode}`}</p>
-          {payload.map((entry, index) => (
-            <p key={index} style={{ color: entry.color }}>
-              {`${entry.name}: ${entry.value}`}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
-
-  const EmptyState = ({ title, description, icon: Icon }: EmptyStateProps) => (
-    <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-      <Icon className="h-12 w-12 mb-4 text-gray-300" />
-      <h3 className="text-lg font-medium text-gray-700 mb-2">{title}</h3>
-      <p className="text-sm text-center max-w-sm">{description}</p>
-    </div>
-  );
 
   return (
     <div>
@@ -268,7 +267,7 @@ const ChartTwo: React.FC = () => {
                     tickLine={false}
                     width={30}
                   />
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip content={<ChartTooltip />} />
                   <Legend
                     verticalAlign="top"
                     align="right"

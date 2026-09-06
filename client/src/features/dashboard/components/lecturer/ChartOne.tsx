@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { useMutation } from '@tanstack/react-query';
 import api from '@/lib/axios';
+import { AxiosError } from 'axios';
 
 import { Loader2, TrendingUp, BarChart3, Users, Percent } from 'lucide-react';
 import { toast } from 'sonner';
@@ -46,8 +47,55 @@ interface QuickStatsProps {
   maxAttendance: number;
   averageRate: number;
   totalSessions: number;
-  isLoading: boolean;
 }
+
+const QuickStats = ({
+  averageAttendance,
+  maxAttendance,
+  averageRate,
+  totalSessions,
+}: QuickStatsProps) => (
+  <div className='grid grid-cols-2 sm:grid-cols-3  mt-3 gap-3 text-sm '>
+    <div className='bg-blue-50 p-2 rounded-lg flex items-center gap-2 min-w-[120px]'>
+      <Users className='h-4 w-4 text-blue-600' />
+      <div>
+        <div className='font-medium text-blue-800'>Average</div>
+        <div className='text-blue-600'>{averageAttendance} students</div>
+      </div>
+    </div>
+    <div className='bg-green-50 p-2 rounded-lg flex items-center gap-2 min-w-[120px]'>
+      <TrendingUp className='h-4 w-4 text-green-600' />
+      <div>
+        <div className='font-medium text-green-800'>Highest</div>
+        <div className='text-green-600'>{maxAttendance} students</div>
+      </div>
+    </div>
+    <div className='bg-purple-50 p-2 rounded-lg flex items-center gap-2 min-w-[120px]'>
+      <Percent className='h-4 w-4 text-purple-600' />
+      <div>
+        <div className='font-medium text-purple-800'>Avg Rate</div>
+        <div className='text-purple-600'>{averageRate}%</div>
+      </div>
+    </div>
+    <div className='bg-gray-50 p-2 rounded-lg flex items-center gap-2 min-w-[120px]'>
+      <BarChart3 className='h-4 w-4 text-gray-600' />
+      <div>
+        <div className='font-medium text-gray-800'>Sessions</div>
+        <div className='text-gray-600'>{totalSessions}</div>
+      </div>
+    </div>
+  </div>
+);
+
+const EmptyState = ({ title, description, icon: Icon }: EmptyStateProps) => (
+  <div className='flex flex-col items-center justify-center py-12 text-gray-500'>
+    <Icon className='h-12 w-12 mb-4 text-gray-300' />
+    <h3 className='text-lg font-medium text-gray-700 mb-2'>{title}</h3>
+    <p className='text-sm text-center max-w-sm leading-relaxed'>
+      {description}
+    </p>
+  </div>
+);
 
 const ChartOne = () => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
@@ -72,13 +120,12 @@ const ChartOne = () => {
       const dayOfMonth = date.getDate().toString().padStart(2, '0');
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
       return `${day} ${dayOfMonth}/${month}`;
-    } catch (error) {
-      // console.warn("Error formatting date:", error);
+    } catch {
       return dateString;
     }
   };
 
-  const fetchAttendanceMutation = useMutation({
+  const { mutate, ...fetchAttendanceMutation } = useMutation({
     mutationFn: async (): Promise<AttendanceRecord[]> => {
       const response = await api.get<AttendanceRecord[]>('attendance/trend', {
         withCredentials: true,
@@ -159,17 +206,13 @@ const ChartOne = () => {
   });
 
   useEffect(() => {
-    fetchAttendanceMutation.mutate();
-  }, []);
+    mutate();
+  }, [mutate]);
 
   // Error state helpers
   const isNoRecordsFound =
     fetchAttendanceMutation.isError &&
-    typeof fetchAttendanceMutation.error === 'object' &&
-    fetchAttendanceMutation.error !== null &&
-    'response' in fetchAttendanceMutation.error &&
-    // @ts-expect-error: error may be AxiosError
-    fetchAttendanceMutation.error.response?.status === 404;
+    (fetchAttendanceMutation.error as AxiosError)?.response?.status === 404;
 
   const hasError = fetchAttendanceMutation.isError && !isNoRecordsFound;
 
@@ -265,54 +308,6 @@ const ChartOne = () => {
     );
   };
 
-  const QuickStats = ({
-    averageAttendance,
-    maxAttendance,
-    averageRate,
-    totalSessions,
-  }: QuickStatsProps) => (
-    <div className='grid grid-cols-2 sm:grid-cols-3  mt-3 gap-3 text-sm '>
-      <div className='bg-blue-50 p-2 rounded-lg flex items-center gap-2 min-w-[120px]'>
-        <Users className='h-4 w-4 text-blue-600' />
-        <div>
-          <div className='font-medium text-blue-800'>Average</div>
-          <div className='text-blue-600'>{averageAttendance} students</div>
-        </div>
-      </div>
-      <div className='bg-green-50 p-2 rounded-lg flex items-center gap-2 min-w-[120px]'>
-        <TrendingUp className='h-4 w-4 text-green-600' />
-        <div>
-          <div className='font-medium text-green-800'>Highest</div>
-          <div className='text-green-600'>{maxAttendance} students</div>
-        </div>
-      </div>
-      <div className='bg-purple-50 p-2 rounded-lg flex items-center gap-2 min-w-[120px]'>
-        <Percent className='h-4 w-4 text-purple-600' />
-        <div>
-          <div className='font-medium text-purple-800'>Avg Rate</div>
-          <div className='text-purple-600'>{averageRate}%</div>
-        </div>
-      </div>
-      <div className='bg-gray-50 p-2 rounded-lg flex items-center gap-2 min-w-[120px]'>
-        <BarChart3 className='h-4 w-4 text-gray-600' />
-        <div>
-          <div className='font-medium text-gray-800'>Sessions</div>
-          <div className='text-gray-600'>{totalSessions}</div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const EmptyState = ({ title, description, icon: Icon }: EmptyStateProps) => (
-    <div className='flex flex-col items-center justify-center py-12 text-gray-500'>
-      <Icon className='h-12 w-12 mb-4 text-gray-300' />
-      <h3 className='text-lg font-medium text-gray-700 mb-2'>{title}</h3>
-      <p className='text-sm text-center max-w-sm leading-relaxed'>
-        {description}
-      </p>
-    </div>
-  );
-
   return (
     <div>
       <Card className='bg-white shadow-sm'>
@@ -361,7 +356,6 @@ const ChartOne = () => {
                 maxAttendance={filteredStats.maxAttendance}
                 averageRate={filteredStats.averageRate}
                 totalSessions={filteredStats.totalSessions}
-                isLoading={fetchAttendanceMutation.isPending}
               />
             )}
         </CardHeader>
