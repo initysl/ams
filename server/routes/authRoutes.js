@@ -4,7 +4,6 @@ const {
   login,
   resendVerificationEmail,
   verifyEmail,
-  resendVerificationEmail,
   forgotPassword,
   validateResetToken,
   resetPassword,

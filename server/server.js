@@ -11,12 +11,30 @@ const attendanceRoutes = require('./routes/attendanceRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 
-// Frontend url here
+// Frontend urls here (CLIENT_URL may hold a comma-separated list)
+const allowedOrigins = [
+  ...(process.env.CLIENT_URL || '')
+    .split(',')
+    .map((url) => url.trim().replace(/\/$/, ''))
+    .filter(Boolean),
+  'https://attendease.yusola.pro',
+  'https://www.attendease.yusola.pro',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
+
 const corsOptions = {
-  origin: process.env.CLIENT_URL,
+  origin(origin, callback) {
+    // Allow server-to-server / curl requests that send no Origin header
+    if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ''))) {
+      return callback(null, true);
+    }
+    return callback(null, false);
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 204,
 };
 app.set('trust proxy', 1);
 app.use(express.json());
@@ -31,7 +49,7 @@ app.use(
         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
-        connectSrc: ["'self'", process.env.CLIENT_URL],
+        connectSrc: ["'self'", ...allowedOrigins],
         fontSrc: [
           "'self'",
           'https://fonts.googleapis.com',
@@ -42,11 +60,16 @@ app.use(
         baseUri: ["'self'"],
       },
     },
+    // Static uploads/images are fetched from the frontend origin
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
   })
 );
 
-// Connect to Database
+// Connect to Database (never kills the process: a dead process means the
+// platform returns a 502 with no CORS headers, which masks the real error)
 connectDB();
+
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 // Routes
 app.use('/api/attendance', attendanceRoutes);

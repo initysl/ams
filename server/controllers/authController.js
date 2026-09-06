@@ -192,34 +192,6 @@ const login = asyncHandler(async (req, res) => {
   logger.info(`User signed in: ${user.email}`);
 });
 
-const resendVerificationEmail = asyncHandler(async (req, res) => {
-  const email = req.body?.email?.toLowerCase?.().trim?.();
-
-  if (!email) {
-    return res.status(400).json({ message: 'Email is required.' });
-  }
-
-  const user = await User.findOne({ email });
-
-  if (!user) {
-    return res.status(404).json({ message: 'No account found for this email.' });
-  }
-
-  if (user.isVerified) {
-    return res.status(200).json({ message: 'This email is already verified.' });
-  }
-
-  const token = jwt.sign({ id: user._id }, SECRET_KEY, {
-    expiresIn: '24h',
-  });
-
-  await sendVerificationEmail(user.email, token, user.name);
-
-  return res.status(200).json({
-    message: 'Verification email sent. Please check your inbox and spam folder.',
-  });
-});
-
 // Verify Email Address - Updated with welcome email option
 const verifyEmail = asyncHandler(async (req, res) => {
   const { token } = req.query;
@@ -570,7 +542,6 @@ module.exports = {
   resendVerificationEmail,
   verifyEmail,
   forgotPassword,
-  resendVerificationEmail,
   validateResetToken,
   resetPassword,
   logout,
