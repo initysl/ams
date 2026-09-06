@@ -11,33 +11,40 @@ const attendanceRoutes = require('./routes/attendanceRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 
-// Frontend url here
+// 1. Define CORS options
 const corsOptions = {
   origin: process.env.CLIENT_URL,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
+
 app.set('trust proxy', 1);
+
+// 2. Place CORS FIRST before parsing json or cookies
+app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors(corsOptions));
 app.use(morgan('dev'));
+
+// 3. Update Helmet to bypass cross-origin restrictions
 app.use(
   helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // <-- Add this line
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
-        connectSrc: ["'self'", process.env.CLIENT_URL],
+        connectSrc: ["'self'", process.env.CLIENT_URL, "https://railway.app"], // <-- Ensure backend self is allowed
         fontSrc: [
           "'self'",
           'https://fonts.googleapis.com',
-          'https://fonts.gstatic.com', // Google Fonts assets
+          'https://fonts.gstatic.com',
         ],
-        objectSrc: ["'none'"], // Prevents Flash, Java applets, etc. (security best practice)
+        objectSrc: ["'none'"],
         frameSrc: ["'none'"],
         baseUri: ["'self'"],
       },
