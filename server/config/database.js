@@ -2,6 +2,16 @@ const mongoose = require("mongoose");
 
 const RETRY_DELAY_MS = 5000;
 
+mongoose.connection.on("disconnected", () =>
+  console.error("Database disconnected")
+);
+mongoose.connection.on("reconnected", () =>
+  console.log("Database reconnected")
+);
+mongoose.connection.on("error", (err) =>
+  console.error("Database error:", err.message)
+);
+
 const connectDB = async () => {
   try {
     const connect = await mongoose.connect(process.env.MONGO_URI, {

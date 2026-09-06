@@ -15,8 +15,15 @@ const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console(), // Log to console
-    new winston.transports.File({ filename: 'app.log' }), // Log to file
+    // Hosted filesystems are ephemeral and can be read-only; in production the
+    // platform captures stdout, so the file transport only adds a failure mode.
+    ...(process.env.NODE_ENV === 'production'
+      ? []
+      : [new winston.transports.File({ filename: 'app.log' })]),
   ],
 });
+
+// A transport error must never take down the process.
+logger.on('error', (err) => console.error('Logger transport error:', err));
 
 module.exports = logger;
