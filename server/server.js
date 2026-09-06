@@ -45,8 +45,6 @@ app.use(
   })
 );
 
-// Connect to Database
-connectDB();
 
 // Routes
 app.use('/api/attendance', attendanceRoutes);
@@ -56,6 +54,23 @@ app.use('/api/user', userRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/images', express.static(path.join(__dirname, '/public/images')));
 
-// Server Start
-const PORT = process.env.PORT || 5060;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT || 5000;
+
+async function startServer() {
+  try {
+    console.log("CLIENT_URL:", process.env.CLIENT_URL);
+    console.log("NODE_ENV:", process.env.NODE_ENV);
+    console.log("PORT:", PORT);
+
+    await connectDB();
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+}
+
+startServer();
