@@ -1,8 +1,9 @@
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
 import {
+  ArrowLeft,
   BadgeHelp,
   ChevronRight,
   LogOut,
@@ -10,35 +11,24 @@ import {
   UserPen,
 } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { motion } from 'framer-motion';
+import {
+  applyProfileImageFallback,
+  resolveProfileImageUrl,
+} from '@/lib/profile-image';
 
 const Settings = () => {
   const { user, logout } = useAuth();
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isSmallMobile = useMediaQuery('(max-width: 480px)');
-  const [showMobileDialog, setShowMobileDialog] = useState(false);
-
   const location = useLocation();
-
-  // Detect route changes to open dialog on mobile
-  useEffect(() => {
-    if (isMobile && location.pathname !== '/dashboard/settings') {
-      setShowMobileDialog(true);
-    } else {
-      setShowMobileDialog(false);
-    }
-  }, [location, isMobile]);
-
-  // Function to get the correct image URL with cache busting
-  const getImageUrl = (profilePicture: string | null | undefined) => {
-    if (!profilePicture) {
-      const baseUrl = import.meta.env.VITE_API_URL.replace('/api/', '');
-      return `${baseUrl}/images/default.png`;
-    }
-    return profilePicture;
-  };
+  const navigate = useNavigate();
+  const mobileDetailOpen = isMobile && location.pathname !== '/dashboard/settings';
+  const mobilePathSegments = location.pathname.split('/').filter(Boolean);
+  const lastMobilePathSegment =
+    mobilePathSegments[mobilePathSegments.length - 1] || 'settings';
+  const mobileDetailTitle = lastMobilePathSegment.replace(/-/g, ' ');
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20, scale: 0.95 },
@@ -114,7 +104,7 @@ const Settings = () => {
               className={`relative ${isMobile ? 'mb-6' : 'mb-3'}`}
             >
               <img
-                src={getImageUrl(user?.profilePicture)}
+                src={resolveProfileImageUrl(user?.profilePicture)}
                 className={`
                   rounded-full object-cover ring-4 ring-white shadow-lg
                   ${
@@ -126,15 +116,7 @@ const Settings = () => {
                   }
                 `}
                 alt='Profile picture'
-                onError={(e) => {
-                  const baseUrl = import.meta.env.VITE_API_URL.replace(
-                    '/api/',
-                    ''
-                  );
-                  (
-                    e.target as HTMLImageElement
-                  ).src = `${baseUrl}/api/images/default.png?t=${Date.now()}`;
-                }}
+                onError={applyProfileImageFallback}
               />
               {/* Online indicator */}
               <div
@@ -204,6 +186,13 @@ const Settings = () => {
             <Separator
               className={`bg-gray-200 w-full ${isMobile ? 'mb-6' : 'mb-4'}`}
             />
+
+            {isMobile ? (
+              <div className='mb-5 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-left text-sm leading-6 text-blue-900'>
+                Tap a setting below to open its detail panel. Swipe down or use
+                the back button to return here.
+              </div>
+            ) : null}
 
             {/* Navigation Menu */}
             <nav className='w-full'>
@@ -446,11 +435,40 @@ const Settings = () => {
 
       {/* Mobile full-screen dialog */}
       {isMobile && (
-        <Dialog open={showMobileDialog} onOpenChange={setShowMobileDialog}>
-          {/* Readd h-full if continue overlapping */}
-          <DialogContent className='w-full space-y-8 m-0 p-0 overflow-y-auto bg-white border-none rounded-xl'>
-            <div className={`${isSmallMobile ? 'p-3' : 'p-4'}`}>
+        <Dialog
+          open={mobileDetailOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              navigate('/dashboard/settings');
+            }
+          }}
+        >
+          <DialogContent className='left-0 top-0 h-[100dvh] w-screen max-w-none translate-x-0 translate-y-0 overflow-hidden rounded-none border-none bg-white p-0 sm:max-w-none'>
+            <DialogTitle className='sr-only'>
+              {mobileDetailTitle} settings panel
+            </DialogTitle>
+            <div className='flex h-full flex-col'>
+              <div className='sticky top-0 z-10 border-b border-slate-200 bg-white/95 px-4 py-4 backdrop-blur-sm'>
+                <button
+                  type='button'
+                  onClick={() => navigate('/dashboard/settings')}
+                  className='inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50'
+                >
+                  <ArrowLeft className='h-4 w-4' />
+                  Back to settings
+                </button>
+                <div className='mt-4'>
+                  <p className='text-xs uppercase tracking-[0.18em] text-slate-500'>
+                    Settings detail
+                  </p>
+                  <h2 className='text-xl font-semibold capitalize text-slate-900'>
+                    {mobileDetailTitle}
+                  </h2>
+                </div>
+              </div>
+              <div className={`flex-1 overflow-y-auto ${isSmallMobile ? 'p-3' : 'p-4'}`}>
               <Outlet />
+              </div>
             </div>
           </DialogContent>
         </Dialog>

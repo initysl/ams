@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { Button } from '@/components/ui/button';
 import { useMutation } from '@tanstack/react-query';
@@ -66,6 +66,7 @@ const QRScanner: React.FC = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [scannedToken, setScannedToken] = useState<string>('');
   const [scannerActive, setScannerActive] = useState(false);
+  const [mobileActionsOpen, setMobileActionsOpen] = useState(false);
 
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
@@ -126,6 +127,7 @@ const QRScanner: React.FC = () => {
   const handleQRCodeScanned = (decodedText: string) => {
     setScanResult(decodedText);
     setScannedToken(decodedText);
+    setMobileActionsOpen(false);
     scanQRMutation.mutate(decodedText);
   };
 
@@ -162,20 +164,11 @@ const QRScanner: React.FC = () => {
           setIsLoading(false);
           handleQRCodeScanned(decodedText);
         },
-        // Debounce error toast to avoid rapid firing
-        (() => {
-          let lastToastTime = 0;
-          return () => {
-            const now = Date.now();
-            if (now - lastToastTime > 10000) {
-              toast.error('QR code not detected');
-              lastToastTime = now;
-            }
-          };
-        })(),
+        () => {},
       );
       setIsScanning(true);
       setScannerActive(true);
+      setMobileActionsOpen(false);
     } catch (err) {
       // console.error("Error starting scanner:", err);
       toast.error('Failed to start QR scanner.');
@@ -189,8 +182,15 @@ const QRScanner: React.FC = () => {
       await html5QrCodeRef.current.stop().catch(() => {});
       setIsScanning(false);
       setScannerActive(false);
+      setMobileActionsOpen(false);
     }
   };
+
+  const scannerGuidance = isLoading
+    ? 'Starting your camera. Hold your phone steady for a second.'
+    : isScanning
+    ? 'Point the camera at the lecturer QR code and keep it within the frame.'
+    : 'Open the scanner when you are ready, then align the QR code inside the frame.';
 
   // const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
   //   const file = e.target.files?.[0];
@@ -270,7 +270,7 @@ const QRScanner: React.FC = () => {
           <div className='grid sm:grid-cols-2 gap-8 items-center'>
             {/* Scanner Area */}
             <motion.div
-              className='flex justify-center'
+              className='flex flex-col items-center'
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
@@ -346,11 +346,15 @@ const QRScanner: React.FC = () => {
                   </div>
                 </div>
               </div>
+              <div className='mt-4 max-w-sm rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm leading-6 text-slate-600 shadow-sm'>
+                <p className='font-semibold text-slate-800'>Scanner guidance</p>
+                <p className='mt-1'>{scannerGuidance}</p>
+              </div>
             </motion.div>
 
             {/* Controls Panel */}
             <motion.div
-              className='space-y-6 hidden sm:flex'
+              className='hidden space-y-6 sm:flex sm:flex-col'
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
@@ -362,6 +366,9 @@ const QRScanner: React.FC = () => {
                 </CardHeader>
 
                 <CardContent className='grid gap-3'>
+                  <div className='rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600'>
+                    {scannerGuidance}
+                  </div>
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -411,7 +418,6 @@ const QRScanner: React.FC = () => {
           </div>
 
           {/* Cotrols Panel Mobile */}
-          {/* Mobile Controls Panel - FIXED VERSION */}
           <motion.div
             className='space-y-5 sm:hidden fixed bottom-5 right-5 z-50'
             initial={{
@@ -434,46 +440,78 @@ const QRScanner: React.FC = () => {
               right: '1.25rem',
             }}
           >
-            <div className='w-fit rounded-full bg-white/80 backdrop-blur-sm border border-white/50 p-2 shadow-lg'>
-              <div className='flex flex-col gap-3'>
-                {/* Scan/Stop Button */}
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    variant={isScanning ? 'destructive' : 'default'}
-                    onClick={isScanning ? stopScanner : startScanner}
-                    disabled={isLoading}
-                    className={`h-12 w-12 font-medium transition-all duration-300 rounded-full flex items-center justify-center ${
-                      isScanning
-                        ? 'bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/25'
-                        : 'bg-teal-500 hover:bg-teal-600 shadow-xl shadow-teal-500/25 text-white'
-                    }`}
-                  >
-                    {isScanning ? (
-                      <X className='w-5 h-5' />
-                    ) : (
-                      <>
-                        {isLoading ? (
-                          <Loader2 className='w-5 h-5 animate-spin' />
-                        ) : (
-                          <Camera className='w-5 h-5' />
-                        )}
-                      </>
-                    )}
-                  </Button>
-                </motion.div>
+            <div className='flex flex-col items-end gap-3'>
+              {mobileActionsOpen ? (
+                <div className='w-fit rounded-3xl border border-white/60 bg-white/90 p-3 shadow-2xl backdrop-blur-sm'>
+                  <div className='mb-2 px-1 text-right text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500'>
+                    Scanner actions
+                  </div>
+                  <div className='flex flex-col gap-2'>
+                    <motion.button
+                      type='button'
+                      onClick={() => {
+                        if (isScanning) {
+                          void stopScanner();
+                        } else {
+                          void startScanner();
+                        }
+                      }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      disabled={isLoading}
+                      className={`flex items-center gap-3 rounded-full px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all disabled:cursor-not-allowed disabled:opacity-80 ${
+                        isScanning
+                          ? 'bg-red-500 shadow-red-500/25'
+                          : 'bg-teal-500 shadow-teal-500/25'
+                      }`}
+                    >
+                      {isScanning ? (
+                        <X className='h-4 w-4' />
+                      ) : isLoading ? (
+                        <Loader2 className='h-4 w-4 animate-spin' />
+                      ) : (
+                        <Camera className='h-4 w-4' />
+                      )}
+                      <span>{isScanning ? 'Stop scanner' : 'Start scan'}</span>
+                    </motion.button>
 
-                {/* Attendance Records Button - FIXED VERSION */}
-                <motion.button
-                  onClick={() => navigate('/dashboard/attendance')} // Use navigate instead of Link
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className='h-12 w-12 bg-emerald-500 hover:bg-emerald-600 rounded-full shadow-xl hover:shadow-lg shadow-emerald-500/25 transition-all duration-300 flex items-center justify-center text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
-                >
-                  <CheckSquare className='w-5 h-5' />
-                </motion.button>
+                    <motion.button
+                      type='button'
+                      onClick={() => {
+                        setMobileActionsOpen(false);
+                        navigate('/dashboard/attendance');
+                      }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      className='flex items-center gap-3 rounded-full bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all'
+                    >
+                      <CheckSquare className='h-4 w-4' />
+                      <span>Attendance records</span>
+                    </motion.button>
+                  </div>
+                </div>
+              ) : null}
+
+              <motion.button
+                type='button'
+                onClick={() => setMobileActionsOpen((current) => !current)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`flex h-14 w-14 items-center justify-center rounded-full text-white shadow-2xl transition-all ${
+                  mobileActionsOpen || isScanning
+                    ? 'bg-slate-900 shadow-slate-900/30'
+                    : 'bg-teal-500 shadow-teal-500/30'
+                }`}
+                aria-label={mobileActionsOpen ? 'Close scanner actions' : 'Open scanner actions'}
+              >
+                {mobileActionsOpen ? (
+                  <X className='h-5 w-5' />
+                ) : (
+                  <Scan className='h-5 w-5' />
+                )}
+              </motion.button>
+              <div className='rounded-full bg-slate-900/80 px-3 py-1.5 text-[11px] font-medium text-white shadow-lg'>
+                {isScanning ? 'Scanner active' : 'Open actions'}
               </div>
             </div>
           </motion.div>

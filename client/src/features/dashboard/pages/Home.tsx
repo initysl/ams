@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   QrCode,
   FileBarChart,
@@ -16,6 +16,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import WelcomeBanner from '@/features/dashboard/components/WelcomeBanner';
 import ActivityFeed from '@/features/dashboard/components/ActivityFeed';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 const cardData = {
   cards: [
@@ -61,6 +62,7 @@ const cardData = {
 const Home: React.FC = () => {
   const { user } = useAuth();
   const [isFlipped, setIsFlipped] = useState(false);
+  const isTouchLayout = useMediaQuery('(hover: none), (pointer: coarse)');
   const MotionLink = motion(Link);
 
   return (
@@ -81,6 +83,11 @@ const Home: React.FC = () => {
               className='md:w-1/2 relative overflow-hidden'
               onMouseEnter={() => setIsFlipped(true)}
               onMouseLeave={() => setIsFlipped(false)}
+              onClick={() => {
+                if (isTouchLayout) {
+                  setIsFlipped((current) => !current);
+                }
+              }}
             >
               <div
                 className={`relative w-full h-full transform-style-preserve-3d transition-transform duration-700 ${
@@ -114,6 +121,11 @@ const Home: React.FC = () => {
                 Experience seamless attendance tracking with our advanced
                 QR-based system. Streamline attendance across all lecture
                 sessions with comprehensive analytics
+              </p>
+              <p className='text-sm font-medium text-slate-500'>
+                {isTouchLayout
+                  ? 'Tap the hero image to switch views.'
+                  : 'Hover over the hero image to reveal the alternate view.'}
               </p>
             </div>
           </div>

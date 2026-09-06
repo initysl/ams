@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import ProfileBox from "@/components/common/ProfileBox";
 import DeleteProfile from "./DeleteProfile";
 import { AdaptiveInput } from "@/components/common/AdaptiveInput";
+import { resolveProfileImageUrl } from "@/lib/profile-image";
 
 // Dynamic schema based on user role
 const createProfileSchema = (userRole: string | undefined) => {
@@ -52,6 +53,7 @@ type ProfileFields = {
 const Profile = () => {
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState<string>("");
+  const [imageVersion, setImageVersion] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const { user, refetchUser } = useAuth();
 
@@ -89,20 +91,6 @@ const Profile = () => {
   // Custom dirty state that considers both form changes and profile picture changes
   const hasUnsavedChanges = isDirty || profilePicture !== null;
 
-  // Function to get image URL with cache busting
-  const getImageUrl = (profilePicture: string | null | undefined) => {
-    if (!profilePicture) return "";
-
-    // For Cloudinary URLs, return as-is (they handle caching internally)
-    if (profilePicture.startsWith("http")) {
-      return profilePicture;
-    }
-
-    // Fallback for any legacy local files
-    const baseUrl = import.meta.env.VITE_API_URL.replace("/api/", "");
-    return `${baseUrl}${profilePicture}?t=${Date.now()}`;
-  };
-
   useEffect(() => {
     if (user) {
       const formData: ProfileFields = {
@@ -116,11 +104,11 @@ const Profile = () => {
       }
       reset(formData);
       // Set preview URL with cache busting if user has profile picture
-      if (user.profilePicture) {
-        setPreviewURL(getImageUrl(user.profilePicture));
-      }
+      setPreviewURL(
+        resolveProfileImageUrl(user.profilePicture, { cacheKey: imageVersion })
+      );
     }
-  }, [user, reset]);
+  }, [user, reset, imageVersion]);
 
   const updateMutation = useMutation({
     mutationFn: async (data: ProfileFields) => {
@@ -165,14 +153,10 @@ const Profile = () => {
 
         // Always refetch user data to get the latest profile info
         await refetchUser();
+        setImageVersion((current) => current + 1);
 
         // Clear the local profile picture state since we now have the updated user data
         setProfilePicture(null);
-
-        // Force update preview URL with new cache busting parameter
-        if (user?.profilePicture) {
-          setPreviewURL(getImageUrl(user.profilePicture));
-        }
       }
     },
     onError: (error: any) => {
@@ -214,6 +198,7 @@ const Profile = () => {
             key={previewURL} // Force re-render when preview URL changes
             profilePicture={previewURL}
             onImageChange={handleImageChange}
+            size="large"
           />
           <div className="text-center">
             <p className="text-xs text-gray-500 mt-1">JPG, PNG up to 5MB</p>
