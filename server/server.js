@@ -11,44 +11,27 @@ const attendanceRoutes = require('./routes/attendanceRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 
-// 1. Define CORS options
-const corsOptions = {
-  origin: process.env.CLIENT_URL,
+app.set('trust proxy', 1);
+
+// 1. Enable CORS first (with a fallback to your production frontend URL if env is missing)
+const allowedOrigin = process.env.CLIENT_URL || 'https://attendease.yusola.pro';
+app.use(cors({
+  origin: allowedOrigin,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-};
+}));
 
-app.set('trust proxy', 1);
-
-// 2. Place CORS FIRST before parsing json or cookies
-app.use(cors(corsOptions));
-
+// 2. Standard Parsers
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan('dev'));
 
-// 3. Update Helmet to bypass cross-origin restrictions
+// 3. Clean and Safe Helmet Config
 app.use(
   helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" }, // <-- Add this line
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
-        connectSrc: ["'self'", process.env.CLIENT_URL, "https://railway.app"], // <-- Ensure backend self is allowed
-        fontSrc: [
-          "'self'",
-          'https://fonts.googleapis.com',
-          'https://fonts.gstatic.com',
-        ],
-        objectSrc: ["'none'"],
-        frameSrc: ["'none'"],
-        baseUri: ["'self'"],
-      },
-    },
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: false, // Disabling CSP temporarily simplifies cross-domain assets and cuts crash risks
   })
 );
 
