@@ -31,6 +31,10 @@ import { Link, NavLink } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
+import {
+  applyProfileImageFallback,
+  resolveProfileImageUrl,
+} from '@/lib/profile-image';
 // import logo from "/at.svg";
 
 export function AppSidebar() {
@@ -54,15 +58,6 @@ export function AppSidebar() {
     if (isMobile) {
       setOpenMobile(false);
     }
-  };
-
-  // Get profile picture URL
-  const getImageUrl = (profilePicture: string | null | undefined) => {
-    if (!profilePicture) {
-      const baseUrl = import.meta.env.VITE_API_URL.replace('/api/', '');
-      return `${baseUrl}/images/default.png`;
-    }
-    return profilePicture;
   };
 
   if (!user) return null;
@@ -164,28 +159,26 @@ export function AppSidebar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className='flex items-center gap-3 px-3 py-3 rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-colors duration-150'>
-                <div className='relative w-9 h-9 shrink-0'>
+                <div className='relative h-11 w-11 shrink-0'>
                   <img
-                    src={getImageUrl(user?.profilePicture)}
-                    className='w-9 h-9 rounded-full object-cover ring-2 ring-slate-200'
+                    src={resolveProfileImageUrl(user?.profilePicture)}
+                    className='h-11 w-11 rounded-full object-cover ring-2 ring-slate-200'
                     alt='Profile picture'
-                    onError={(e) => {
-                      const baseUrl = import.meta.env.VITE_API_URL.replace(
-                        '/api/',
-                        '',
-                      );
-                      (e.target as HTMLImageElement).src =
-                        `${baseUrl}/api/images/default.png?t=${Date.now()}`;
-                    }}
+                    onError={applyProfileImageFallback}
                   />
                   {/* Online indicator */}
                   <div className='absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full ring-2 ring-white'></div>
                 </div>
                 <div className='flex-1 min-w-0'>
-                  <div className='text-sm font-medium text-slate-900 truncate'>
+                  <div className='text-sm font-semibold text-slate-900 truncate'>
                     {user.name}
                   </div>
-                  <div className='text-xs text-slate-500 truncate capitalize'>
+                  <div className='text-xs text-slate-500 truncate'>
+                    {user.role === 'student'
+                      ? user.matricNumber || 'Student'
+                      : user.email}
+                  </div>
+                  <div className='text-[11px] text-slate-400 truncate capitalize'>
                     {user.role}
                   </div>
                 </div>

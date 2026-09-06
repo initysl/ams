@@ -2,6 +2,7 @@ const express = require("express");
 const {
   register,
   login,
+  resendVerificationEmail,
   verifyEmail,
   resendVerificationEmail,
   forgotPassword,
@@ -44,6 +45,7 @@ router.post(
   register
 );
 router.post("/login", validateLogin, loginLimiter, login);
+router.post("/resend-verification", resendVerificationEmail);
 router.get("/verify", verifyEmail);
 router.post("/resend-verification", validateEmailRequest, resendVerificationEmail);
 router.post("/logout", authMiddleware, logout);

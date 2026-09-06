@@ -1,17 +1,17 @@
-import { useForm, Controller } from 'react-hook-form';
-import { useAuth } from '@/context/AuthContext';
-import { useEffect, useState } from 'react';
-import { EyeIcon, EyeOff, Loader } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import api from '@/lib/axios';
-import { toast } from 'sonner';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
-import ProfileBox from '@/components/common/ProfileBox';
-import DeleteProfile from './DeleteProfile';
-import { AdaptiveInput } from '@/components/common/AdaptiveInput';
-import { asApiError, getApiErrorMessage } from '@/lib/api-error';
+import { useForm, Controller } from "react-hook-form";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect, useState } from "react";
+import { EyeIcon, EyeOff, Loader } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import api from "@/lib/axios";
+import { toast } from "sonner";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import ProfileBox from "@/components/common/ProfileBox";
+import DeleteProfile from "./DeleteProfile";
+import { AdaptiveInput } from "@/components/common/AdaptiveInput";
+import { resolveProfileImageUrl } from "@/lib/profile-image";
 
 // Dynamic schema based on user role
 const createProfileSchema = (userRole: string | undefined) => {
@@ -52,7 +52,8 @@ type ProfileFields = {
 
 const Profile = () => {
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [previewURL, setPreviewURL] = useState<string>('');
+  const [previewURL, setPreviewURL] = useState<string>("");
+  const [imageVersion, setImageVersion] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const { user, refetchUser } = useAuth();
 
@@ -90,20 +91,6 @@ const Profile = () => {
   // Custom dirty state that considers both form changes and profile picture changes
   const hasUnsavedChanges = isDirty || profilePicture !== null;
 
-  // Function to get image URL with cache busting
-  const getImageUrl = (profilePicture: string | null | undefined) => {
-    if (!profilePicture) return '';
-
-    // For Cloudinary URLs, return as-is (they handle caching internally)
-    if (profilePicture.startsWith('http')) {
-      return profilePicture;
-    }
-
-    // Fallback for any legacy local files
-    const baseUrl = import.meta.env.VITE_API_URL.replace('/api/', '');
-    return `${baseUrl}${profilePicture}`;
-  };
-
   useEffect(() => {
     if (user) {
       const formData: ProfileFields = {
@@ -116,8 +103,12 @@ const Profile = () => {
         formData.matricNumber = user.matricNumber || '';
       }
       reset(formData);
+      // Set preview URL with cache busting if user has profile picture
+      setPreviewURL(
+        resolveProfileImageUrl(user.profilePicture, { cacheKey: imageVersion })
+      );
     }
-  }, [user, reset]);
+  }, [user, reset, imageVersion]);
 
   const updateMutation = useMutation({
     mutationFn: async (data: ProfileFields) => {
@@ -153,7 +144,18 @@ const Profile = () => {
     onSuccess: async (data) => {
       if (data.message?.includes('Verification email sent')) {
         toast.success(data.message);
-        return;
+      } else {
+        toast.success("Profile updated successfully!");
+
+        // Wait a moment for the server to process the image
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        // Always refetch user data to get the latest profile info
+        await refetchUser();
+        setImageVersion((current) => current + 1);
+
+        // Clear the local profile picture state since we now have the updated user data
+        setProfilePicture(null);
       }
 
       toast.success('Profile updated successfully!');
@@ -207,6 +209,7 @@ const Profile = () => {
             key={previewURL || user?.profilePicture || 'profile-picture'}
             profilePicture={previewURL || getImageUrl(user?.profilePicture)}
             onImageChange={handleImageChange}
+            size="large"
           />
           <div className='text-center'>
             <p className='text-xs text-gray-500 mt-1'>JPG, PNG up to 5MB</p>

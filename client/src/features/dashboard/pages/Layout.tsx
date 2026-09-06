@@ -1,28 +1,23 @@
-import { AppSidebar } from '@/components/layout/AppSidebar';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronRight, User } from 'lucide-react';
+import { AppSidebar } from "@/components/layout/AppSidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
 
 import { useAuth } from '@/context/AuthContext';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from "@/components/ui/tooltip";
+import {
+  applyProfileImageFallback,
+  resolveProfileImageUrl,
+} from "@/lib/profile-image";
 
 const Layout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-
-  // Get profile picture URL
-  const getImageUrl = (profilePicture: string | null | undefined) => {
-    if (!profilePicture) {
-      const baseUrl = import.meta.env.VITE_API_URL.replace('/api/', '');
-      return `${baseUrl}/images/default.png`;
-    }
-    return profilePicture;
-  };
 
   // Generate breadcrumbs from current path
   const generateBreadcrumbs = () => {
@@ -146,30 +141,18 @@ const Layout: React.FC = () => {
 
               {/* User Info */}
               <div>
-                <div className='flex items-center gap-2 md:bg-slate-100 text-slate-500 px-3 py-1.5 rounded-md mr-2'>
-                  <div className='w-8 h-8 md:w-4 md:h-4 flex items-center justify-center'>
+                <div className="mr-2 flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-500 shadow-sm md:min-w-[220px]">
+                  <div className="flex h-10 w-10 items-center justify-center">
                     <Tooltip>
                       <TooltipTrigger>
-                        {user?.profilePicture ? (
-                          <div className='relative shrink-0'>
-                            <img
-                              src={getImageUrl(user?.profilePicture)}
-                              className='w-8 h-8 md:w-4 md:h-4 rounded-full object-cover ring-1 ring-slate-300'
-                              alt='Profile picture'
-                              onError={(e) => {
-                                const baseUrl =
-                                  import.meta.env.VITE_API_URL.replace(
-                                    '/api/',
-                                    '',
-                                  );
-                                (e.target as HTMLImageElement).src =
-                                  `${baseUrl}/images/default.png`;
-                              }}
-                            />
-                          </div>
-                        ) : (
-                          <User size={16} />
-                        )}
+                        <div className="relative flex-shrink-0">
+                          <img
+                            src={resolveProfileImageUrl(user?.profilePicture)}
+                            className="h-10 w-10 rounded-full object-cover ring-2 ring-slate-200"
+                            alt="Profile picture"
+                            onError={applyProfileImageFallback}
+                          />
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent
                         side='top'
@@ -177,15 +160,23 @@ const Layout: React.FC = () => {
                         sideOffset={0}
                         className='md:hidden bg-slate-200 rounded-lg px-3 py-2'
                       >
-                        <span className='text-xs font-medium text-slate-500'>
-                          {user?.matricNumber || user?.name}
+                        <span className="text-xs font-medium text-slate-500">
+                          {user?.name}
                         </span>
                       </TooltipContent>
                     </Tooltip>
                   </div>
-                  <div className='hidden md:block text-left'>
-                    <div className='text-sm  text-slate-500 '>
-                      {user?.matricNumber || user?.email}
+                  <div className="hidden min-w-0 md:block text-left">
+                    <div className="truncate text-sm font-semibold text-slate-900">
+                      {user?.name}
+                    </div>
+                    <div className="truncate text-xs text-slate-500">
+                      {user?.role === "student"
+                        ? user?.matricNumber || user?.email
+                        : user?.email}
+                    </div>
+                    <div className="truncate text-[11px] uppercase tracking-[0.16em] text-slate-400">
+                      {user?.role}
                     </div>
                   </div>
                 </div>
